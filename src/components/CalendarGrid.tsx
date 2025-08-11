@@ -1,0 +1,1237 @@
+import React, { useRef, useEffect, useState } from 'react';
+import { CalendarGridProps, Event as CalendarEvent } from '../types';
+import { 
+  getMonthDays, 
+  getWeekDays, 
+  isToday, 
+  isSelected, 
+  isCurrentMonth, 
+  getDayName, 
+  getEventsForDate, 
+  getTasksForDate,
+  getYearMonths,
+  getMonthEvents,
+  getMonthTasks,
+  formatDate,
+  formatTime
+} from '../utils/dateUtils';
+import { Circle, CheckCircle, Clock, Plus, Edit, Trash2 } from 'lucide-react';
+import clsx from 'clsx';
+import ContextMenu, { ContextMenuItem } from './ContextMenu';
+
+// Live Time Indicator Component
+const LiveTimeIndicator: React.FC<{ timeSlots: Date[] }> = ({ timeSlots }) => {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Find the closest time slot to current time
+  const currentHour = currentTime.getHours();
+  const currentMinute = currentTime.getMinutes();
+  
+  // Find the time slot that matches the current hour
+  const currentTimeSlot = timeSlots.find(time => time.getHours() === currentHour);
+  
+  if (!currentTimeSlot) return null;
+
+  // Calculate position based on current time within the hour
+  const timeSlotIndex = timeSlots.findIndex(time => time.getHours() === currentHour);
+  const topPosition = timeSlotIndex * 96; // 96px per hour (h-24)
+  
+  // Adjust position within the hour based on minutes
+  const minuteOffset = (currentMinute / 60) * 96; // 96px per hour
+  const finalTopPosition = topPosition + minuteOffset;
+
+  return (
+    <div 
+      className="absolute left-0 right-0 z-20 pointer-events-none"
+      style={{ top: `${finalTopPosition}px` }}
+    >
+      {/* Red line */}
+      <div className="h-0.5 bg-red-500 w-full"></div>
+      {/* Red dot */}
+      <div className="absolute -left-1 -top-1 w-2 h-2 bg-red-500 rounded-full"></div>
+      {/* Time label */}
+      <div className="absolute -left-16 top-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
+        {formatTime(currentTime)}
+      </div>
+    </div>
+  );
+};
+
+const CalendarGrid: React.FC<CalendarGridProps> = ({
+  currentDate,
+  selectedDate,
+  onDateSelect,
+  events,
+  tasks,
+  view,
+  onEventEdit,
+  onEventDelete,
+  onTaskEdit,
+  onTaskDelete,
+  onEventCreate,
+  onTaskCreate
+}) => {
+  const [localCurrentDate, setLocalCurrentDate] = useState(currentDate);
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const timeGridRef = useRef<HTMLDivElement>(null);
+  
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{
+    isOpen: boolean;
+    x: number;
+    y: number;
+    type: 'empty' | 'event' | 'task';
+    data?: any;
+  }>({
+    isOpen: false,
+    x: 0,
+    y: 0,
+    type: 'empty'
+  });
+
+
+
+  // Event dragging state
+  const [eventDrag, setEventDrag] = useState<{
+    isActive: boolean;
+    event: CalendarEvent | null;
+    originalStartDate: Date | null;
+    originalEndDate: Date | null;
+    offsetX: number;
+    offsetY: number;
+    dragStartDate: Date | null;
+    dragStartHour: number | null;
+  }>({
+    isActive: false,
+    event: null,
+    originalStartDate: null,
+    originalEndDate: null,
+    offsetX: 0,
+    offsetY: 0,
+    dragStartDate: null,
+    dragStartHour: null
+  });
+
+  // Scroll to 6 AM on mount
+  useEffect(() => {
+    if (view === 'week' && timeGridRef.current) {
+      const scrollToHour = 6; // 6 AM
+      const timeSlotHeight = 24; // 24px per 15-minute slot
+      const slotsPerHour = 4; // 4 slots per hour (15 minutes each)
+      const scrollPosition = scrollToHour * slotsPerHour * timeSlotHeight;
+      
+      timeGridRef.current.scrollTop = scrollPosition;
+    }
+  }, [view]);
+
+  // Handle mouse wheel events for calendar scrolling
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (!calendarRef.current || !timeGridRef.current) return;
+
+      const rect = calendarRef.current.getBoundingClientRect();
+      const isInCalendar = e.clientX >= rect.left && e.clientX <= rect.right && 
+                          e.clientY >= rect.top && e.clientY <= rect.bottom;
+
+      if (isInCalendar) {
+        // Prevent page scroll when in calendar
+        e.preventDefault();
+        
+        const scrollContainer = timeGridRef.current;
+        const currentScrollTop = scrollContainer.scrollTop;
+        const maxScrollTop = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+        
+        // Check if we're at the bottom (23:59) and trying to scroll down
+        if (currentScrollTop >= maxScrollTop && e.deltaY > 0) {
+          // Allow page to scroll when at bottom of calendar
+          return;
+        }
+        
+        // Check if we're at the top (00:00) and trying to scroll up
+        if (currentScrollTop <= 0 && e.deltaY < 0) {
+          // Allow page to scroll when at top of calendar
+          return;
+        }
+        
+        // Scroll the calendar
+        scrollContainer.scrollTop += e.deltaY;
+      }
+    };
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (eventDrag.isActive) {
+        handleEventMouseMove(e as any);
+      }
+    };
+
+    const handleGlobalMouseUp = (e: MouseEvent) => {
+      if (eventDrag.isActive) {
+        handleEventMouseUp(e as any);
+      }
+    };
+
+    document.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    
+    return () => {
+      document.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [eventDrag.isActive]);
+
+  // Context menu handlers
+  const handleContextMenu = (e: React.MouseEvent, type: 'empty' | 'event' | 'task', data?: any) => {
+    e.preventDefault();
+    setContextMenu({
+      isOpen: true,
+      x: e.clientX,
+      y: e.clientY,
+      type,
+      data
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu(prev => ({ ...prev, isOpen: false }));
+  };
+
+
+
+
+
+  const getContextMenuItems = (): ContextMenuItem[] => {
+    // Handle regular context menu
+    switch (contextMenu.type) {
+      case 'empty':
+        return [
+          {
+            id: 'create-event',
+            label: 'Create Event',
+            icon: <Plus className="w-4 h-4" />,
+            onClick: () => {
+              if (!onEventCreate) return;
+              const payload = contextMenu.data;
+              // Support both Date (timed slot) and { date, allDay } payloads
+              if (payload instanceof Date) {
+                const start = new Date(payload);
+                const end = new Date(payload);
+                end.setHours(end.getHours() + 1);
+                const evt = {
+                  id: `event-${Date.now()}`,
+                  title: 'New Event',
+                  description: '',
+                  startDate: start,
+                  endDate: end,
+                  color: '#0ea5e9',
+                  isAllDay: false
+                } as CalendarEvent;
+                onEventCreate(evt);
+              } else if (payload && payload.date) {
+                const baseDate = new Date(payload.date);
+                const start = new Date(baseDate);
+                start.setHours(0, 0, 0, 0);
+                const end = new Date(baseDate);
+                end.setHours(23, 59, 59, 999);
+                const evt = {
+                  id: `event-${Date.now()}`,
+                  title: 'New Daily Event',
+                  description: '',
+                  startDate: start,
+                  endDate: end,
+                  color: '#0ea5e9',
+                  isAllDay: true
+                } as CalendarEvent;
+                onEventCreate(evt);
+              }
+            }
+          },
+          {
+            id: 'create-task',
+            label: 'Create Task',
+            icon: <CheckCircle className="w-4 h-4" />,
+            onClick: () => {
+              if (onTaskCreate && contextMenu.data) {
+                const payload = contextMenu.data;
+                const dateArg = payload && payload.date ? new Date(payload.date) : payload;
+                if (dateArg instanceof Date) {
+                  onTaskCreate(dateArg);
+                }
+              }
+            }
+          }
+        ];
+      
+      case 'event':
+        return [
+          {
+            id: 'edit-event',
+            label: 'Edit Event',
+            icon: <Edit className="w-4 h-4" />,
+            onClick: () => {
+              if (onEventEdit && contextMenu.data) {
+                onEventEdit(contextMenu.data);
+              }
+            }
+          },
+          {
+            id: 'delete-event',
+            label: 'Delete Event',
+            icon: <Trash2 className="w-4 h-4" />,
+            onClick: () => {
+              if (onEventDelete && contextMenu.data) {
+                onEventDelete(contextMenu.data.id);
+              }
+            }
+          }
+        ];
+      
+      case 'task':
+        return [
+          {
+            id: 'edit-task',
+            label: 'Edit Task',
+            icon: <Edit className="w-4 h-4" />,
+            onClick: () => {
+              if (onTaskEdit && contextMenu.data) {
+                onTaskEdit(contextMenu.data);
+              }
+            }
+          },
+          {
+            id: 'delete-task',
+            label: 'Delete Task',
+            icon: <Trash2 className="w-4 h-4" />,
+            onClick: () => {
+              if (onTaskDelete && contextMenu.data) {
+                onTaskDelete(contextMenu.data.id);
+              }
+            }
+          }
+        ];
+      
+      default:
+        return [];
+    }
+  };
+
+
+
+
+
+
+
+  // Event dragging handlers
+  const handleEventMouseDown = (e: React.MouseEvent, event: CalendarEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const rect = timeGridRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    setEventDrag({
+      isActive: true,
+      event,
+      originalStartDate: new Date(event.startDate),
+      originalEndDate: new Date(event.endDate),
+      offsetX: e.clientX - rect.left,
+      offsetY: e.clientY - rect.top,
+      dragStartDate: new Date(event.startDate),
+      dragStartHour: new Date(event.startDate).getHours()
+    });
+  };
+
+  const handleEventMouseMove = (e: React.MouseEvent) => {
+    if (!eventDrag.isActive || !timeGridRef.current || !eventDrag.event) return;
+
+    const rect = timeGridRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top + timeGridRef.current.scrollTop;
+
+    // Calculate new day and hour
+    const dayWidth = (rect.width - 80) / 7;
+    const hourHeight = 96;
+    
+    // Calculate day index - need to account for 80px time column
+    let dayIndex = Math.floor((x - 80) / dayWidth);
+    let hourIndex = Math.floor(y / hourHeight);
+    
+    // Clamp indices
+    dayIndex = Math.max(0, Math.min(6, dayIndex));
+    hourIndex = Math.max(0, Math.min(23, hourIndex));
+
+    const weekDays = getWeekDays(localCurrentDate);
+    const newStartDay = weekDays[dayIndex];
+    
+    // Calculate duration in hours
+    const originalStart = new Date(eventDrag.originalStartDate!);
+    const originalEnd = new Date(eventDrag.originalEndDate!);
+    const durationMs = originalEnd.getTime() - originalStart.getTime();
+    const durationHours = Math.ceil(durationMs / (60 * 60 * 1000));
+    
+    // Create new start and end times
+    const newStartTime = new Date(newStartDay);
+    newStartTime.setHours(hourIndex, 0, 0, 0);
+    
+    const newEndTime = new Date(newStartTime);
+    newEndTime.setHours(hourIndex + durationHours, 0, 0, 0);
+    
+    // Update the event drag state with new position for visual feedback
+    setEventDrag(prev => ({
+      ...prev,
+      dragStartDate: newStartDay,
+      dragStartHour: hourIndex
+    }));
+  };
+
+  const handleEventMouseUp = (e: React.MouseEvent) => {
+    if (!eventDrag.isActive || !eventDrag.event) return;
+
+    const rect = timeGridRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top + (timeGridRef.current?.scrollTop || 0);
+
+    // Calculate final position
+    const dayWidth = (rect.width - 80) / 7;
+    const hourHeight = 96;
+    
+    // Calculate day index - need to account for 80px time column
+    let dayIndex = Math.floor((x - 80) / dayWidth);
+    let hourIndex = Math.floor(y / hourHeight);
+    
+    dayIndex = Math.max(0, Math.min(6, dayIndex));
+    hourIndex = Math.max(0, Math.min(23, hourIndex));
+
+    const weekDays = getWeekDays(localCurrentDate);
+    const newStartDay = weekDays[dayIndex];
+    
+    // Calculate duration
+    const originalStart = new Date(eventDrag.originalStartDate!);
+    const originalEnd = new Date(eventDrag.originalEndDate!);
+    const durationMs = originalEnd.getTime() - originalStart.getTime();
+    const durationHours = Math.ceil(durationMs / (60 * 60 * 1000));
+    
+    // Create new times
+    const newStartTime = new Date(newStartDay);
+    newStartTime.setHours(hourIndex, 0, 0, 0);
+    
+    const newEndTime = new Date(newStartTime);
+    newEndTime.setHours(hourIndex + durationHours, 0, 0, 0);
+    
+    // Update the event via the callback
+    if (onEventEdit) {
+      const updatedEvent = {
+        ...eventDrag.event,
+        startDate: newStartTime,
+        endDate: newEndTime
+      };
+      onEventEdit(updatedEvent);
+    }
+    
+    // Reset event drag state
+    setEventDrag({
+      isActive: false,
+      event: null,
+      originalStartDate: null,
+      originalEndDate: null,
+      offsetX: 0,
+      offsetY: 0,
+      dragStartDate: null,
+      dragStartHour: null
+    });
+  };
+
+  const renderDayCell = (date: Date) => {
+    const dayEvents = getEventsForDate(events, date);
+    const dayTasks = getTasksForDate(tasks, date);
+    const isCurrentMonthDay = isCurrentMonth(date, currentDate);
+    const isTodayDay = isToday(date);
+    const isSelectedDay = isSelected(date, selectedDate);
+
+    return (
+      <div
+        key={date.toISOString()}
+        onClick={() => onDateSelect(date)}
+        onDoubleClick={() => {
+          // Double click to open day view
+          if (onDateSelect) {
+            onDateSelect(date, true);
+          }
+        }}
+        onContextMenu={(e) => handleContextMenu(e, 'empty', date)}
+        className={clsx(
+          'calendar-day relative',
+          isTodayDay && 'today',
+          isSelectedDay && 'selected',
+          !isCurrentMonthDay && 'other-month'
+        )}
+      >
+        {/* Day number */}
+        <div className="flex items-center justify-between mb-2">
+          <span className={clsx(
+            'text-sm font-medium',
+            isTodayDay && 'text-primary-600 font-bold',
+            isSelectedDay && 'text-primary-700'
+          )}>
+            {date.getDate()}
+          </span>
+          
+          {/* Event indicator */}
+          {dayEvents.length > 0 && (
+            <div className="flex space-x-1">
+              {dayEvents.slice(0, 3).map((event, index) => (
+                <div
+                  key={index}
+                  className="event-dot"
+                  style={{ backgroundColor: event.color }}
+                />
+              ))}
+              {dayEvents.length > 3 && (
+                <span className="text-xs text-gray-500">+{dayEvents.length - 3}</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Events preview */}
+        <div className="space-y-1">
+          {dayEvents.slice(0, 2).map((event) => (
+            <div
+              key={event.id}
+              className="text-xs p-1 rounded truncate cursor-pointer"
+              style={{ 
+                backgroundColor: `${event.color}20`,
+                color: event.color,
+                borderLeft: `3px solid ${event.color}`
+              }}
+              onContextMenu={(e) => {
+                e.stopPropagation();
+                handleContextMenu(e, 'event', event);
+              }}
+            >
+              {event.title}
+            </div>
+          ))}
+        </div>
+
+        {/* Tasks preview */}
+        <div className="mt-2 space-y-1">
+          {dayTasks.slice(0, 2).map((task) => (
+            <div
+              key={task.id}
+              className={clsx(
+                'flex items-center space-x-1 text-xs cursor-pointer',
+                task.completed ? 'text-gray-400' : 'text-gray-700'
+              )}
+              onContextMenu={(e) => {
+                e.stopPropagation();
+                handleContextMenu(e, 'task', task);
+              }}
+            >
+              {task.completed ? (
+                <CheckCircle className="w-3 h-3 text-green-500" />
+              ) : (
+                <Circle className="w-3 h-3 text-gray-400" />
+              )}
+              <span className={clsx(
+                'truncate',
+                task.completed && 'line-through'
+              )}>
+                {task.title}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderWeekView = () => {
+    const weekDays = getWeekDays(localCurrentDate);
+    const timeSlots: Date[] = [];
+    
+    // Generate time slots from 00:00 to 23:00 (hour-level only)
+    for (let hour = 0; hour < 24; hour++) {
+      const time = new Date();
+      time.setHours(hour, 0, 0, 0);
+      timeSlots.push(time);
+    }
+    
+    return (
+      <div ref={calendarRef} className="bg-white shadow-soft rounded-xl overflow-hidden">
+        {/* Week header - fixed */}
+        <div className="sticky-header bg-gray-50">
+          <div className="flex">
+            <div className="w-20 bg-gray-50 p-3"></div>
+            {weekDays.map((date) => (
+              <div
+                key={date.toISOString()}
+                className={clsx(
+                  'flex-1 bg-gray-50 p-3 text-center',
+                  isToday(date) && 'bg-primary-50'
+                )}
+              >
+                <div className="text-sm font-medium text-gray-600">
+                  {getDayName(date)}
+                </div>
+                <div className={clsx(
+                  'text-lg font-bold',
+                  isToday(date) ? 'text-primary-600' : 'text-gray-900'
+                )}>
+                  {date.getDate()}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Time grid - scrollable */}
+        <div 
+          ref={timeGridRef}
+          className="calendar-week-grid relative max-h-[600px] overflow-y-auto calendar-scroll"
+        >
+          {/* Live time indicator */}
+          <LiveTimeIndicator timeSlots={timeSlots} />
+
+
+
+
+
+          {/* Event drag preview */}
+          {eventDrag.isActive && eventDrag.event && eventDrag.dragStartDate && eventDrag.dragStartHour !== null && (
+            <div
+              className="absolute z-25 pointer-events-none bg-blue-600 bg-opacity-30 border-2 border-blue-600 rounded"
+              style={{
+                left: `${80 + weekDays.findIndex(day => day.toDateString() === eventDrag.dragStartDate!.toDateString()) * ((timeGridRef.current?.getBoundingClientRect().width || 800) - 80) / 7}px`,
+                top: `${eventDrag.dragStartHour! * 96}px`,
+                width: `${((timeGridRef.current?.getBoundingClientRect().width || 800) - 80) / 7}px`,
+                height: `${Math.ceil((new Date(eventDrag.originalEndDate!).getTime() - new Date(eventDrag.originalStartDate!).getTime()) / (60 * 60 * 1000)) * 96}px`
+              }}
+            >
+              <div className="absolute top-1 left-1 text-xs text-blue-800 font-medium bg-white bg-opacity-80 px-1 rounded">
+                {eventDrag.event.title}
+              </div>
+            </div>
+          )}
+
+          {/* Time column - sticky */}
+          <div className="w-20 bg-gray-50 sticky-time-column border-r border-gray-300">
+            {timeSlots.map((time, index) => (
+              <div
+                key={index}
+                className="h-24 flex items-center justify-end pr-2 bg-gray-50"
+              >
+                <span className="text-xs text-gray-500 font-medium">
+                  {formatTime(time)}
+                </span>
+              </div>
+            ))}
+          </div>
+          
+          {/* Day columns */}
+          {weekDays.map((date) => (
+            <div key={date.toISOString()} className="bg-white relative border-l border-gray-300">
+              {timeSlots.map((time, index) => (
+                <div
+                  key={index}
+                  className="h-24 relative group cursor-pointer hover:bg-gray-50 transition-colors duration-150 border-b border-gray-300"
+
+                  onClick={(e) => {
+                    // Create event at clicked time - only hour increments
+                    const clickedTime = new Date(date);
+                    clickedTime.setHours(time.getHours(), 0, 0, 0);
+                    
+                    // Trigger event creation
+                    if (onDateSelect) {
+                      onDateSelect(clickedTime);
+                    }
+                  }}
+                  onContextMenu={(e) => {
+                    const clickedTime = new Date(date);
+                    clickedTime.setHours(time.getHours(), 0, 0, 0);
+                    handleContextMenu(e, 'empty', clickedTime);
+                  }}
+                >
+
+                  
+                  {/* Events for this time slot */}
+          {events.map((event) => {
+              const eventStart = new Date(event.startDate);
+              const eventEnd = new Date(event.endDate);
+              
+              // Only render in the start cell of the event
+              const isStartCell = (
+                eventStart.toDateString() === date.toDateString() &&
+                time.getHours() === eventStart.getHours()
+              );
+              
+              if (!isStartCell) return null;
+              
+              const durationHours = Math.max(
+                1,
+                Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 60 * 1000))
+              );
+              return (
+                <div
+                  key={event.id}
+                  className={`absolute left-1 right-1 rounded text-xs p-1 overflow-hidden cursor-move ${
+                    eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
+                  }`}
+                  style={{ 
+                    top: `4px`,
+                    height: `${durationHours * 96 - 8}px`,
+                    backgroundColor: `${event.color}20`,
+                    color: event.color,
+                    borderLeft: `3px solid ${event.color}`,
+                    zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5
+                  }}
+                  onMouseDown={(e) => handleEventMouseDown(e, event)}
+                  onContextMenu={(e) => {
+                    e.stopPropagation();
+                    handleContextMenu(e, 'event', event);
+                  }}
+                >
+                  <div className="font-medium truncate">{event.title}</div>
+                  <div className="text-xs opacity-75 truncate">
+                    {formatTime(eventStart)} - {formatTime(eventEnd)}
+                  </div>
+                </div>
+              );
+            })}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderDayView = () => {
+    const dayEvents = getEventsForDate(events, selectedDate);
+    const dayTasks = getTasksForDate(tasks, selectedDate);
+    const dailyEvents = dayEvents.filter(evt => evt.isAllDay);
+    const timedEvents = dayEvents.filter(evt => !evt.isAllDay);
+
+    // Layout config: an odd number so we have a clear middle column
+    const totalCols = 13;
+    const centerCol = Math.ceil(totalCols / 2);
+    const rowCapacity = totalCols; // one item per column
+
+    // Distribute daily events into 4 rows, filling each row center-out before moving to the next
+    const rows: CalendarEvent[][] = [[], [], [], []];
+    dailyEvents.forEach((evt, idx) => {
+      const rowIdx = Math.min(3, Math.floor(idx / rowCapacity));
+      rows[rowIdx].push(evt as CalendarEvent);
+    });
+
+    // Helper: compute center-out grid column for an index within a row
+    const getCenterOutColumn = (i: number) => {
+      if (i === 0) return centerCol;
+      const k = Math.ceil(i / 2);
+      // odd indices go to the right, even indices go to the left
+      const offset = i % 2 === 1 ? k : -k;
+      return centerCol + offset;
+    };
+
+    return (
+      <div className="bg-white shadow-soft rounded-xl p-6">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {formatDate(selectedDate, 'EEEE, MMMM dd, yyyy')}
+          </h2>
+          <p className="text-gray-600">
+            {dayEvents.length} events, {dayTasks.length} tasks
+          </p>
+        </div>
+
+        {/* Daily Events Board (All-day) */}
+        <div
+          className="mb-8 border border-gray-200 rounded-lg p-3 bg-gray-50"
+          onContextMenu={(e) => handleContextMenu(e, 'empty', { date: selectedDate, allDay: true })}
+        >
+          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+            <Clock className="w-5 h-5 mr-2 text-primary-600" />
+            Daily Events
+          </h3>
+          <div className="space-y-2">
+            {rows.map((row, rowIdx) => (
+              <div
+                key={rowIdx}
+                className="grid min-h-[40px] gap-2"
+                style={{ gridTemplateColumns: `repeat(${totalCols}, minmax(0, 1fr))` }}
+              >
+                {row.length === 0 ? (
+                  <div className="col-span-full text-center text-xs text-gray-400">Right-click here to add a daily event</div>
+                ) : (
+                  row.map((evt, i) => (
+                    <div
+                      key={evt.id}
+                      className="px-3 py-1 rounded-full text-xs font-medium cursor-pointer select-none justify-self-center"
+                      style={{
+                        gridColumn: `${getCenterOutColumn(i)} / span 1`,
+                        backgroundColor: `${evt.color}20`,
+                        color: evt.color,
+                        border: `1px solid ${evt.color}`
+                      }}
+                      onClick={() => onEventEdit && onEventEdit(evt)}
+                      onContextMenu={(e) => {
+                        e.stopPropagation();
+                        handleContextMenu(e, 'event', evt);
+                      }}
+                    >
+                      {evt.title}
+                    </div>
+                  ))
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Events */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Clock className="w-5 h-5 mr-2 text-primary-600" />
+            Events
+          </h3>
+          {timedEvents.length > 0 ? (
+            <div className="space-y-3">
+              {timedEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="p-4 rounded-lg border-l-4"
+                  style={{ 
+                    backgroundColor: `${event.color}10`,
+                    borderLeftColor: event.color
+                  }}
+                  onClick={() => onEventEdit && onEventEdit(event)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    handleContextMenu(e, 'event', event);
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-gray-900">{event.title}</h4>
+                    <span className="text-sm text-gray-500">
+                      {formatTime(new Date(event.startDate))} - {formatTime(new Date(event.endDate))}
+                    </span>
+                  </div>
+                  {event.description && (
+                    <p className="text-sm text-gray-600 mt-1">{event.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-8">No events scheduled</p>
+          )}
+        </div>
+
+        {/* Tasks */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <CheckCircle className="w-5 h-5 mr-2 text-primary-600" />
+            Tasks
+          </h3>
+          {dayTasks.length > 0 ? (
+            <div className="space-y-3">
+              {dayTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={clsx(
+                    'p-4 rounded-lg border border-gray-200',
+                    task.completed && 'bg-gray-50'
+                  )}
+                >
+                  <div className="flex items-center space-x-3">
+                    {task.completed ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-gray-400" />
+                    )}
+                    <div className="flex-1">
+                      <h4 className={clsx(
+                        'font-medium',
+                        task.completed ? 'text-gray-500 line-through' : 'text-gray-900'
+                      )}>
+                        {task.title}
+                      </h4>
+                      {task.description && (
+                        <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+                      )}
+                    </div>
+                    <span className={clsx(
+                      'px-2 py-1 rounded-full text-xs font-medium',
+                      task.priority === 'high' && 'bg-red-100 text-red-700',
+                      task.priority === 'medium' && 'bg-yellow-100 text-yellow-700',
+                      task.priority === 'low' && 'bg-green-100 text-green-700'
+                    )}>
+                      {task.priority}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-8">No tasks due</p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderYearView = () => {
+    const yearMonths = getYearMonths(currentDate);
+    
+    return (
+      <div className="bg-white shadow-soft rounded-xl overflow-hidden">
+        {/* Year grid - 4 rows of 3 months each */}
+        <div className="grid grid-rows-4 gap-px bg-gray-200">
+          {/* Row 1: Jan, Feb, Mar */}
+          <div className="grid grid-cols-3 gap-px bg-gray-200">
+            {yearMonths.slice(0, 3).map((month, index) => {
+              const monthEvents = getMonthEvents(events, month);
+              const monthTasks = getMonthTasks(tasks, month);
+              const isCurrentMonthDay = isCurrentMonth(new Date(), month);
+              
+              return (
+                <div
+                  key={index}
+                  onClick={() => onDateSelect(month)}
+                  className={clsx(
+                    'bg-white p-3 min-h-[140px] cursor-pointer hover:bg-gray-50 transition-colors duration-200',
+                    isCurrentMonthDay && 'bg-primary-50 border-2 border-primary-600'
+                  )}
+                >
+                  {/* Month name */}
+                  <div className="text-xs font-medium text-gray-600 mb-2">
+                    {formatDate(month, 'MMM')}
+                  </div>
+                  
+                  {/* Mini calendar grid */}
+                  <div className="grid grid-cols-7 gap-px text-xs">
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, dayIndex) => (
+                      <div key={dayIndex} className="text-center text-gray-400 p-1">
+                        {day}
+                      </div>
+                    ))}
+                    
+                    {getMonthDays(month).map((date, dateIndex) => (
+                      <div
+                        key={dateIndex}
+                        className={clsx(
+                          'text-center p-1',
+                          isToday(date) && 'bg-primary-600 text-white rounded',
+                          !isCurrentMonth(date, month) && 'text-gray-300'
+                        )}
+                      >
+                        {date.getDate()}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Event indicators */}
+                  {monthEvents.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {monthEvents.slice(0, 3).map((event, eventIndex) => (
+                        <div
+                          key={eventIndex}
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: event.color }}
+                        />
+                      ))}
+                      {monthEvents.length > 3 && (
+                        <span className="text-xs text-gray-500">+{monthEvents.length - 3}</span>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Task indicators */}
+                  {monthTasks.length > 0 && (
+                    <div className="mt-1 text-xs text-gray-600">
+                      {monthTasks.filter(task => !task.completed).length} tasks
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Row 2: Apr, May, Jun */}
+          <div className="grid grid-cols-3 gap-px bg-gray-200">
+            {yearMonths.slice(3, 6).map((month, index) => {
+              const monthEvents = getMonthEvents(events, month);
+              const monthTasks = getMonthTasks(tasks, month);
+              const isCurrentMonthDay = isCurrentMonth(new Date(), month);
+              
+              return (
+                <div
+                  key={index + 3}
+                  onClick={() => onDateSelect(month)}
+                  className={clsx(
+                    'bg-white p-3 min-h-[140px] cursor-pointer hover:bg-gray-50 transition-colors duration-200',
+                    isCurrentMonthDay && 'bg-primary-50 border-2 border-primary-600'
+                  )}
+                >
+                  {/* Month name */}
+                  <div className="text-xs font-medium text-gray-600 mb-2">
+                    {formatDate(month, 'MMM')}
+                  </div>
+                  
+                  {/* Mini calendar grid */}
+                  <div className="grid grid-cols-7 gap-px text-xs">
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, dayIndex) => (
+                      <div key={dayIndex} className="text-center text-gray-400 p-1">
+                        {day}
+                      </div>
+                    ))}
+                    
+                    {getMonthDays(month).map((date, dateIndex) => (
+                      <div
+                        key={dateIndex}
+                        className={clsx(
+                          'text-center p-1',
+                          isToday(date) && 'bg-primary-600 text-white rounded',
+                          !isCurrentMonth(date, month) && 'text-gray-300'
+                        )}
+                      >
+                        {date.getDate()}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Event indicators */}
+                  {monthEvents.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {monthEvents.slice(0, 3).map((event, eventIndex) => (
+                        <div
+                          key={eventIndex}
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: event.color }}
+                        />
+                      ))}
+                      {monthEvents.length > 3 && (
+                        <span className="text-xs text-gray-500">+{monthEvents.length - 3}</span>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Task indicators */}
+                  {monthTasks.length > 0 && (
+                    <div className="mt-1 text-xs text-gray-600">
+                      {monthTasks.filter(task => !task.completed).length} tasks
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Row 3: Jul, Aug, Sep */}
+          <div className="grid grid-cols-3 gap-px bg-gray-200">
+            {yearMonths.slice(6, 9).map((month, index) => {
+              const monthEvents = getMonthEvents(events, month);
+              const monthTasks = getMonthTasks(tasks, month);
+              const isCurrentMonthDay = isCurrentMonth(new Date(), month);
+              
+              return (
+                <div
+                  key={index + 6}
+                  onClick={() => onDateSelect(month)}
+                  className={clsx(
+                    'bg-white p-3 min-h-[140px] cursor-pointer hover:bg-gray-50 transition-colors duration-200',
+                    isCurrentMonthDay && 'bg-primary-50 border-2 border-primary-600'
+                  )}
+                >
+                  {/* Month name */}
+                  <div className="text-xs font-medium text-gray-600 mb-2">
+                    {formatDate(month, 'MMM')}
+                  </div>
+                  
+                  {/* Mini calendar grid */}
+                  <div className="grid grid-cols-7 gap-px text-xs">
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, dayIndex) => (
+                      <div key={dayIndex} className="text-center text-gray-400 p-1">
+                        {day}
+                      </div>
+                    ))}
+                    
+                    {getMonthDays(month).map((date, dateIndex) => (
+                      <div
+                        key={dateIndex}
+                        className={clsx(
+                          'text-center p-1',
+                          isToday(date) && 'bg-primary-600 text-white rounded',
+                          !isCurrentMonth(date, month) && 'text-gray-300'
+                        )}
+                      >
+                        {date.getDate()}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Event indicators */}
+                  {monthEvents.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {monthEvents.slice(0, 3).map((event, eventIndex) => (
+                        <div
+                          key={eventIndex}
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: event.color }}
+                        />
+                      ))}
+                      {monthEvents.length > 3 && (
+                        <span className="text-xs text-gray-500">+{monthEvents.length - 3}</span>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Task indicators */}
+                  {monthTasks.length > 0 && (
+                    <div className="mt-1 text-xs text-gray-600">
+                      {monthTasks.filter(task => !task.completed).length} tasks
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Row 4: Oct, Nov, Dec */}
+          <div className="grid grid-cols-3 gap-px bg-gray-200">
+            {yearMonths.slice(9, 12).map((month, index) => {
+              const monthEvents = getMonthEvents(events, month);
+              const monthTasks = getMonthTasks(tasks, month);
+              const isCurrentMonthDay = isCurrentMonth(new Date(), month);
+              
+              return (
+                <div
+                  key={index + 9}
+                  onClick={() => onDateSelect(month)}
+                  className={clsx(
+                    'bg-white p-3 min-h-[140px] cursor-pointer hover:bg-gray-50 transition-colors duration-200',
+                    isCurrentMonthDay && 'bg-primary-50 border-2 border-primary-600'
+                  )}
+                >
+                  {/* Month name */}
+                  <div className="text-xs font-medium text-gray-600 mb-2">
+                    {formatDate(month, 'MMM')}
+                  </div>
+                  
+                  {/* Mini calendar grid */}
+                  <div className="grid grid-cols-7 gap-px text-xs">
+                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, dayIndex) => (
+                      <div key={dayIndex} className="text-center text-gray-400 p-1">
+                        {day}
+                      </div>
+                    ))}
+                    
+                    {getMonthDays(month).map((date, dateIndex) => (
+                      <div
+                        key={dateIndex}
+                        className={clsx(
+                          'text-center p-1',
+                          isToday(date) && 'bg-primary-600 text-white rounded',
+                          !isCurrentMonth(date, month) && 'text-gray-300'
+                        )}
+                      >
+                        {date.getDate()}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Event indicators */}
+                  {monthEvents.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {monthEvents.slice(0, 3).map((event, eventIndex) => (
+                        <div
+                          key={eventIndex}
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: event.color }}
+                        />
+                      ))}
+                      {monthEvents.length > 3 && (
+                        <span className="text-xs text-gray-500">+{monthEvents.length - 3}</span>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Task indicators */}
+                  {monthTasks.length > 0 && (
+                    <div className="mt-1 text-xs text-gray-600">
+                      {monthTasks.filter(task => !task.completed).length} tasks
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderMonthView = () => {
+    const monthDays = getMonthDays(currentDate);
+    
+    return (
+      <div className="bg-white shadow-soft rounded-xl overflow-hidden">
+        {/* Month header */}
+        <div className="grid grid-cols-7 gap-px bg-gray-200">
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+            <div key={day} className="bg-gray-50 p-3 text-center">
+              <span className="text-sm font-medium text-gray-600">{day}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar grid */}
+        <div className="calendar-grid">
+          {monthDays.map((date) => renderDayCell(date))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderContent = () => {
+    switch (view) {
+      case 'day':
+        return renderDayView();
+      case 'week':
+        return renderWeekView();
+      case 'month':
+        return renderMonthView();
+      case 'year':
+        return renderYearView();
+      default:
+        return renderMonthView();
+    }
+  };
+
+  return (
+    <>
+      {renderContent()}
+      <ContextMenu
+        isOpen={contextMenu.isOpen}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        items={getContextMenuItems()}
+        onClose={closeContextMenu}
+      />
+    </>
+  );
+};
+
+export default CalendarGrid; 
