@@ -134,16 +134,18 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     timestamp: 0
   });
 
+  // Dynamic hour height state for zoom functionality
+  const [hourHeight, setHourHeight] = useState(96); // Default 96px per hour
+
   // Scroll to 6 AM on mount (or 00:00 for full 24-hour view)
   useEffect(() => {
     if (view === 'week' && timeGridRef.current) {
       const scrollToHour = isFull24Hours ? 0 : 6; // 00:00 for full view, 6 AM for normal
-      const timeSlotHeight = 96; // 96px per hour slot
-      const scrollPosition = scrollToHour * timeSlotHeight;
+      const scrollPosition = scrollToHour * hourHeight;
       
       timeGridRef.current.scrollTop = scrollPosition;
     }
-  }, [view, isFull24Hours]);
+  }, [view, isFull24Hours, hourHeight]);
 
 
 
@@ -442,6 +444,27 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           e.clientY >= rect.top && e.clientY <= rect.bottom;
 
       if (isInCalendar) {
+        // Check for Command (Mac) or Alt (PC) + scroll for zoom functionality
+        const isZoomKeyPressed = e.metaKey || e.altKey; // metaKey is Command on Mac, altKey is Alt on PC
+        
+        if (isZoomKeyPressed) {
+          e.preventDefault();
+          
+          // Calculate zoom factor (positive for zoom in, negative for zoom out)
+          const zoomFactor = e.deltaY > 0 ? -1 : 1;
+          const zoomStep = 8; // 8px per scroll step
+          
+          // Calculate new hour height with bounds
+          const newHourHeight = Math.max(24, Math.min(600, hourHeight + (zoomFactor * zoomStep)));
+          
+          // Only update if the height actually changed
+          if (newHourHeight !== hourHeight) {
+            setHourHeight(newHourHeight);
+          }
+          
+          return;
+        }
+        
         // In full 24-hour mode, allow page scrolling
         if (isFull24Hours) {
           return;
@@ -488,7 +511,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [handleEventMouseMove, handleEventMouseUp, isFull24Hours]);
+  }, [handleEventMouseMove, handleEventMouseUp, isFull24Hours, hourHeight]);
 
   const renderDayCell = (date: Date) => {
     const dayEvents = getEventsForDate(events, date);
@@ -714,7 +737,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
             {timeSlots.map((time, index) => (
               <div
                 key={index}
-                className="h-24 flex items-center justify-end pr-2 bg-gray-50"
+                className="flex items-center justify-end pr-2 bg-gray-50"
+                style={{ height: `${hourHeight}px` }}
               >
                 <span className="text-xs text-gray-500 font-medium">
                   {formatTime(time)}
@@ -729,7 +753,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               {timeSlots.map((time, index) => (
                 <div
                   key={index}
-                  className="h-24 relative group cursor-pointer hover:bg-gray-50 transition-colors duration-150 border-b border-gray-300 overflow-visible"
+                  className="relative group cursor-pointer hover:bg-gray-50 transition-colors duration-150 border-b border-gray-300 overflow-visible"
+                  style={{ height: `${hourHeight}px` }}
 
                   onClick={(e) => {
                     // Create event at clicked time - only hour increments
@@ -772,7 +797,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     if (eventsInSlot.length === 0) return null;
 
                     // Calculate the height for each event based on number of events
-                    const slotHeight = 96; // 1 hour = 96px
+                    const slotHeight = hourHeight; // Dynamic hour height
                     const padding = 4; // 4px top padding
                     const availableHeight = slotHeight - (padding * 2);
                     const eventHeight = Math.max(20, availableHeight / eventsInSlot.length);
@@ -808,7 +833,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
                         const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
                         const remainingMinutes = Math.ceil((effectiveEndTime.getTime() - currentTime.getTime()) / (60 * 1000));
-                        actualHeight = Math.max(eventHeight, Math.min((remainingMinutes / 60) * 96, slotHeight - padding));
+                        actualHeight = Math.max(eventHeight, Math.min((remainingMinutes / 60) * hourHeight, slotHeight - padding));
                       }
 
                       return (
