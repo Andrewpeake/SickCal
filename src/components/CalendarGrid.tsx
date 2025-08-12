@@ -720,8 +720,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     // Calculate the height for each event based on number of events
                     const slotHeight = 96; // 1 hour = 96px
                     const padding = 4; // 4px top padding
-                    const gap = 2; // 2px gap between events
-                    const availableHeight = slotHeight - (padding * 2) - (gap * (eventsInSlot.length - 1));
+                    const availableHeight = slotHeight - (padding * 2);
                     const eventHeight = Math.max(20, availableHeight / eventsInSlot.length);
 
                     // Show event count indicator if multiple events
@@ -740,8 +739,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       // Determine if this is the first time slot of the day for this event
                       const isFirstSlotOfDay = time.getHours() === 0;
                       
-                      // Calculate position for this event
-                      const top = padding + (index * (eventHeight + gap));
+                      // Calculate position for this event - no gap for seamless appearance
+                      const top = padding + (index * eventHeight);
                       
                       // Calculate height based on whether this is start or continuation
                       let actualHeight = eventHeight;
@@ -765,9 +764,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       return (
                         <div
                           key={event.id}
-                          className={`absolute left-1 right-1 rounded text-xs p-1 overflow-hidden cursor-move transition-all duration-200 hover:shadow-md hover:scale-[1.02] hover:z-10 hover:border-2 hover:border-blue-400 group ${
+                          className={`absolute left-1 right-1 text-xs p-1 overflow-hidden cursor-move transition-all duration-200 group ${
                             eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
-                          } ${!isStartOfEvent ? 'border-l-0' : ''}`}
+                          }`}
                           style={{ 
                             top: `${top}px`,
                             height: `${actualHeight}px`,
@@ -776,7 +775,27 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             borderLeft: isStartOfEvent ? `3px solid ${event.color}` : 'none',
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                            overflow: 'visible'
+                            overflow: 'visible',
+                            // Remove rounded corners for seamless appearance
+                            borderRadius: '0px',
+                            // Add hover effects that reveal hour boundaries
+                            borderTop: isStartOfEvent ? '2px solid transparent' : 'none',
+                            borderBottom: '2px solid transparent',
+                            borderRight: '2px solid transparent'
+                          }}
+                          onMouseEnter={(e) => {
+                            // On hover, show hour boundaries
+                            e.currentTarget.style.borderTop = '2px solid rgba(0,0,0,0.1)';
+                            e.currentTarget.style.borderBottom = '2px solid rgba(0,0,0,0.1)';
+                            e.currentTarget.style.borderRight = '2px solid rgba(0,0,0,0.1)';
+                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+                          }}
+                          onMouseLeave={(e) => {
+                            // On leave, hide hour boundaries
+                            e.currentTarget.style.borderTop = isStartOfEvent ? '2px solid transparent' : 'none';
+                            e.currentTarget.style.borderBottom = '2px solid transparent';
+                            e.currentTarget.style.borderRight = '2px solid transparent';
+                            e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
