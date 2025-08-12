@@ -125,6 +125,15 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     dragStartHour: null
   });
 
+  // Double right-click state for quick delete
+  const [doubleRightClick, setDoubleRightClick] = useState<{
+    eventId: string | null;
+    timestamp: number;
+  }>({
+    eventId: null,
+    timestamp: 0
+  });
+
   // Scroll to 6 AM on mount (or 00:00 for full 24-hour view)
   useEffect(() => {
     if (view === 'week' && timeGridRef.current) {
@@ -152,6 +161,28 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
   const closeContextMenu = () => {
     setContextMenu(prev => ({ ...prev, isOpen: false }));
+  };
+
+  // Handle double right-click for quick delete
+  const handleDoubleRightClick = (e: React.MouseEvent, event: CalendarEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const now = Date.now();
+    const timeDiff = now - doubleRightClick.timestamp;
+    const isSameEvent = doubleRightClick.eventId === event.id;
+    
+    if (isSameEvent && timeDiff < 500) { // 500ms threshold for double right-click
+      // Double right-click detected - delete the event
+      if (onEventDelete) {
+        onEventDelete(event.id);
+      }
+      // Reset the double right-click state
+      setDoubleRightClick({ eventId: null, timestamp: 0 });
+    } else {
+      // First right-click - set the state
+      setDoubleRightClick({ eventId: event.id, timestamp: now });
+    }
   };
 
 
@@ -819,6 +850,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
                             e.stopPropagation();
+                            handleDoubleRightClick(e, event);
                             handleContextMenu(e, 'event', event);
                           }}
                         >
