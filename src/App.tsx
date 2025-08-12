@@ -47,6 +47,7 @@ function App() {
 
   // Apply settings on load and when settings change
   useEffect(() => {
+    console.log('Settings changed in App component:', settings);
     applyAllSettings(settings);
   }, [settings]);
 
@@ -397,6 +398,9 @@ function App() {
     saveSettings(newSettings);
     applyAllSettings(newSettings); // Actually apply the settings
     console.log('Settings applied, new state:', newSettings);
+    
+    // Force a re-render by updating currentDate
+    setCurrentDate(new Date());
   };
 
   const handleOpenSettings = () => {
