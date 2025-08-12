@@ -86,6 +86,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   
   // Calendar expand state
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isFull24Hours, setIsFull24Hours] = useState(false);
   
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -124,17 +125,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     dragStartHour: null
   });
 
-  // Scroll to 6 AM on mount
+  // Scroll to 6 AM on mount (or 00:00 for full 24-hour view)
   useEffect(() => {
     if (view === 'week' && timeGridRef.current) {
-      const scrollToHour = 6; // 6 AM
-      const timeSlotHeight = 24; // 24px per 15-minute slot
-      const slotsPerHour = 4; // 4 slots per hour (15 minutes each)
-      const scrollPosition = scrollToHour * slotsPerHour * timeSlotHeight;
+      const scrollToHour = isFull24Hours ? 0 : 6; // 00:00 for full view, 6 AM for normal
+      const timeSlotHeight = 96; // 96px per hour slot
+      const scrollPosition = scrollToHour * timeSlotHeight;
       
       timeGridRef.current.scrollTop = scrollPosition;
     }
-  }, [view]);
+  }, [view, isFull24Hours]);
 
 
 
@@ -600,11 +600,29 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
             {/* Expand/Collapse button */}
             <div className="px-3">
               <button
-                onClick={() => setIsExpanded(!isExpanded)}
+                onClick={() => {
+                  // Single click: toggle normal expand
+                  if (isExpanded || isFull24Hours) {
+                    // Collapse both modes back to default
+                    setIsExpanded(false);
+                    setIsFull24Hours(false);
+                  } else {
+                    // Single click expand
+                    setIsExpanded(true);
+                    setIsFull24Hours(false);
+                  }
+                }}
+                onDoubleClick={() => {
+                  // Double click: show full 24 hours
+                  if (!isExpanded && !isFull24Hours) {
+                    setIsExpanded(true);
+                    setIsFull24Hours(true);
+                  }
+                }}
                 className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors duration-150"
-                title={isExpanded ? "Collapse calendar" : "Expand calendar"}
+                title={isExpanded || isFull24Hours ? "Collapse calendar" : "Single click: Expand | Double click: Full 24 hours"}
               >
-                {isExpanded ? (
+                {isExpanded || isFull24Hours ? (
                   <>
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -628,7 +646,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         <div 
           ref={timeGridRef}
           className={`calendar-week-grid relative overflow-y-auto calendar-scroll transition-all duration-300 ${
-            isExpanded ? 'max-h-[800px]' : 'max-h-[600px]'
+            isFull24Hours ? 'max-h-[2304px]' : isExpanded ? 'max-h-[800px]' : 'max-h-[600px]'
           }`}
         >
           {/* Live time indicator */}
