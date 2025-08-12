@@ -276,6 +276,11 @@ function App() {
 
   // Context menu handlers
   const handleEventEdit = (event: Event) => {
+    // Update the event in the state (for drag-and-drop)
+    setEvents(prev => prev.map(e => e.id === event.id ? event : e));
+  };
+
+  const handleEventOpen = (event: Event) => {
     setEditingEvent(event);
     setShowEventModal(true);
   };
@@ -399,6 +404,7 @@ function App() {
               tasks={tasks}
               view={view}
               onEventEdit={handleEventEdit}
+              onEventOpen={handleEventOpen}
               onEventDelete={handleEventDelete}
               onTaskEdit={handleTaskEdit}
               onTaskDelete={handleTaskDelete}

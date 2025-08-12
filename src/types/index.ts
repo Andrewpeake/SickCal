@@ -52,6 +52,7 @@ export interface CalendarGridProps {
   tasks: Task[];
   view: CalendarView;
   onEventEdit?: (event: Event) => void;
+  onEventOpen?: (event: Event) => void;
   onEventDelete?: (eventId: string) => void;
   onTaskEdit?: (task: Task) => void;
   onTaskDelete?: (taskId: string) => void;

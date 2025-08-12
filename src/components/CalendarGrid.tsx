@@ -73,6 +73,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   tasks,
   view,
   onEventEdit,
+  onEventOpen,
   onEventDelete,
   onTaskEdit,
   onTaskDelete,
@@ -223,8 +224,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
             label: 'Edit Event',
             icon: <Edit className="w-4 h-4" />,
             onClick: () => {
-              if (onEventEdit && contextMenu.data) {
-                onEventEdit(contextMenu.data);
+              if (onEventOpen && contextMenu.data) {
+                onEventOpen(contextMenu.data);
               }
             }
           },
