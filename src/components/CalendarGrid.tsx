@@ -747,19 +747,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       let actualHeight = eventHeight;
                       
                       if (isStartOfEvent) {
-                        // For start of event, calculate height but limit to current day
-                        const endOfDay = new Date(date);
-                        endOfDay.setHours(23, 59, 59, 999);
-                        const effectiveEndTime = eventEnd < endOfDay ? eventEnd : endOfDay;
+                        // For start of event, calculate height but limit to current time slot
+                        const endOfHour = new Date(date);
+                        endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
+                        const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
                         const durationMinutes = Math.ceil((effectiveEndTime.getTime() - eventStart.getTime()) / (60 * 1000));
-                        actualHeight = Math.max(eventHeight, (durationMinutes / 60) * 96);
+                        actualHeight = Math.max(eventHeight, Math.min((durationMinutes / 60) * 96, slotHeight - padding));
                       } else {
-                        // For continuation, calculate remaining time from current slot to end of day
-                        const endOfDay = new Date(date);
-                        endOfDay.setHours(23, 59, 59, 999);
-                        const effectiveEndTime = eventEnd < endOfDay ? eventEnd : endOfDay;
+                        // For continuation, calculate remaining time from current slot to end of hour
+                        const endOfHour = new Date(date);
+                        endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
+                        const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
                         const remainingMinutes = Math.ceil((effectiveEndTime.getTime() - currentTime.getTime()) / (60 * 1000));
-                        actualHeight = Math.max(eventHeight, (remainingMinutes / 60) * 96);
+                        actualHeight = Math.max(eventHeight, Math.min((remainingMinutes / 60) * 96, slotHeight - padding));
                       }
 
                       return (
