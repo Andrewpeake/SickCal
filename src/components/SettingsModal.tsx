@@ -547,10 +547,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
             <button
               onClick={handleApply}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200 border-2 border-blue-600"
-              style={{ backgroundColor: '#3b82f6' }}
+              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200"
+              style={{ backgroundColor: '#ef4444', border: '2px solid #dc2626' }}
             >
-              Apply
+              APPLY NOW
+            </button>
+            <button
+              onClick={() => alert('TEST BUTTON WORKS!')}
+              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200"
+              style={{ backgroundColor: '#10b981', border: '2px solid #059669' }}
+            >
+              TEST
             </button>
             <button
               onClick={handleSave}
