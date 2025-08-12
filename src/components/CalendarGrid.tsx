@@ -416,9 +416,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           return;
         }
         
-        // Prevent page scroll when in calendar (normal and expanded modes)
-        e.preventDefault();
-        
         const scrollContainer = timeGridRef.current;
         const currentScrollTop = scrollContainer.scrollTop;
         const maxScrollTop = scrollContainer.scrollHeight - scrollContainer.clientHeight;
@@ -434,6 +431,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           // Allow page to scroll when at top of calendar
           return;
         }
+        
+        // Prevent page scroll when in calendar (normal and expanded modes)
+        e.preventDefault();
         
         // Scroll the calendar
         scrollContainer.scrollTop += e.deltaY;
