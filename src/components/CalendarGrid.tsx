@@ -103,9 +103,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       showLiveTimeIndicator,
       enableDragAndDrop,
       enableDoubleRightClickDelete,
-      enableZoomScroll
+      enableZoomScroll,
+      fullSettings: settings
     });
-  }, [hourHeight, showLiveTimeIndicator, enableDragAndDrop, enableDoubleRightClickDelete, enableZoomScroll]);
+  }, [hourHeight, showLiveTimeIndicator, enableDragAndDrop, enableDoubleRightClickDelete, enableZoomScroll, settings]);
   
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{

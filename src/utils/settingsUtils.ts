@@ -46,24 +46,31 @@ export const defaultSettings: Settings = {
 };
 
 const SETTINGS_STORAGE_KEY = 'sickcal_settings';
+const APPLIED_SETTINGS_STORAGE_KEY = 'sickcal_applied_settings';
 
 export const loadSettings = (): Settings => {
   try {
     const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    console.log('Loading settings from localStorage:', { stored, key: SETTINGS_STORAGE_KEY });
     if (stored) {
       const parsed = JSON.parse(stored);
       // Merge with defaults to ensure all properties exist
-      return { ...defaultSettings, ...parsed };
+      const mergedSettings = { ...defaultSettings, ...parsed };
+      console.log('Loaded and merged settings:', mergedSettings);
+      return mergedSettings;
     }
   } catch (error) {
     console.warn('Failed to load settings from localStorage:', error);
   }
+  console.log('Using default settings');
   return defaultSettings;
 };
 
 export const saveSettings = (settings: Settings): void => {
   try {
+    console.log('Saving settings to localStorage:', { settings, key: SETTINGS_STORAGE_KEY });
     localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+    console.log('Settings saved successfully');
   } catch (error) {
     console.warn('Failed to save settings to localStorage:', error);
   }
@@ -120,7 +127,7 @@ export const applyAllSettings = (settings: Settings): void => {
   document.body.style.setProperty('--hour-height', `${settings.hourHeight}px`);
   
   // Store settings in localStorage for components to access
-  localStorage.setItem('sickcal_applied_settings', JSON.stringify(settings));
+  localStorage.setItem(APPLIED_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
   
   // Dispatch custom event to notify components of settings change
   window.dispatchEvent(new CustomEvent('sickcal-settings-changed', { 
@@ -133,7 +140,7 @@ export const applyAllSettings = (settings: Settings): void => {
 // Get applied settings from localStorage
 export const getAppliedSettings = (): Settings | null => {
   try {
-    const stored = localStorage.getItem('sickcal_applied_settings');
+    const stored = localStorage.getItem(APPLIED_SETTINGS_STORAGE_KEY);
     return stored ? JSON.parse(stored) : null;
   } catch (error) {
     console.warn('Failed to get applied settings:', error);

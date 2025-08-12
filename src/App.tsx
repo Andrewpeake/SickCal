@@ -39,6 +39,12 @@ function App() {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const savedSettings = loadSettings();
+    setSettings(savedSettings);
+  }, []);
+
   // Apply settings on load and when settings change
   useEffect(() => {
     applyAllSettings(settings);
@@ -386,9 +392,11 @@ function App() {
 
   // Settings handlers
   const handleSettingsSave = (newSettings: Settings) => {
+    console.log('Saving settings:', newSettings);
     setSettings(newSettings);
     saveSettings(newSettings);
     applyAllSettings(newSettings); // Actually apply the settings
+    console.log('Settings applied, new state:', newSettings);
   };
 
   const handleOpenSettings = () => {
