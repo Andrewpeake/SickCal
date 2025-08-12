@@ -665,49 +665,70 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
                   
                   {/* Events for this time slot */}
-          {events.map((event) => {
-              const eventStart = new Date(event.startDate);
-              const eventEnd = new Date(event.endDate);
-              
-              // Only render in the start cell of the event
-              const isStartCell = (
-                eventStart.toDateString() === date.toDateString() &&
-                time.getHours() === eventStart.getHours()
-              );
-              
-              if (!isStartCell) return null;
-              
-              const durationHours = Math.max(
-                1,
-                Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 60 * 1000))
-              );
-              return (
-                <div
-                  key={event.id}
-                  className={`absolute left-1 right-1 rounded text-xs p-1 overflow-hidden cursor-move ${
-                    eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
-                  }`}
-                  style={{ 
-                    top: `4px`,
-                    height: `${durationHours * 96 - 8}px`,
-                    backgroundColor: `${event.color}20`,
-                    color: event.color,
-                    borderLeft: `3px solid ${event.color}`,
-                    zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5
-                  }}
-                  onMouseDown={(e) => handleEventMouseDown(e, event)}
-                  onContextMenu={(e) => {
-                    e.stopPropagation();
-                    handleContextMenu(e, 'event', event);
-                  }}
-                >
-                  <div className="font-medium truncate">{event.title}</div>
-                  <div className="text-xs opacity-75 truncate">
-                    {formatTime(eventStart)} - {formatTime(eventEnd)}
-                  </div>
-                </div>
-              );
-            })}
+                  {(() => {
+                    // Get all events that start in this time slot
+                    const eventsInSlot = events.filter((event) => {
+                      const eventStart = new Date(event.startDate);
+                      return (
+                        eventStart.toDateString() === date.toDateString() &&
+                        time.getHours() === eventStart.getHours()
+                      );
+                    });
+
+                    if (eventsInSlot.length === 0) return null;
+
+                    // Calculate the height for each event based on number of events
+                    const slotHeight = 96; // 1 hour = 96px
+                    const padding = 4; // 4px top padding
+                    const gap = 2; // 2px gap between events
+                    const availableHeight = slotHeight - (padding * 2) - (gap * (eventsInSlot.length - 1));
+                    const eventHeight = Math.max(20, availableHeight / eventsInSlot.length);
+
+                    return eventsInSlot.map((event, index) => {
+                      const eventStart = new Date(event.startDate);
+                      const eventEnd = new Date(event.endDate);
+                      
+                      const durationHours = Math.max(
+                        1,
+                        Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 60 * 1000))
+                      );
+
+                      // Calculate position for this event
+                      const top = padding + (index * (eventHeight + gap));
+                      
+                      // If event spans multiple hours, adjust height accordingly
+                      const actualHeight = durationHours > 1 
+                        ? Math.min(durationHours * 96 - 8, eventHeight) 
+                        : eventHeight;
+
+                      return (
+                        <div
+                          key={event.id}
+                          className={`absolute left-1 right-1 rounded text-xs p-1 overflow-hidden cursor-move ${
+                            eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
+                          }`}
+                          style={{ 
+                            top: `${top}px`,
+                            height: `${actualHeight}px`,
+                            backgroundColor: `${event.color}20`,
+                            color: event.color,
+                            borderLeft: `3px solid ${event.color}`,
+                            zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5
+                          }}
+                          onMouseDown={(e) => handleEventMouseDown(e, event)}
+                          onContextMenu={(e) => {
+                            e.stopPropagation();
+                            handleContextMenu(e, 'event', event);
+                          }}
+                        >
+                          <div className="font-medium truncate">{event.title}</div>
+                          <div className="text-xs opacity-75 truncate">
+                            {formatTime(eventStart)} - {formatTime(eventEnd)}
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               ))}
             </div>
