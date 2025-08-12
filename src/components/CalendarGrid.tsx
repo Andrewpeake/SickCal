@@ -72,6 +72,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   events,
   tasks,
   view,
+  settings,
   onEventEdit,
   onEventOpen,
   onEventDelete,
@@ -80,13 +81,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   onEventCreate,
   onTaskCreate
 }) => {
-  const [localCurrentDate, setLocalCurrentDate] = useState(currentDate);
+  // const [localCurrentDate, setLocalCurrentDate] = useState(currentDate); // Unused - using currentDate directly
   const calendarRef = useRef<HTMLDivElement>(null);
   const timeGridRef = useRef<HTMLDivElement>(null);
   
   // Calendar expand state
   const [isExpanded, setIsExpanded] = useState(false);
   const [isFull24Hours, setIsFull24Hours] = useState(false);
+  
+  // Use settings for hour height
+  const hourHeight = settings.hourHeight;
   
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -134,8 +138,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     timestamp: 0
   });
 
-  // Dynamic hour height state for zoom functionality
-  const [hourHeight, setHourHeight] = useState(96); // Default 96px per hour
+  // Use settings for hour height (no local state needed)
 
   // Scroll to 6 AM on mount (or 00:00 for full 24-hour view)
   useEffect(() => {
@@ -351,7 +354,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     dayIndex = Math.max(0, Math.min(6, dayIndex));
     hourIndex = Math.max(0, Math.min(23, hourIndex));
 
-    const weekDays = getWeekDays(localCurrentDate);
+    const weekDays = getWeekDays(currentDate);
     const newStartDay = weekDays[dayIndex];
     
     // Calculate duration in hours
@@ -373,7 +376,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       dragStartDate: newStartDay,
       dragStartHour: hourIndex
     }));
-  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, localCurrentDate]);
+  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, currentDate]);
 
   const handleEventMouseUp = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!eventDrag.isActive || !eventDrag.event) return;
@@ -395,7 +398,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     dayIndex = Math.max(0, Math.min(6, dayIndex));
     hourIndex = Math.max(0, Math.min(23, hourIndex));
 
-    const weekDays = getWeekDays(localCurrentDate);
+    const weekDays = getWeekDays(currentDate);
     const newStartDay = weekDays[dayIndex];
     
     // Calculate duration
@@ -432,7 +435,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       dragStartDate: null,
       dragStartHour: null
     });
-  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, localCurrentDate, onEventEdit]);
+  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, currentDate, onEventEdit]);
 
   // Handle mouse wheel events for calendar scrolling and global mouse events
   useEffect(() => {
@@ -454,13 +457,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           const zoomFactor = e.deltaY > 0 ? -1 : 1;
           const zoomStep = 8; // 8px per scroll step
           
-          // Calculate new hour height with bounds
-          const newHourHeight = Math.max(24, Math.min(600, hourHeight + (zoomFactor * zoomStep)));
-          
-          // Only update if the height actually changed
-          if (newHourHeight !== hourHeight) {
-            setHourHeight(newHourHeight);
-          }
+          // Note: Hour height is now controlled by settings, not local state
+          // The zoom functionality is handled through the settings modal
+          console.log('Zoom functionality moved to settings');
           
           return;
         }
@@ -511,7 +510,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [handleEventMouseMove, handleEventMouseUp, isFull24Hours, hourHeight]);
+  }, [handleEventMouseMove, handleEventMouseUp, isFull24Hours]);
 
   const renderDayCell = (date: Date) => {
     const dayEvents = getEventsForDate(events, date);
@@ -619,7 +618,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   };
 
   const renderWeekView = () => {
-    const weekDays = getWeekDays(localCurrentDate);
+    const weekDays = getWeekDays(currentDate);
     const timeSlots: Date[] = [];
     
     // Generate time slots from 00:00 to 23:00 (hour-level only)

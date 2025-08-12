@@ -52,6 +52,7 @@ export interface CalendarGridProps {
   events: Event[];
   tasks: Task[];
   view: CalendarView;
+  settings: Settings;
   onEventEdit?: (event: Event) => void;
   onEventOpen?: (event: Event) => void;
   onEventDelete?: (eventId: string) => void;
@@ -77,4 +78,49 @@ export interface TaskModalProps {
   selectedDate?: Date;
   onSave: (task: Task) => void;
   onDelete?: (taskId: string) => void;
+}
+
+export interface Settings {
+  // Appearance
+  theme: 'light' | 'dark' | 'auto';
+  primaryColor: string;
+  hourHeight: number;
+  showWeekNumbers: boolean;
+  showTodayHighlight: boolean;
+  showLiveTimeIndicator: boolean;
+  
+  // Calendar Behavior
+  defaultView: 'day' | 'week' | 'month' | 'year';
+  defaultStartHour: number;
+  defaultEndHour: number;
+  weekStartsOn: 0 | 1; // 0 = Sunday, 1 = Monday
+  showWeekend: boolean;
+  
+  // Event Settings
+  defaultEventDuration: number; // in minutes
+  allowEventOverlap: boolean;
+  showEventCount: boolean;
+  eventColorScheme: 'category' | 'random' | 'custom';
+  
+  // Interaction
+  enableDragAndDrop: boolean;
+  enableDoubleRightClickDelete: boolean;
+  enableKeyboardShortcuts: boolean;
+  enableZoomScroll: boolean;
+  
+  // Notifications
+  enableNotifications: boolean;
+  reminderTime: number; // minutes before event
+  soundNotifications: boolean;
+  
+  // Data & Storage
+  autoSave: boolean;
+  backupFrequency: 'daily' | 'weekly' | 'monthly' | 'never';
+  exportFormat: 'json' | 'csv' | 'ics';
+  
+  // Advanced
+  timeFormat: '12h' | '24h';
+  dateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD';
+  language: string;
+  timezone: string;
 } 

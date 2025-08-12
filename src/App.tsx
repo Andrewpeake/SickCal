@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CalendarView, Event, Task } from './types';
+import { CalendarView, Event, Task, Settings } from './types';
 import { OverdueManager } from './types/overdue';
 import { ProjectManager as ProjectManagerClass, Project, ProjectTask, ProjectMilestone } from './types/project';
 import Navigation from './components/Navigation';
@@ -11,6 +11,8 @@ import OverdueTasks from './components/OverdueTasks';
 import ProjectManager from './components/ProjectManager';
 import ProjectModal from './components/ProjectModal';
 import ProjectDetail from './components/ProjectDetail';
+import SettingsModal from './components/SettingsModal';
+import { loadSettings, saveSettings, applyTheme, applyPrimaryColor } from './utils/settingsUtils';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -32,6 +34,16 @@ function App() {
   const [showProjectDetail, setShowProjectDetail] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | undefined>();
   const [selectedProject, setSelectedProject] = useState<Project | undefined>();
+
+  // Settings state
+  const [settings, setSettings] = useState<Settings>(() => loadSettings());
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Apply settings on load and when settings change
+  useEffect(() => {
+    applyTheme(settings.theme);
+    applyPrimaryColor(settings.primaryColor);
+  }, [settings.theme, settings.primaryColor]);
 
   // Load data from localStorage on component mount
   useEffect(() => {
@@ -373,15 +385,38 @@ function App() {
     }
   };
 
+  // Settings handlers
+  const handleSettingsSave = (newSettings: Settings) => {
+    setSettings(newSettings);
+    saveSettings(newSettings);
+  };
+
+  const handleOpenSettings = () => {
+    setShowSettingsModal(true);
+  };
+
 
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">SickCal</h1>
-          <p className="text-gray-600">Your sleek and intuitive calendar app</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">SickCal</h1>
+            <p className="text-gray-600">Your sleek and intuitive calendar app</p>
+          </div>
+          <button
+            onClick={handleOpenSettings}
+            className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg transition-colors duration-200"
+            title="Settings"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Settings
+          </button>
         </div>
 
         {/* Navigation */}
@@ -403,6 +438,7 @@ function App() {
               events={events}
               tasks={tasks}
               view={view}
+              settings={settings}
               onEventEdit={handleEventEdit}
               onEventOpen={handleEventOpen}
               onEventDelete={handleEventDelete}
@@ -525,6 +561,14 @@ function App() {
             onMilestoneAdd={(milestoneData) => handleProjectMilestoneAdd(selectedProject.id, milestoneData)}
           />
         )}
+
+        {/* Settings Modal */}
+        <SettingsModal
+          isOpen={showSettingsModal}
+          onClose={() => setShowSettingsModal(false)}
+          settings={settings}
+          onSave={handleSettingsSave}
+        />
       </div>
     </div>
   );
