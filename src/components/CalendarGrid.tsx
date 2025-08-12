@@ -89,8 +89,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isFull24Hours, setIsFull24Hours] = useState(false);
   
-  // Use settings for hour height
+  // Use settings for various features
   const hourHeight = settings.hourHeight;
+  const showLiveTimeIndicator = settings.showLiveTimeIndicator;
+  const enableDragAndDrop = settings.enableDragAndDrop;
+  const enableDoubleRightClickDelete = settings.enableDoubleRightClickDelete;
+  const enableZoomScroll = settings.enableZoomScroll;
   
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -138,7 +142,20 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     timestamp: 0
   });
 
-  // Use settings for hour height (no local state needed)
+  // Listen for settings changes and apply them
+  useEffect(() => {
+    const handleSettingsChange = (event: CustomEvent) => {
+      const newSettings = event.detail;
+      // Settings change will trigger re-render through props
+      console.log('Settings changed:', newSettings);
+    };
+
+    window.addEventListener('sickcal-settings-changed', handleSettingsChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('sickcal-settings-changed', handleSettingsChange as EventListener);
+    };
+  }, []);
 
   // Scroll to 6 AM on mount (or 00:00 for full 24-hour view)
   useEffect(() => {
@@ -170,6 +187,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
   // Handle double right-click for quick delete
   const handleDoubleRightClick = (e: React.MouseEvent, event: CalendarEvent) => {
+    if (!enableDoubleRightClickDelete) return;
+    
     e.preventDefault();
     e.stopPropagation();
     
@@ -317,6 +336,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
   // Event dragging handlers
   const handleEventMouseDown = useCallback((e: React.MouseEvent, event: CalendarEvent) => {
+    if (!enableDragAndDrop) return;
+    
     e.preventDefault();
     e.stopPropagation();
     
@@ -376,7 +397,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       dragStartDate: newStartDay,
       dragStartHour: hourIndex
     }));
-  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, currentDate]);
+  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, currentDate, enableDragAndDrop]);
 
   const handleEventMouseUp = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!eventDrag.isActive || !eventDrag.event) return;
@@ -450,12 +471,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         // Check for Command (Mac) or Alt (PC) + scroll for zoom functionality
         const isZoomKeyPressed = e.metaKey || e.altKey; // metaKey is Command on Mac, altKey is Alt on PC
         
-        if (isZoomKeyPressed) {
+        if (isZoomKeyPressed && enableZoomScroll) {
           e.preventDefault();
-          
-          // Calculate zoom factor (positive for zoom in, negative for zoom out)
-          const zoomFactor = e.deltaY > 0 ? -1 : 1;
-          const zoomStep = 8; // 8px per scroll step
           
           // Note: Hour height is now controlled by settings, not local state
           // The zoom functionality is handled through the settings modal
@@ -510,7 +527,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [handleEventMouseMove, handleEventMouseUp, isFull24Hours]);
+  }, [handleEventMouseMove, handleEventMouseUp, isFull24Hours, enableZoomScroll]);
 
   const renderDayCell = (date: Date) => {
     const dayEvents = getEventsForDate(events, date);
@@ -708,7 +725,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           }`}
         >
           {/* Live time indicator */}
-          <LiveTimeIndicator timeSlots={timeSlots} />
+          {showLiveTimeIndicator && <LiveTimeIndicator timeSlots={timeSlots} />}
 
 
 

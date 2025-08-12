@@ -12,7 +12,7 @@ import ProjectManager from './components/ProjectManager';
 import ProjectModal from './components/ProjectModal';
 import ProjectDetail from './components/ProjectDetail';
 import SettingsModal from './components/SettingsModal';
-import { loadSettings, saveSettings, applyTheme, applyPrimaryColor } from './utils/settingsUtils';
+import { loadSettings, saveSettings, applyAllSettings } from './utils/settingsUtils';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -41,9 +41,8 @@ function App() {
 
   // Apply settings on load and when settings change
   useEffect(() => {
-    applyTheme(settings.theme);
-    applyPrimaryColor(settings.primaryColor);
-  }, [settings.theme, settings.primaryColor]);
+    applyAllSettings(settings);
+  }, [settings]);
 
   // Load data from localStorage on component mount
   useEffect(() => {

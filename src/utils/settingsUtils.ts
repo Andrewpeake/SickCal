@@ -104,6 +104,38 @@ export const applyPrimaryColor = (color: string): void => {
   root.style.setProperty('--primary-700', adjustColor(color, -20));
 };
 
+// Apply all settings at once
+export const applyAllSettings = (settings: Settings): void => {
+  // Apply theme
+  applyTheme(settings.theme);
+  
+  // Apply primary color
+  applyPrimaryColor(settings.primaryColor);
+  
+  // Apply CSS custom properties for other appearance settings
+  const root = document.documentElement;
+  root.style.setProperty('--hour-height', `${settings.hourHeight}px`);
+  
+  // Store settings in localStorage for components to access
+  localStorage.setItem('sickcal_applied_settings', JSON.stringify(settings));
+  
+  // Dispatch custom event to notify components of settings change
+  window.dispatchEvent(new CustomEvent('sickcal-settings-changed', { 
+    detail: settings 
+  }));
+};
+
+// Get applied settings from localStorage
+export const getAppliedSettings = (): Settings | null => {
+  try {
+    const stored = localStorage.getItem('sickcal_applied_settings');
+    return stored ? JSON.parse(stored) : null;
+  } catch (error) {
+    console.warn('Failed to get applied settings:', error);
+    return null;
+  }
+};
+
 // Helper function to adjust color brightness
 const adjustColor = (color: string, amount: number): string => {
   const hex = color.replace('#', '');
