@@ -63,8 +63,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   if (!isOpen) return null;
 
-  console.log('SettingsModal rendering with buttons:', { isOpen, localSettings });
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden" onClick={e => e.stopPropagation()}>
@@ -531,8 +529,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6 bg-yellow-100 p-4" style={{ backgroundColor: '#fef3c7' }}>
-          <div className="text-red-600 font-bold">FOOTER IS HERE!</div>
+        <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
           <button
             onClick={handleReset}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
@@ -540,7 +537,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             Reset to Defaults
           </button>
           <div className="flex gap-3">
-            <div className="text-blue-600 font-bold">BUTTONS: 4</div>
             <button
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
@@ -549,17 +545,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
             <button
               onClick={handleApply}
-              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200"
-              style={{ backgroundColor: '#ef4444', border: '2px solid #dc2626' }}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-200"
             >
-              APPLY NOW
-            </button>
-            <button
-              onClick={() => alert('TEST BUTTON WORKS!')}
-              className="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200"
-              style={{ backgroundColor: '#10b981', border: '2px solid #059669' }}
-            >
-              TEST
+              Apply
             </button>
             <button
               onClick={handleSave}
