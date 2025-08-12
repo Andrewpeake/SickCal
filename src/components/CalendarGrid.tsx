@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { CalendarGridProps, Event as CalendarEvent } from '../types';
 import { 
   getMonthDays, 
@@ -132,62 +132,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
   }, [view]);
 
-  // Handle mouse wheel events for calendar scrolling
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (!calendarRef.current || !timeGridRef.current) return;
 
-      const rect = calendarRef.current.getBoundingClientRect();
-      const isInCalendar = e.clientX >= rect.left && e.clientX <= rect.right && 
-                          e.clientY >= rect.top && e.clientY <= rect.bottom;
-
-      if (isInCalendar) {
-        // Prevent page scroll when in calendar
-        e.preventDefault();
-        
-        const scrollContainer = timeGridRef.current;
-        const currentScrollTop = scrollContainer.scrollTop;
-        const maxScrollTop = scrollContainer.scrollHeight - scrollContainer.clientHeight;
-        
-        // Check if we're at the bottom (23:59) and trying to scroll down
-        if (currentScrollTop >= maxScrollTop && e.deltaY > 0) {
-          // Allow page to scroll when at bottom of calendar
-          return;
-        }
-        
-        // Check if we're at the top (00:00) and trying to scroll up
-        if (currentScrollTop <= 0 && e.deltaY < 0) {
-          // Allow page to scroll when at top of calendar
-          return;
-        }
-        
-        // Scroll the calendar
-        scrollContainer.scrollTop += e.deltaY;
-      }
-    };
-
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (eventDrag.isActive) {
-        handleEventMouseMove(e as any);
-      }
-    };
-
-    const handleGlobalMouseUp = (e: MouseEvent) => {
-      if (eventDrag.isActive) {
-        handleEventMouseUp(e as any);
-      }
-    };
-
-    document.addEventListener('wheel', handleWheel, { passive: false });
-    document.addEventListener('mousemove', handleGlobalMouseMove);
-    document.addEventListener('mouseup', handleGlobalMouseUp);
-    
-    return () => {
-      document.removeEventListener('wheel', handleWheel);
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-    };
-  }, [eventDrag.isActive]);
 
   // Context menu handlers
   const handleContextMenu = (e: React.MouseEvent, type: 'empty' | 'event' | 'task', data?: any) => {
@@ -331,7 +276,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
 
   // Event dragging handlers
-  const handleEventMouseDown = (e: React.MouseEvent, event: CalendarEvent) => {
+  const handleEventMouseDown = useCallback((e: React.MouseEvent, event: CalendarEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -348,9 +293,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       dragStartDate: new Date(event.startDate),
       dragStartHour: new Date(event.startDate).getHours()
     });
-  };
+  }, []);
 
-  const handleEventMouseMove = (e: React.MouseEvent) => {
+  const handleEventMouseMove = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!eventDrag.isActive || !timeGridRef.current || !eventDrag.event) return;
 
     const rect = timeGridRef.current.getBoundingClientRect();
@@ -391,9 +336,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       dragStartDate: newStartDay,
       dragStartHour: hourIndex
     }));
-  };
+  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, localCurrentDate]);
 
-  const handleEventMouseUp = (e: React.MouseEvent) => {
+  const handleEventMouseUp = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!eventDrag.isActive || !eventDrag.event) return;
 
     const rect = timeGridRef.current?.getBoundingClientRect();
@@ -450,7 +395,60 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       dragStartDate: null,
       dragStartHour: null
     });
-  };
+  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, localCurrentDate, onEventEdit]);
+
+  // Handle mouse wheel events for calendar scrolling and global mouse events
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (!calendarRef.current || !timeGridRef.current) return;
+
+      const rect = calendarRef.current.getBoundingClientRect();
+      const isInCalendar = e.clientX >= rect.left && e.clientX <= rect.right && 
+                          e.clientY >= rect.top && e.clientY <= rect.bottom;
+
+      if (isInCalendar) {
+        // Prevent page scroll when in calendar
+        e.preventDefault();
+        
+        const scrollContainer = timeGridRef.current;
+        const currentScrollTop = scrollContainer.scrollTop;
+        const maxScrollTop = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+        
+        // Check if we're at the bottom (23:59) and trying to scroll down
+        if (currentScrollTop >= maxScrollTop && e.deltaY > 0) {
+          // Allow page to scroll when at bottom of calendar
+          return;
+        }
+        
+        // Check if we're at the top (00:00) and trying to scroll up
+        if (currentScrollTop <= 0 && e.deltaY < 0) {
+          // Allow page to scroll when at top of calendar
+          return;
+        }
+        
+        // Scroll the calendar
+        scrollContainer.scrollTop += e.deltaY;
+      }
+    };
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      handleEventMouseMove(e);
+    };
+
+    const handleGlobalMouseUp = (e: MouseEvent) => {
+      handleEventMouseUp(e);
+    };
+
+    document.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    
+    return () => {
+      document.removeEventListener('wheel', handleWheel);
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [handleEventMouseMove, handleEventMouseUp]);
 
   const renderDayCell = (date: Date) => {
     const dayEvents = getEventsForDate(events, date);
