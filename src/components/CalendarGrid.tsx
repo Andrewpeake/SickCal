@@ -624,63 +624,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           </div>
         </div>
 
-        {/* All-day/All-week events bar */}
-        <div className="bg-gray-50 border-b border-gray-300">
-          <div className="flex">
-            <div className="w-20 bg-gray-50 p-2 flex items-center justify-center">
-              <span className="text-xs text-gray-500 font-medium">All Day</span>
-            </div>
-            {weekDays.map((date) => {
-              const dayAllDayEvents = events.filter((event) => {
-                const eventStart = new Date(event.startDate);
-                const eventEnd = new Date(event.endDate);
-                return (
-                  event.isAllDay &&
-                  eventStart.toDateString() === date.toDateString()
-                );
-              });
-
-              return (
-                <div
-                  key={date.toISOString()}
-                  className="flex-1 bg-white relative border-l border-gray-300 min-h-[60px] p-1"
-                  onContextMenu={(e) => {
-                    const clickedTime = new Date(date);
-                    clickedTime.setHours(0, 0, 0, 0);
-                    handleContextMenu(e, 'empty', clickedTime);
-                  }}
-                >
-                  {dayAllDayEvents.map((event, index) => (
-                    <div
-                      key={event.id}
-                      className={`mb-1 p-2 rounded text-xs cursor-pointer transition-all duration-200 hover:shadow-md hover:scale-[1.02] ${
-                        eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
-                      }`}
-                      style={{
-                        backgroundColor: `${event.color}20`,
-                        color: event.color,
-                        borderLeft: `3px solid ${event.color}`,
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                      }}
-                      onClick={() => onEventOpen && onEventOpen(event)}
-                      onMouseDown={(e) => handleEventMouseDown(e, event)}
-                      onContextMenu={(e) => {
-                        e.stopPropagation();
-                        handleContextMenu(e, 'event', event);
-                      }}
-                    >
-                      <div className="font-medium truncate">{event.title}</div>
-                      {event.isAllWeek && (
-                        <div className="text-xs opacity-75">All Week</div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Time grid - scrollable */}
         <div 
           ref={timeGridRef}
@@ -756,9 +699,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   {(() => {
                     // Get all events that are active in this time slot (start here OR continue from previous time)
                     const eventsInSlot = events.filter((event) => {
-                      // Skip all-day events as they're displayed in the all-day bar
-                      if (event.isAllDay) return false;
-                      
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
                       const currentTime = new Date(date);
