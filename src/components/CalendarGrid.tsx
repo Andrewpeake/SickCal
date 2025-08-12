@@ -411,7 +411,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           e.clientY >= rect.top && e.clientY <= rect.bottom;
 
       if (isInCalendar) {
-        // Prevent page scroll when in calendar
+        // In full 24-hour mode, allow page scrolling
+        if (isFull24Hours) {
+          return;
+        }
+        
+        // Prevent page scroll when in calendar (normal and expanded modes)
         e.preventDefault();
         
         const scrollContainer = timeGridRef.current;
@@ -452,7 +457,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [handleEventMouseMove, handleEventMouseUp]);
+  }, [handleEventMouseMove, handleEventMouseUp, isFull24Hours]);
 
   const renderDayCell = (date: Date) => {
     const dayEvents = getEventsForDate(events, date);
@@ -646,7 +651,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         <div 
           ref={timeGridRef}
           className={`calendar-week-grid relative overflow-y-auto calendar-scroll transition-all duration-300 ${
-            isFull24Hours ? 'max-h-[2304px]' : isExpanded ? 'max-h-[800px]' : 'max-h-[600px]'
+            isFull24Hours ? 'max-h-[2304px]' : isExpanded ? 'max-h-[1056px]' : 'max-h-[600px]'
           }`}
         >
           {/* Live time indicator */}
