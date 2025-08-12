@@ -96,6 +96,17 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   const enableDoubleRightClickDelete = settings.enableDoubleRightClickDelete;
   const enableZoomScroll = settings.enableZoomScroll;
   
+  // Debug: Log settings when they change
+  useEffect(() => {
+    console.log('CalendarGrid settings updated:', {
+      hourHeight,
+      showLiveTimeIndicator,
+      enableDragAndDrop,
+      enableDoubleRightClickDelete,
+      enableZoomScroll
+    });
+  }, [hourHeight, showLiveTimeIndicator, enableDragAndDrop, enableDoubleRightClickDelete, enableZoomScroll]);
+  
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean;
@@ -365,7 +376,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
     // Calculate new day and hour
     const dayWidth = (rect.width - 80) / 7;
-    const hourHeight = 96;
+    const hourHeight = settings.hourHeight;
     
     // Calculate day index - need to account for 80px time column
     let dayIndex = Math.floor((x - 80) / dayWidth);
@@ -397,7 +408,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       dragStartDate: newStartDay,
       dragStartHour: hourIndex
     }));
-  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, currentDate, enableDragAndDrop]);
+  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, currentDate, enableDragAndDrop, settings.hourHeight]);
 
   const handleEventMouseUp = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!eventDrag.isActive || !eventDrag.event) return;
@@ -410,7 +421,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
     // Calculate final position
     const dayWidth = (rect.width - 80) / 7;
-    const hourHeight = 96;
+    const hourHeight = settings.hourHeight;
     
     // Calculate day index - need to account for 80px time column
     let dayIndex = Math.floor((x - 80) / dayWidth);
@@ -456,7 +467,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       dragStartDate: null,
       dragStartHour: null
     });
-  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, currentDate, onEventEdit]);
+  }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, currentDate, onEventEdit, settings.hourHeight]);
 
   // Handle mouse wheel events for calendar scrolling and global mouse events
   useEffect(() => {

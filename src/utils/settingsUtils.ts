@@ -116,6 +116,9 @@ export const applyAllSettings = (settings: Settings): void => {
   const root = document.documentElement;
   root.style.setProperty('--hour-height', `${settings.hourHeight}px`);
   
+  // Apply settings to body as well for broader compatibility
+  document.body.style.setProperty('--hour-height', `${settings.hourHeight}px`);
+  
   // Store settings in localStorage for components to access
   localStorage.setItem('sickcal_applied_settings', JSON.stringify(settings));
   
@@ -123,6 +126,8 @@ export const applyAllSettings = (settings: Settings): void => {
   window.dispatchEvent(new CustomEvent('sickcal-settings-changed', { 
     detail: settings 
   }));
+  
+  console.log('Settings applied:', settings);
 };
 
 // Get applied settings from localStorage

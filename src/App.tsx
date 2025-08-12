@@ -388,6 +388,7 @@ function App() {
   const handleSettingsSave = (newSettings: Settings) => {
     setSettings(newSettings);
     saveSettings(newSettings);
+    applyAllSettings(newSettings); // Actually apply the settings
   };
 
   const handleOpenSettings = () => {
@@ -431,6 +432,7 @@ function App() {
           {/* Calendar Grid */}
           <div className="flex-1">
             <CalendarGrid
+              key={`calendar-${settings.hourHeight}-${settings.theme}-${settings.primaryColor}`}
               currentDate={currentDate}
               selectedDate={selectedDate}
               onDateSelect={handleDateSelect}
