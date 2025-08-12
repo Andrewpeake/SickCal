@@ -63,6 +63,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   if (!isOpen) return null;
 
+  console.log('SettingsModal rendering with buttons:', { isOpen, localSettings });
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden" onClick={e => e.stopPropagation()}>
@@ -545,7 +547,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
             <button
               onClick={handleApply}
-              className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-200"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200 border-2 border-blue-600"
+              style={{ backgroundColor: '#3b82f6' }}
             >
               Apply
             </button>
