@@ -81,7 +81,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        <div className="flex gap-6 h-[calc(90vh-120px)]">
+        <div className="flex gap-6 h-[calc(90vh-180px)]">
           {/* Sidebar */}
           <div className="w-48 bg-gray-50 rounded-lg p-4">
             <nav className="space-y-2">
@@ -531,7 +531,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
+        <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6 bg-yellow-100 p-4" style={{ backgroundColor: '#fef3c7' }}>
+          <div className="text-red-600 font-bold">FOOTER IS HERE!</div>
           <button
             onClick={handleReset}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
@@ -539,6 +540,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             Reset to Defaults
           </button>
           <div className="flex gap-3">
+            <div className="text-blue-600 font-bold">BUTTONS: 4</div>
             <button
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
