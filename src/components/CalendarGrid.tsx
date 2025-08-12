@@ -684,6 +684,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     const availableHeight = slotHeight - (padding * 2) - (gap * (eventsInSlot.length - 1));
                     const eventHeight = Math.max(20, availableHeight / eventsInSlot.length);
 
+                    // Show event count indicator if multiple events
+                    const showEventCount = eventsInSlot.length > 1;
+
                     return eventsInSlot.map((event, index) => {
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
@@ -704,7 +707,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       return (
                         <div
                           key={event.id}
-                          className={`absolute left-1 right-1 rounded text-xs p-1 overflow-hidden cursor-move ${
+                          className={`absolute left-1 right-1 rounded text-xs p-1 overflow-hidden cursor-move transition-all duration-200 hover:shadow-md hover:scale-[1.02] hover:z-10 hover:border-2 hover:border-blue-400 group ${
                             eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
                           }`}
                           style={{ 
@@ -713,7 +716,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             backgroundColor: `${event.color}20`,
                             color: event.color,
                             borderLeft: `3px solid ${event.color}`,
-                            zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5
+                            zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
@@ -725,6 +729,18 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           <div className="text-xs opacity-75 truncate">
                             {formatTime(eventStart)} - {formatTime(eventEnd)}
                           </div>
+                          {/* Event count indicator for multiple events */}
+                          {showEventCount && index === 0 && (
+                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                              {eventsInSlot.length}
+                            </div>
+                          )}
+                          {/* Hover tooltip for compressed events */}
+                          {showEventCount && (
+                            <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                              {event.title} ({formatTime(eventStart)} - {formatTime(eventEnd)})
+                            </div>
+                          )}
                         </div>
                       );
                     });
