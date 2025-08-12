@@ -644,7 +644,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               {timeSlots.map((time, index) => (
                 <div
                   key={index}
-                  className="h-24 relative group cursor-pointer hover:bg-gray-50 transition-colors duration-150 border-b border-gray-300"
+                  className="h-24 relative group cursor-pointer hover:bg-gray-50 transition-colors duration-150 border-b border-gray-300 overflow-visible"
 
                   onClick={(e) => {
                     // Create event at clicked time - only hour increments
@@ -666,29 +666,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   
                   {/* Events for this time slot */}
                   {(() => {
-                    // Get all events that are active in this time slot (start here OR span through here)
+                    // Get all events that start in this time slot
                     const eventsInSlot = events.filter((event) => {
                       const eventStart = new Date(event.startDate);
-                      const eventEnd = new Date(event.endDate);
-                      const currentHour = time.getHours();
-                      const currentDate = date.toDateString();
-                      
-                      // Event starts in this hour
-                      const startsHere = eventStart.toDateString() === currentDate && eventStart.getHours() === currentHour;
-                      
-                      // Event spans through this hour (starts before and ends after)
-                      const spansThrough = eventStart.toDateString() === currentDate && 
-                                         eventStart.getHours() < currentHour && 
-                                         eventEnd.toDateString() === currentDate && 
-                                         eventEnd.getHours() > currentHour;
-                      
-                      // Event continues from previous hour
-                      const continuesFromPrevious = eventStart.toDateString() === currentDate && 
-                                                  eventStart.getHours() < currentHour && 
-                                                  eventEnd.toDateString() === currentDate && 
-                                                  eventEnd.getHours() >= currentHour;
-                      
-                      return startsHere || spansThrough || continuesFromPrevious;
+                      return (
+                        eventStart.toDateString() === date.toDateString() &&
+                        time.getHours() === eventStart.getHours()
+                      );
                     });
 
                     if (eventsInSlot.length === 0) return null;
@@ -706,53 +690,31 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     return eventsInSlot.map((event, index) => {
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
-                      const currentHour = time.getHours();
                       
-                      const durationHours = Math.max(
-                        1,
-                        Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 60 * 1000))
-                      );
-
+                      // Calculate the total duration in minutes
+                      const durationMinutes = Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 1000));
+                      
                       // Calculate position for this event
                       const top = padding + (index * (eventHeight + gap));
                       
-                      // Determine if this is the start cell or continuation cell
-                      const isStartCell = eventStart.getHours() === currentHour;
-                      const isContinuationCell = eventStart.getHours() < currentHour;
-                      
-                      // Calculate height for this specific cell
-                      let actualHeight = eventHeight;
-                      
-                      if (isStartCell) {
-                        // If event spans multiple hours, it can extend beyond this cell
-                        const remainingHours = Math.max(0, durationHours - 1);
-                        actualHeight = Math.min(slotHeight - padding, eventHeight + (remainingHours * 96));
-                      } else if (isContinuationCell) {
-                        // For continuation cells, show full height if it ends in this hour or later
-                        const hoursUntilEnd = eventEnd.getHours() - currentHour;
-                        if (hoursUntilEnd > 0) {
-                          actualHeight = Math.min(slotHeight - padding, hoursUntilEnd * 96);
-                        } else {
-                          // Event ends in this hour, calculate remaining height
-                          const minutesInThisHour = eventEnd.getMinutes();
-                          actualHeight = Math.min(slotHeight - padding, (minutesInThisHour / 60) * 96);
-                        }
-                      }
+                      // Calculate the actual height based on duration (96px per hour)
+                      const actualHeight = Math.max(eventHeight, (durationMinutes / 60) * 96);
 
                       return (
                         <div
                           key={event.id}
                           className={`absolute left-1 right-1 rounded text-xs p-1 overflow-hidden cursor-move transition-all duration-200 hover:shadow-md hover:scale-[1.02] hover:z-10 hover:border-2 hover:border-blue-400 group ${
                             eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
-                          } ${isContinuationCell ? 'border-l-0' : ''}`}
+                          }`}
                           style={{ 
                             top: `${top}px`,
                             height: `${actualHeight}px`,
-                            backgroundColor: isContinuationCell ? `${event.color}15` : `${event.color}20`,
+                            backgroundColor: `${event.color}20`,
                             color: event.color,
-                            borderLeft: isContinuationCell ? 'none' : `3px solid ${event.color}`,
+                            borderLeft: `3px solid ${event.color}`,
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                            overflow: 'visible'
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
@@ -760,20 +722,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             handleContextMenu(e, 'event', event);
                           }}
                         >
-                          {isContinuationCell ? (
-                            // For continuation cells, show minimal content
-                            <div className="font-medium truncate opacity-75">{event.title}</div>
-                          ) : (
-                            // For start cells, show full content
-                            <>
-                              <div className="font-medium truncate">{event.title}</div>
-                              <div className="text-xs opacity-75 truncate">
-                                {formatTime(eventStart)} - {formatTime(eventEnd)}
-                              </div>
-                            </>
-                          )}
+                          <div className="font-medium truncate">{event.title}</div>
+                          <div className="text-xs opacity-75 truncate">
+                            {formatTime(eventStart)} - {formatTime(eventEnd)}
+                          </div>
                           {/* Event count indicator for multiple events */}
-                          {showEventCount && index === 0 && isStartCell && (
+                          {showEventCount && index === 0 && (
                             <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                               {eventsInSlot.length}
                             </div>
