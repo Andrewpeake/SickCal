@@ -737,6 +737,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       const isStartOfEvent = eventStart.toDateString() === date.toDateString() && 
                                            eventStart.getHours() === time.getHours();
                       
+                      // Determine if this is the first time slot of the day for this event
+                      const isFirstSlotOfDay = time.getHours() === 0;
+                      
                       // Calculate position for this event
                       const top = padding + (index * (eventHeight + gap));
                       
@@ -789,9 +792,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                                 {formatTime(eventStart)} - {formatTime(eventEnd)}
                               </div>
                             </>
-                          ) : (
-                            // For continuation, show minimal content
+                          ) : isFirstSlotOfDay ? (
+                            // For first slot of day (but not start of event), show title only
                             <div className="font-medium truncate opacity-75">{event.title}</div>
+                          ) : (
+                            // For continuation slots, show no content
+                            <div></div>
                           )}
                           {/* Event count indicator for multiple events */}
                           {showEventCount && index === 0 && isStartOfEvent && (
