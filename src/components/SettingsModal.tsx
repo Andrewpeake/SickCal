@@ -24,9 +24,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     setLocalSettings(settings);
   }, [settings]);
 
+
+
   const handleSave = () => {
+    console.log('SettingsModal: Saving settings:', localSettings);
     onSave(localSettings);
     onClose();
+  };
+
+  const handleApply = () => {
+    console.log('SettingsModal: Applying settings:', localSettings);
+    onSave(localSettings);
   };
 
   const handleReset = () => {
@@ -534,6 +542,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
             >
               Cancel
+            </button>
+            <button
+              onClick={handleApply}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-200"
+            >
+              Apply
             </button>
             <button
               onClick={handleSave}

@@ -113,28 +113,35 @@ export const applyPrimaryColor = (color: string): void => {
 
 // Apply all settings at once
 export const applyAllSettings = (settings: Settings): void => {
+  console.log('applyAllSettings called with:', settings);
+  
   // Apply theme
   applyTheme(settings.theme);
+  console.log('Theme applied:', settings.theme);
   
   // Apply primary color
   applyPrimaryColor(settings.primaryColor);
+  console.log('Primary color applied:', settings.primaryColor);
   
   // Apply CSS custom properties for other appearance settings
   const root = document.documentElement;
   root.style.setProperty('--hour-height', `${settings.hourHeight}px`);
+  console.log('CSS custom property set: --hour-height =', `${settings.hourHeight}px`);
   
   // Apply settings to body as well for broader compatibility
   document.body.style.setProperty('--hour-height', `${settings.hourHeight}px`);
   
   // Store settings in localStorage for components to access
   localStorage.setItem(APPLIED_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  console.log('Settings stored in localStorage');
   
   // Dispatch custom event to notify components of settings change
   window.dispatchEvent(new CustomEvent('sickcal-settings-changed', { 
     detail: settings 
   }));
+  console.log('Custom event dispatched');
   
-  console.log('Settings applied:', settings);
+  console.log('All settings applied successfully');
 };
 
 // Get applied settings from localStorage
