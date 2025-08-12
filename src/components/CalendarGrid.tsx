@@ -744,12 +744,18 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       let actualHeight = eventHeight;
                       
                       if (isStartOfEvent) {
-                        // For start of event, calculate full remaining duration
-                        const durationMinutes = Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 1000));
+                        // For start of event, calculate height but limit to current day
+                        const endOfDay = new Date(date);
+                        endOfDay.setHours(23, 59, 59, 999);
+                        const effectiveEndTime = eventEnd < endOfDay ? eventEnd : endOfDay;
+                        const durationMinutes = Math.ceil((effectiveEndTime.getTime() - eventStart.getTime()) / (60 * 1000));
                         actualHeight = Math.max(eventHeight, (durationMinutes / 60) * 96);
                       } else {
-                        // For continuation, calculate remaining time from current slot to end
-                        const remainingMinutes = Math.ceil((eventEnd.getTime() - currentTime.getTime()) / (60 * 1000));
+                        // For continuation, calculate remaining time from current slot to end of day
+                        const endOfDay = new Date(date);
+                        endOfDay.setHours(23, 59, 59, 999);
+                        const effectiveEndTime = eventEnd < endOfDay ? eventEnd : endOfDay;
+                        const remainingMinutes = Math.ceil((effectiveEndTime.getTime() - currentTime.getTime()) / (60 * 1000));
                         actualHeight = Math.max(eventHeight, (remainingMinutes / 60) * 96);
                       }
 
