@@ -666,13 +666,22 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   
                   {/* Events for this time slot */}
                   {(() => {
-                    // Get all events that start in this time slot
+                    // Get all events that are active in this time slot (start here OR continue from previous time)
                     const eventsInSlot = events.filter((event) => {
                       const eventStart = new Date(event.startDate);
-                      return (
-                        eventStart.toDateString() === date.toDateString() &&
-                        time.getHours() === eventStart.getHours()
-                      );
+                      const eventEnd = new Date(event.endDate);
+                      const currentTime = new Date(date);
+                      currentTime.setHours(time.getHours(), 0, 0, 0);
+                      
+                      // Event starts in this exact time slot
+                      const startsHere = eventStart.toDateString() === date.toDateString() && 
+                                       eventStart.getHours() === time.getHours();
+                      
+                      // Event continues from previous time (same day or previous day)
+                      const continuesFromPrevious = eventStart.getTime() < currentTime.getTime() && 
+                                                  eventEnd.getTime() > currentTime.getTime();
+                      
+                      return startsHere || continuesFromPrevious;
                     });
 
                     if (eventsInSlot.length === 0) return null;
@@ -690,28 +699,41 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     return eventsInSlot.map((event, index) => {
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
+                      const currentTime = new Date(date);
+                      currentTime.setHours(time.getHours(), 0, 0, 0);
                       
-                      // Calculate the total duration in minutes
-                      const durationMinutes = Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 1000));
+                      // Determine if this is the start of the event or a continuation
+                      const isStartOfEvent = eventStart.toDateString() === date.toDateString() && 
+                                           eventStart.getHours() === time.getHours();
                       
                       // Calculate position for this event
                       const top = padding + (index * (eventHeight + gap));
                       
-                      // Calculate the actual height based on duration (96px per hour)
-                      const actualHeight = Math.max(eventHeight, (durationMinutes / 60) * 96);
+                      // Calculate height based on whether this is start or continuation
+                      let actualHeight = eventHeight;
+                      
+                      if (isStartOfEvent) {
+                        // For start of event, calculate full remaining duration
+                        const durationMinutes = Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 1000));
+                        actualHeight = Math.max(eventHeight, (durationMinutes / 60) * 96);
+                      } else {
+                        // For continuation, calculate remaining time from current slot to end
+                        const remainingMinutes = Math.ceil((eventEnd.getTime() - currentTime.getTime()) / (60 * 1000));
+                        actualHeight = Math.max(eventHeight, (remainingMinutes / 60) * 96);
+                      }
 
                       return (
                         <div
                           key={event.id}
                           className={`absolute left-1 right-1 rounded text-xs p-1 overflow-hidden cursor-move transition-all duration-200 hover:shadow-md hover:scale-[1.02] hover:z-10 hover:border-2 hover:border-blue-400 group ${
                             eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
-                          }`}
+                          } ${!isStartOfEvent ? 'border-l-0' : ''}`}
                           style={{ 
                             top: `${top}px`,
                             height: `${actualHeight}px`,
-                            backgroundColor: `${event.color}20`,
+                            backgroundColor: isStartOfEvent ? `${event.color}20` : `${event.color}15`,
                             color: event.color,
-                            borderLeft: `3px solid ${event.color}`,
+                            borderLeft: isStartOfEvent ? `3px solid ${event.color}` : 'none',
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                             overflow: 'visible'
@@ -722,12 +744,20 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             handleContextMenu(e, 'event', event);
                           }}
                         >
-                          <div className="font-medium truncate">{event.title}</div>
-                          <div className="text-xs opacity-75 truncate">
-                            {formatTime(eventStart)} - {formatTime(eventEnd)}
-                          </div>
+                          {isStartOfEvent ? (
+                            // For start of event, show full details
+                            <>
+                              <div className="font-medium truncate">{event.title}</div>
+                              <div className="text-xs opacity-75 truncate">
+                                {formatTime(eventStart)} - {formatTime(eventEnd)}
+                              </div>
+                            </>
+                          ) : (
+                            // For continuation, show minimal content
+                            <div className="font-medium truncate opacity-75">{event.title}</div>
+                          )}
                           {/* Event count indicator for multiple events */}
-                          {showEventCount && index === 0 && (
+                          {showEventCount && index === 0 && isStartOfEvent && (
                             <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                               {eventsInSlot.length}
                             </div>
