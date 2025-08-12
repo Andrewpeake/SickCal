@@ -19,6 +19,7 @@ const EventModal: React.FC<EventModalProps> = ({
     endDate: selectedDate || new Date(),
     color: '#0ea5e9',
     isAllDay: false,
+    isAllWeek: false,
     location: '',
     attendees: []
   });
@@ -54,6 +55,7 @@ const EventModal: React.FC<EventModalProps> = ({
       
       setFormData({
         ...event,
+        isAllWeek: event.isAllWeek || false,
         startDate: isNaN(eventStartDate.getTime()) ? new Date() : eventStartDate,
         endDate: isNaN(eventEndDate.getTime()) ? new Date() : eventEndDate
       });
@@ -113,6 +115,7 @@ const EventModal: React.FC<EventModalProps> = ({
       endDate: formData.endDate!,
       color: formData.color!,
       isAllDay: formData.isAllDay,
+      isAllWeek: formData.isAllWeek,
       location: formData.location,
       attendees: formData.attendees
     };
@@ -209,18 +212,67 @@ const EventModal: React.FC<EventModalProps> = ({
                 </select>
               </div>
 
-              {/* All Day Toggle */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="allDay"
-                  checked={formData.isAllDay}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isAllDay: e.target.checked }))}
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                />
-                <label htmlFor="allDay" className="ml-2 text-sm text-gray-700">
-                  All day event
+              {/* Event Type Options */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Event Type
                 </label>
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      isAllDay: false,
+                      isAllWeek: false 
+                    }))}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                      !formData.isAllDay && !formData.isAllWeek
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    Timed Event
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      isAllDay: true,
+                      isAllWeek: false 
+                    }))}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                      formData.isAllDay && !formData.isAllWeek
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    All Day
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const startDate = new Date(formData.startDate || new Date());
+                      const endDate = new Date(startDate);
+                      endDate.setDate(endDate.getDate() + 6); // End of week (7 days)
+                      endDate.setHours(23, 59, 59, 999);
+                      
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        isAllDay: true,
+                        isAllWeek: true,
+                        startDate,
+                        endDate
+                      }));
+                    }}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                      formData.isAllWeek
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    All Week
+                  </button>
+                </div>
               </div>
 
               {/* Description */}

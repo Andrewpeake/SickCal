@@ -8,6 +8,7 @@ export interface Event {
   endDate: Date;
   color: string;
   isAllDay?: boolean;
+  isAllWeek?: boolean;
   location?: string;
   attendees?: string[];
   category?: string;
