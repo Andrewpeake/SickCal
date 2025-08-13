@@ -20,7 +20,7 @@ import clsx from 'clsx';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
 
 // Live Time Indicator Component
-const LiveTimeIndicator: React.FC<{ timeSlots: Date[] }> = ({ timeSlots }) => {
+const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = ({ timeSlots, hourHeight }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -42,10 +42,10 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[] }> = ({ timeSlots }) => {
 
   // Calculate position based on current time within the hour
   const timeSlotIndex = timeSlots.findIndex(time => time.getHours() === currentHour);
-  const topPosition = timeSlotIndex * 96; // 96px per hour (h-24)
+  const topPosition = timeSlotIndex * hourHeight; // Use dynamic hour height
   
   // Adjust position within the hour based on minutes
-  const minuteOffset = (currentMinute / 60) * 96; // 96px per hour
+  const minuteOffset = (currentMinute / 60) * hourHeight; // Use dynamic hour height
   const finalTopPosition = topPosition + minuteOffset;
 
   return (
@@ -780,7 +780,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           }`}
         >
           {/* Live time indicator */}
-          {showLiveTimeIndicator && <LiveTimeIndicator timeSlots={timeSlots} />}
+          {showLiveTimeIndicator && <LiveTimeIndicator timeSlots={timeSlots} hourHeight={hourHeight} />}
 
 
 
