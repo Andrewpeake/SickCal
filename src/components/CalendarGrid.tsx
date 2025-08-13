@@ -783,6 +783,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   key={index}
                   className="relative group cursor-pointer hover:bg-gray-50 transition-colors duration-150 border-b border-gray-300 overflow-visible"
                   style={{ height: `${hourHeight}px` }}
+                  title="Click to create event, Double-click to create task"
 
                   onClick={(e) => {
                     // Create event at clicked time - only hour increments
@@ -792,6 +793,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     // Trigger event creation
                     if (onDateSelect) {
                       onDateSelect(clickedTime);
+                    }
+                  }}
+                  onDoubleClick={(e) => {
+                    // Create task at clicked time - only hour increments
+                    const clickedTime = new Date(date);
+                    clickedTime.setHours(time.getHours(), 0, 0, 0);
+                    
+                    // Trigger task creation
+                    if (onTaskCreate) {
+                      onTaskCreate(clickedTime);
                     }
                   }}
                   onContextMenu={(e) => {
