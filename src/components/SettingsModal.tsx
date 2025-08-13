@@ -38,7 +38,49 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleReset = () => {
-    setLocalSettings(settings);
+    const defaultSettings = {
+      // Appearance
+      theme: 'light',
+      primaryColor: '#0ea5e9',
+      hourHeight: 64,
+      showLiveTimeIndicator: true,
+      
+      // Calendar
+      defaultView: 'week',
+      weekStartsOn: 0,
+      defaultStartHour: 6,
+      defaultEndHour: 18,
+      showWeekend: true,
+      
+      // Events
+      defaultEventDuration: 60,
+      allowEventOverlap: false,
+      showEventCount: true,
+      eventColorScheme: 'category',
+      
+      // Interaction
+      enableDragAndDrop: true,
+      enableDoubleRightClickDelete: true,
+      enableKeyboardShortcuts: true,
+      enableZoomScroll: true,
+      
+      // Notifications
+      enableNotifications: false,
+      reminderTime: 15,
+      soundNotifications: false,
+      
+      // Data & Storage
+      autoSave: true,
+      backupFrequency: 'weekly',
+      exportFormat: 'json',
+      
+      // Advanced
+      timeFormat: '24h',
+      dateFormat: 'MM/DD/YYYY',
+      language: 'en',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+    };
+    setLocalSettings(defaultSettings);
   };
 
   const colorOptions = [

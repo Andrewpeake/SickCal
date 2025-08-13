@@ -99,13 +99,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   const enableDoubleRightClickDelete = settings.enableDoubleRightClickDelete;
   const enableZoomScroll = settings.enableZoomScroll;
   
-  // Debug zoom settings
-  console.log('CalendarGrid zoom settings:', { 
-    enableZoomScroll, 
-    hourHeight, 
-    localZoomHeight,
-    settingsHourHeight: settings.hourHeight 
-  });
+
   
   // Debug: Log settings when they change
   useEffect(() => {
@@ -499,56 +493,26 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         // Check for Command (Mac) or Alt (PC) + scroll for zoom functionality
         const isZoomKeyPressed = e.metaKey || e.altKey; // metaKey is Command on Mac, altKey is Alt on PC
         
-        console.log('Wheel event in calendar:', { 
-          isInCalendar, 
-          isZoomKeyPressed, 
-          enableZoomScroll, 
-          metaKey: e.metaKey, 
-          altKey: e.altKey,
-          deltaY: e.deltaY 
-        });
+
         
         if (isZoomKeyPressed && enableZoomScroll) {
           e.preventDefault();
-          console.log('Zoom triggered:', { 
-            metaKey: e.metaKey, 
-            altKey: e.altKey, 
-            deltaY: e.deltaY, 
-            currentHeight: localZoomHeight,
-            enableZoomScroll 
-          });
+          e.stopPropagation();
           
-          // Calculate new hour height based on scroll direction
-          const currentHourHeight = localZoomHeight; // Use current zoomed height, not settings
-          const zoomFactor = 0.1; // 10% change per scroll
-          const delta = e.deltaY > 0 ? -1 : 1; // Negative delta = scroll down = zoom out
+          // Simple zoom calculation - 8px change per scroll
+          const zoomStep = 8;
+          const delta = e.deltaY > 0 ? -zoomStep : zoomStep;
+          const newHeight = Math.max(24, Math.min(600, localZoomHeight + delta));
           
-          let newHourHeight = currentHourHeight + (delta * currentHourHeight * zoomFactor);
-          
-          // Clamp between minimum and maximum values
-          const minHeight = 24; // Minimum 24px per hour
-          const maxHeight = 600; // Maximum 600px per hour
-          newHourHeight = Math.max(minHeight, Math.min(maxHeight, newHourHeight));
-          
-          // Round to nearest integer
-          newHourHeight = Math.round(newHourHeight);
-          
-                      // Only update if the height actually changed
-            if (newHourHeight !== currentHourHeight) {
-              console.log('Zoom height changing:', { 
-                from: currentHourHeight, 
-                to: newHourHeight, 
-                delta: newHourHeight - currentHourHeight 
-              });
-              
-              // Update local zoom state for this session only
-              setLocalZoomHeight(newHourHeight);
-              
-              // Apply the CSS custom property immediately
-              const root = document.documentElement;
-              root.style.setProperty('--hour-height', `${newHourHeight}px`);
-              document.body.style.setProperty('--hour-height', `${newHourHeight}px`);
-            }
+          if (newHeight !== localZoomHeight) {
+            setLocalZoomHeight(newHeight);
+            
+            // Apply to CSS immediately
+            document.documentElement.style.setProperty('--hour-height', `${newHeight}px`);
+            document.body.style.setProperty('--hour-height', `${newHeight}px`);
+            
+            console.log('ZOOM WORKING: Changed from', localZoomHeight, 'to', newHeight);
+          }
           
           return;
         }
