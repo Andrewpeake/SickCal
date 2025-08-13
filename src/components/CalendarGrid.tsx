@@ -704,71 +704,71 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       <div ref={calendarRef} className="bg-white shadow-soft rounded-xl overflow-hidden">
         {/* Week header - fixed */}
         <div className="sticky-header bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-1">
-              <div className="w-20 bg-gray-50 p-3"></div>
-              {weekDays.map((date) => (
-                <div
-                  key={date.toISOString()}
-                  className={clsx(
-                    'flex-1 bg-gray-50 p-3 text-center',
-                    isToday(date) && 'bg-primary-50'
-                  )}
-                >
-                  <div className="text-sm font-medium text-gray-600">
-                    {getDayName(date)}
-                  </div>
-                  <div className={clsx(
-                    'text-lg font-bold',
-                    isToday(date) ? 'text-primary-600' : 'text-gray-900'
-                  )}>
-                    {date.getDate()}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* Expand/Collapse button */}
-            <div className="px-3">
-              <button
-                onClick={() => {
-                  // Single click: toggle normal expand
-                  if (isExpanded || isFull24Hours) {
-                    // Collapse both modes back to default
-                    setIsExpanded(false);
-                    setIsFull24Hours(false);
-                  } else {
-                    // Single click expand
-                    setIsExpanded(true);
-                    setIsFull24Hours(false);
-                  }
-                }}
-                onDoubleClick={() => {
-                  // Double click: show full 24 hours
-                  if (!isExpanded && !isFull24Hours) {
-                    setIsExpanded(true);
-                    setIsFull24Hours(true);
-                  }
-                }}
-                className="flex items-center gap-1 px-2 py-1 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors duration-150"
-                title={isExpanded || isFull24Hours ? "Collapse calendar" : "Single click: Expand | Double click: Full 24 hours"}
-              >
-                {isExpanded || isFull24Hours ? (
-                  <>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                    Collapse
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                    Expand
-                  </>
+          {/* Expand/Collapse button - positioned above header */}
+          <div className="flex justify-end p-2 border-b border-gray-200">
+            <button
+              onClick={() => {
+                // Single click: toggle normal expand
+                if (isExpanded || isFull24Hours) {
+                  // Collapse both modes back to default
+                  setIsExpanded(false);
+                  setIsFull24Hours(false);
+                } else {
+                  // Single click expand
+                  setIsExpanded(true);
+                  setIsFull24Hours(false);
+                }
+              }}
+              onDoubleClick={() => {
+                // Double click: show full 24 hours
+                if (!isExpanded && !isFull24Hours) {
+                  setIsExpanded(true);
+                  setIsFull24Hours(true);
+                }
+              }}
+              className="flex items-center gap-1 px-3 py-1 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors duration-150"
+              title={isExpanded || isFull24Hours ? "Collapse calendar" : "Single click: Expand | Double click: Full 24 hours"}
+            >
+              {isExpanded || isFull24Hours ? (
+                <>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                  Collapse
+                </>
+              ) : (
+                <>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  Expand
+                </>
+              )}
+            </button>
+          </div>
+          
+          {/* Day headers - now properly aligned */}
+          <div className="flex">
+            <div className="w-20 bg-gray-50 p-3"></div>
+            {weekDays.map((date) => (
+              <div
+                key={date.toISOString()}
+                className={clsx(
+                  'flex-1 bg-gray-50 p-3 text-center',
+                  isToday(date) && 'bg-primary-50'
                 )}
-              </button>
-            </div>
+              >
+                <div className="text-sm font-medium text-gray-600">
+                  {getDayName(date)}
+                </div>
+                <div className={clsx(
+                  'text-lg font-bold',
+                  isToday(date) ? 'text-primary-600' : 'text-gray-900'
+                )}>
+                  {date.getDate()}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
