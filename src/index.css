@@ -9,6 +9,7 @@
     --primary-600: #0ea5e9;
     --primary-700: #0284c7;
     --hour-height: 64px;
+    --grid-line-opacity: 0.75;
   }
   
   * {

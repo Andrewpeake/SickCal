@@ -43,6 +43,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       theme: 'light' as const,
       primaryColor: '#0ea5e9',
       hourHeight: 64,
+      gridLineOpacity: 0.75,
       showWeekNumbers: false,
       showTodayHighlight: true,
       showLiveTimeIndicator: true,
@@ -205,6 +206,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         className="w-full"
                       />
                       <div className="text-sm text-gray-500 mt-1">{localSettings.hourHeight}px</div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Grid Line Opacity
+                      </label>
+                      <input
+                        type="range"
+                        min="0.1"
+                        max="1.0"
+                        step="0.05"
+                        value={localSettings.gridLineOpacity}
+                        onChange={(e) => setLocalSettings(prev => ({ ...prev, gridLineOpacity: parseFloat(e.target.value) }))}
+                        className="w-full"
+                      />
+                      <div className="text-sm text-gray-500 mt-1">{Math.round(localSettings.gridLineOpacity * 100)}%</div>
                     </div>
                     <div className="space-y-3">
                       <label className="flex items-center">

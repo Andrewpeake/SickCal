@@ -85,6 +85,7 @@ export interface Settings {
   theme: 'light' | 'dark' | 'auto';
   primaryColor: string;
   hourHeight: number;
+  gridLineOpacity: number;
   showWeekNumbers: boolean;
   showTodayHighlight: boolean;
   showLiveTimeIndicator: boolean;

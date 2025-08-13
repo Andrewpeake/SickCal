@@ -785,7 +785,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           )}
 
           {/* Time column - sticky */}
-          <div className="w-20 bg-gray-50 sticky-time-column border-r border-gray-300">
+          <div 
+            className="w-20 bg-gray-50 sticky-time-column border-r border-gray-300"
+            style={{ borderRightColor: `rgba(209, 213, 219, ${settings.gridLineOpacity})` }}
+          >
             {timeSlots.map((time, index) => (
               <div
                 key={index}
@@ -801,12 +804,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           
           {/* Day columns */}
           {weekDays.map((date) => (
-            <div key={date.toISOString()} className="bg-white relative border-l border-gray-300">
+            <div 
+              key={date.toISOString()} 
+              className="bg-white relative border-l border-gray-300"
+              style={{ borderLeftColor: `rgba(209, 213, 219, ${settings.gridLineOpacity})` }}
+            >
               {timeSlots.map((time, index) => (
                 <div
                   key={index}
                   className="relative group cursor-pointer hover:bg-gray-50 transition-colors duration-150 border-b border-gray-300 overflow-visible"
-                  style={{ height: `${hourHeight}px` }}
+                  style={{ 
+                    borderBottomColor: `rgba(209, 213, 219, ${settings.gridLineOpacity})`,
+                    height: `${hourHeight}px` 
+                  }}
                   title="Click to create event, Double-click to create task"
 
                   onClick={(e) => {

@@ -5,6 +5,7 @@ export const defaultSettings: Settings = {
   theme: 'light',
   primaryColor: '#0ea5e9',
   hourHeight: 64,
+  gridLineOpacity: 0.75,
   showWeekNumbers: false,
   showTodayHighlight: true,
   showLiveTimeIndicator: true,
