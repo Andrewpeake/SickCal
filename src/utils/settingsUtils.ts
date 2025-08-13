@@ -4,7 +4,7 @@ export const defaultSettings: Settings = {
   // Appearance
   theme: 'light',
   primaryColor: '#0ea5e9',
-  hourHeight: 96,
+  hourHeight: 64,
   showWeekNumbers: false,
   showTodayHighlight: true,
   showLiveTimeIndicator: true,
