@@ -682,11 +682,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
     
     return (
-      <div ref={calendarRef} className="bg-white shadow-soft rounded-xl overflow-hidden">
+              <div ref={calendarRef} className="bg-white dark:bg-[#0d1117] shadow-soft rounded-xl overflow-hidden">
         {/* Week header - fixed */}
-        <div className="sticky-header bg-gray-50">
-          {/* Expand/Collapse button - positioned above header */}
-          <div className="flex justify-end p-2 border-b border-gray-200">
+                        <div className="sticky-header bg-gray-50 dark:bg-[#161b22]">
+                  {/* Expand/Collapse button - positioned above header */}
+                  <div className="flex justify-end p-2 border-b border-gray-200 dark:border-[#30363d]">
             <button
               onClick={() => {
                 // Single click: toggle normal expand
@@ -707,7 +707,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   setIsFull24Hours(true);
                 }
               }}
-              className="flex items-center gap-1 px-3 py-1 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors duration-150"
+              className="flex items-center gap-1 px-3 py-1 text-xs text-gray-600 dark:text-[#c9d1d9] hover:text-gray-800 dark:hover:text-[#f0f6fc] hover:bg-gray-100 dark:hover:bg-[#21262d] rounded transition-colors duration-150"
               title={isExpanded || isFull24Hours ? "Collapse calendar" : "Single click: Expand | Double click: Full 24 hours"}
             >
               {isExpanded || isFull24Hours ? (
@@ -729,22 +729,22 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           </div>
           
           {/* Day headers - now properly aligned */}
-          <div className="flex">
-            <div className="w-20 bg-gray-50 p-3"></div>
+                            <div className="flex">
+                    <div className="w-20 bg-gray-50 dark:bg-[#161b22] p-3"></div>
             {weekDays.map((date) => (
               <div
                 key={date.toISOString()}
                 className={clsx(
-                  'flex-1 bg-gray-50 p-3 text-center',
-                  isToday(date) && 'bg-primary-50'
+                  'flex-1 bg-gray-50 dark:bg-[#161b22] p-3 text-center',
+                  isToday(date) && 'bg-primary-50 dark:bg-[#1f6feb] dark:bg-opacity-10'
                 )}
               >
-                <div className="text-sm font-medium text-gray-600">
+                <div className="text-sm font-medium text-gray-600 dark:text-[#8b949e]">
                   {getDayName(date)}
                 </div>
                 <div className={clsx(
                   'text-lg font-bold',
-                  isToday(date) ? 'text-primary-600' : 'text-gray-900'
+                  isToday(date) ? 'text-primary-600 dark:text-[#1f6feb]' : 'text-gray-900 dark:text-[#c9d1d9]'
                 )}>
                   {date.getDate()}
                 </div>
@@ -786,18 +786,22 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
           {/* Time column - sticky */}
           <div 
-            className="w-20 bg-gray-50 sticky-time-column border-r border-gray-300"
-            style={{ borderRightColor: `rgba(209, 213, 219, ${settings.gridLineOpacity})` }}
+            className="w-20 bg-gray-50 dark:bg-[#161b22] sticky-time-column border-r border-gray-300 dark:border-[#30363d]"
+            style={{ 
+              borderRightColor: settings.theme === 'dark' 
+                ? `rgba(48, 54, 61, ${settings.gridLineOpacity})` 
+                : `rgba(209, 213, 219, ${settings.gridLineOpacity})` 
+            }}
           >
             {timeSlots.map((time, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-end pr-2 bg-gray-50"
-                style={{ height: `${hourHeight}px` }}
-              >
-                <span className="text-xs text-gray-500 font-medium">
-                  {formatTime(time)}
-                </span>
+                              <div
+                  key={index}
+                  className="flex items-center justify-end pr-2 bg-gray-50 dark:bg-[#161b22]"
+                  style={{ height: `${hourHeight}px` }}
+                >
+                                  <span className="text-xs text-gray-500 dark:text-[#8b949e] font-medium">
+                    {formatTime(time)}
+                  </span>
               </div>
             ))}
           </div>
@@ -806,15 +810,21 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           {weekDays.map((date) => (
             <div 
               key={date.toISOString()} 
-              className="bg-white relative border-l border-gray-300"
-              style={{ borderLeftColor: `rgba(209, 213, 219, ${settings.gridLineOpacity})` }}
+              className="bg-white dark:bg-[#0d1117] relative border-l border-gray-300 dark:border-[#30363d]"
+              style={{ 
+                borderLeftColor: settings.theme === 'dark' 
+                  ? `rgba(48, 54, 61, ${settings.gridLineOpacity})` 
+                  : `rgba(209, 213, 219, ${settings.gridLineOpacity})` 
+              }}
             >
               {timeSlots.map((time, index) => (
                 <div
                   key={index}
-                  className="relative group cursor-pointer hover:bg-gray-50 transition-colors duration-150 border-b border-gray-300 overflow-visible"
+                  className="relative group cursor-pointer hover:bg-gray-50 dark:hover:bg-[#161b22] transition-colors duration-150 border-b border-gray-300 dark:border-[#30363d] overflow-visible"
                   style={{ 
-                    borderBottomColor: `rgba(209, 213, 219, ${settings.gridLineOpacity})`,
+                    borderBottomColor: settings.theme === 'dark' 
+                      ? `rgba(48, 54, 61, ${settings.gridLineOpacity})` 
+                      : `rgba(209, 213, 219, ${settings.gridLineOpacity})`,
                     height: `${hourHeight}px` 
                   }}
                   title="Click to create event, Double-click to create task"

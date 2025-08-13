@@ -110,15 +110,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden" onClick={e => e.stopPropagation()}>
+      <div className="modal-content max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden bg-white dark:bg-[#161b22] text-gray-900 dark:text-[#c9d1d9]" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-[#c9d1d9] flex items-center gap-2">
             <Settings className="w-5 h-5" />
             Settings
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-[#21262d] rounded-lg transition-colors duration-200"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -126,7 +126,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
         <div className="flex gap-6 h-[calc(90vh-180px)]">
           {/* Sidebar */}
-          <div className="w-48 bg-gray-50 rounded-lg p-4">
+          <div className="w-48 bg-gray-50 dark:bg-[#0d1117] rounded-lg p-4">
             <nav className="space-y-2">
               {tabs.map((tab) => (
                 <button
@@ -135,7 +135,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                     activeTab === tab.id
                       ? 'bg-primary-600 text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      : 'text-gray-700 dark:text-[#c9d1d9] hover:bg-gray-100 dark:hover:bg-[#21262d]'
                   }`}
                 >
                   {tab.icon}
@@ -589,17 +589,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
-          <button
-            onClick={handleReset}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
-          >
+        <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-[#30363d] mt-6">
+                      <button
+              onClick={handleReset}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[#c9d1d9] bg-gray-100 dark:bg-[#21262d] hover:bg-gray-200 dark:hover:bg-[#30363d] rounded-lg transition-colors duration-200"
+            >
             Reset to Defaults
           </button>
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[#c9d1d9] bg-gray-100 dark:bg-[#21262d] hover:bg-gray-200 dark:hover:bg-[#30363d] rounded-lg transition-colors duration-200"
             >
               Cancel
             </button>

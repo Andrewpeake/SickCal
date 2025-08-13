@@ -21,29 +21,123 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
-  /* Dark theme support */
+  /* Dark theme support - Cursor-style coding aesthetic */
   .dark {
-    @apply bg-gray-900 text-gray-100;
+    @apply bg-[#0d1117] text-[#c9d1d9];
+    color-scheme: dark;
   }
   
+  /* Dark theme body and general elements */
+  .dark body {
+    @apply bg-[#0d1117] text-[#c9d1d9];
+  }
+  
+  /* Dark theme calendar grid */
+  .dark .calendar-grid {
+    @apply bg-[#161b22];
+  }
+  
+  /* Dark theme calendar days */
   .dark .calendar-day {
-    @apply bg-gray-800 text-gray-100;
+    @apply bg-[#0d1117] text-[#c9d1d9] border-[#30363d];
   }
   
   .dark .calendar-day:hover {
-    @apply bg-gray-700;
+    @apply bg-[#161b22];
+  }
+  
+  .dark .calendar-day.today {
+    @apply bg-[#1f6feb] bg-opacity-10 border-2 border-[#1f6feb];
   }
   
   .dark .calendar-day.other-month {
-    @apply bg-gray-900 text-gray-600;
+    @apply bg-[#0d1117] text-[#484f58];
   }
   
+  .dark .calendar-day.selected {
+    @apply bg-[#1f6feb] bg-opacity-20 border-2 border-[#1f6feb];
+  }
+  
+  /* Dark theme modals */
   .dark .modal-content {
-    @apply bg-gray-800 text-gray-100;
+    @apply bg-[#161b22] text-[#c9d1d9] border border-[#30363d];
   }
   
+  .dark .modal-overlay {
+    @apply bg-black bg-opacity-70;
+  }
+  
+  /* Dark theme input fields */
   .dark .input-field {
-    @apply bg-gray-700 border-gray-600 text-gray-100;
+    @apply bg-[#0d1117] border-[#30363d] text-[#c9d1d9] placeholder-[#484f58];
+  }
+  
+  .dark .input-field:focus {
+    @apply border-[#1f6feb] ring-[#1f6feb] ring-opacity-20;
+  }
+  
+  /* Dark theme buttons */
+  .dark .btn-primary {
+    @apply bg-[#1f6feb] hover:bg-[#388bfd] text-white border-[#1f6feb];
+  }
+  
+  .dark .btn-secondary {
+    @apply bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] border-[#30363d];
+  }
+  
+  /* Dark theme time slots */
+  .dark .time-slot {
+    @apply bg-[#0d1117];
+  }
+  
+  .dark .time-slot:hover {
+    @apply bg-[#161b22];
+  }
+  
+  /* Dark theme hour markers */
+  .dark .hour-marker {
+    @apply bg-[#30363d] opacity-60;
+  }
+  
+  .dark .quarter-marker {
+    @apply bg-[#21262d] opacity-40;
+  }
+  
+  /* Dark theme scrollbars */
+  .dark .calendar-scroll::-webkit-scrollbar-track {
+    @apply bg-[#0d1117];
+  }
+  
+  .dark .calendar-scroll::-webkit-scrollbar-thumb {
+    @apply bg-[#30363d];
+  }
+  
+  .dark .calendar-scroll::-webkit-scrollbar-thumb:hover {
+    @apply bg-[#484f58];
+  }
+  
+  /* Dark theme sticky elements */
+  .dark .sticky-header {
+    @apply bg-[#161b22] border-b border-[#30363d];
+  }
+  
+  .dark .sticky-time-column {
+    @apply bg-[#161b22] border-r border-[#30363d];
+  }
+  
+  /* Dark theme week grid */
+  .dark .calendar-week-grid {
+    @apply bg-[#161b22];
+  }
+  
+  /* Dark theme event dots */
+  .dark .event-dot {
+    @apply bg-[#1f6feb];
+  }
+  
+  /* Dark theme magnetic line */
+  .dark .magnetic-line {
+    @apply bg-[#1f6feb];
   }
 }
 
