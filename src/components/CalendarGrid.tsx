@@ -493,9 +493,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         
         if (isZoomKeyPressed && enableZoomScroll) {
           e.preventDefault();
+          console.log('Zoom triggered:', { 
+            metaKey: e.metaKey, 
+            altKey: e.altKey, 
+            deltaY: e.deltaY, 
+            currentHeight: localZoomHeight,
+            enableZoomScroll 
+          });
           
           // Calculate new hour height based on scroll direction
-          const currentHourHeight = settings.hourHeight;
+          const currentHourHeight = localZoomHeight; // Use current zoomed height, not settings
           const zoomFactor = 0.1; // 10% change per scroll
           const delta = e.deltaY > 0 ? -1 : 1; // Negative delta = scroll down = zoom out
           
@@ -511,6 +518,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           
                       // Only update if the height actually changed
             if (newHourHeight !== currentHourHeight) {
+              console.log('Zoom height changing:', { 
+                from: currentHourHeight, 
+                to: newHourHeight, 
+                delta: newHourHeight - currentHourHeight 
+              });
+              
               // Update local zoom state for this session only
               setLocalZoomHeight(newHourHeight);
               
