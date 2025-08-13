@@ -79,7 +79,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   onTaskEdit,
   onTaskDelete,
   onEventCreate,
-  onTaskCreate
+  onTaskCreate,
+  onSettingsChange
 }) => {
   // const [localCurrentDate, setLocalCurrentDate] = useState(currentDate); // Unused - using currentDate directly
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -486,9 +487,34 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         if (isZoomKeyPressed && enableZoomScroll) {
           e.preventDefault();
           
-          // Note: Hour height is now controlled by settings, not local state
-          // The zoom functionality is handled through the settings modal
-          console.log('Zoom functionality moved to settings');
+          // Calculate new hour height based on scroll direction
+          const currentHourHeight = settings.hourHeight;
+          const zoomFactor = 0.1; // 10% change per scroll
+          const delta = e.deltaY > 0 ? -1 : 1; // Negative delta = scroll down = zoom out
+          
+          let newHourHeight = currentHourHeight + (delta * currentHourHeight * zoomFactor);
+          
+          // Clamp between minimum and maximum values
+          const minHeight = 24; // Minimum 24px per hour
+          const maxHeight = 600; // Maximum 600px per hour
+          newHourHeight = Math.max(minHeight, Math.min(maxHeight, newHourHeight));
+          
+          // Round to nearest integer
+          newHourHeight = Math.round(newHourHeight);
+          
+          // Only update if the height actually changed
+          if (newHourHeight !== currentHourHeight) {
+            // Create new settings object with updated hour height
+            const newSettings = {
+              ...settings,
+              hourHeight: newHourHeight
+            };
+            
+            // Apply the new settings immediately
+            if (onSettingsChange) {
+              onSettingsChange(newSettings);
+            }
+          }
           
           return;
         }

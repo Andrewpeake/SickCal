@@ -459,6 +459,7 @@ function App() {
               onTaskDelete={handleTaskDelete}
               onEventCreate={handleEventCreate}
               onTaskCreate={handleTaskCreate}
+              onSettingsChange={handleSettingsSave}
             />
           </div>
 
