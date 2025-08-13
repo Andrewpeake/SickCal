@@ -79,8 +79,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   onTaskEdit,
   onTaskDelete,
   onEventCreate,
-  onTaskCreate,
-  onSettingsChange
+  onTaskCreate
 }) => {
   // const [localCurrentDate, setLocalCurrentDate] = useState(currentDate); // Unused - using currentDate directly
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -90,8 +89,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isFull24Hours, setIsFull24Hours] = useState(false);
   
+  // Local zoom state for session-only zooming
+  const [localZoomHeight, setLocalZoomHeight] = useState(settings.hourHeight);
+  
   // Use settings for various features
-  const hourHeight = settings.hourHeight;
+  const hourHeight = localZoomHeight; // Use local zoom height instead of settings
   const showLiveTimeIndicator = settings.showLiveTimeIndicator;
   const enableDragAndDrop = settings.enableDragAndDrop;
   const enableDoubleRightClickDelete = settings.enableDoubleRightClickDelete;
@@ -108,6 +110,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       fullSettings: settings
     });
   }, [hourHeight, showLiveTimeIndicator, enableDragAndDrop, enableDoubleRightClickDelete, enableZoomScroll, settings]);
+
+  // Sync local zoom height with settings changes (from settings modal)
+  useEffect(() => {
+    setLocalZoomHeight(settings.hourHeight);
+  }, [settings.hourHeight]);
   
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -502,19 +509,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           // Round to nearest integer
           newHourHeight = Math.round(newHourHeight);
           
-          // Only update if the height actually changed
-          if (newHourHeight !== currentHourHeight) {
-            // Create new settings object with updated hour height
-            const newSettings = {
-              ...settings,
-              hourHeight: newHourHeight
-            };
-            
-            // Apply the new settings immediately
-            if (onSettingsChange) {
-              onSettingsChange(newSettings);
+                      // Only update if the height actually changed
+            if (newHourHeight !== currentHourHeight) {
+              // Update local zoom state for this session only
+              setLocalZoomHeight(newHourHeight);
+              
+              // Apply the CSS custom property immediately
+              const root = document.documentElement;
+              root.style.setProperty('--hour-height', `${newHourHeight}px`);
+              document.body.style.setProperty('--hour-height', `${newHourHeight}px`);
             }
-          }
           
           return;
         }

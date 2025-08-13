@@ -60,7 +60,6 @@ export interface CalendarGridProps {
   onTaskDelete?: (taskId: string) => void;
   onEventCreate?: (event: Event) => void;
   onTaskCreate?: (date: Date) => void;
-  onSettingsChange?: (settings: Settings) => void;
 }
 
 export interface EventModalProps {
