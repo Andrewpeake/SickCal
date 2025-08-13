@@ -43,13 +43,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       theme: 'light',
       primaryColor: '#0ea5e9',
       hourHeight: 64,
+      showWeekNumbers: false,
+      showTodayHighlight: true,
       showLiveTimeIndicator: true,
       
       // Calendar
       defaultView: 'week',
-      weekStartsOn: 0,
+      weekStartsOn: 1,
       defaultStartHour: 6,
-      defaultEndHour: 18,
+      defaultEndHour: 22,
       showWeekend: true,
       
       // Events
