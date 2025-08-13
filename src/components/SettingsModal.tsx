@@ -38,9 +38,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleReset = () => {
-    const defaultSettings = {
+    const defaultSettings: Settings = {
       // Appearance
-      theme: 'light',
+      theme: 'light' as const,
       primaryColor: '#0ea5e9',
       hourHeight: 64,
       showWeekNumbers: false,
@@ -48,8 +48,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       showLiveTimeIndicator: true,
       
       // Calendar
-      defaultView: 'week',
-      weekStartsOn: 1,
+      defaultView: 'week' as const,
+      weekStartsOn: 1 as const,
       defaultStartHour: 6,
       defaultEndHour: 22,
       showWeekend: true,
@@ -58,7 +58,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       defaultEventDuration: 60,
       allowEventOverlap: false,
       showEventCount: true,
-      eventColorScheme: 'category',
+      eventColorScheme: 'category' as const,
       
       // Interaction
       enableDragAndDrop: true,
@@ -73,12 +73,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       
       // Data & Storage
       autoSave: true,
-      backupFrequency: 'weekly',
-      exportFormat: 'json',
+      backupFrequency: 'weekly' as const,
+      exportFormat: 'json' as const,
       
       // Advanced
-      timeFormat: '24h',
-      dateFormat: 'MM/DD/YYYY',
+      timeFormat: '24h' as const,
+      dateFormat: 'MM/DD/YYYY' as const,
       language: 'en',
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
