@@ -99,6 +99,14 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   const enableDoubleRightClickDelete = settings.enableDoubleRightClickDelete;
   const enableZoomScroll = settings.enableZoomScroll;
   
+  // Debug zoom settings
+  console.log('CalendarGrid zoom settings:', { 
+    enableZoomScroll, 
+    hourHeight, 
+    localZoomHeight,
+    settingsHourHeight: settings.hourHeight 
+  });
+  
   // Debug: Log settings when they change
   useEffect(() => {
     console.log('CalendarGrid settings updated:', {
@@ -490,6 +498,15 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       if (isInCalendar) {
         // Check for Command (Mac) or Alt (PC) + scroll for zoom functionality
         const isZoomKeyPressed = e.metaKey || e.altKey; // metaKey is Command on Mac, altKey is Alt on PC
+        
+        console.log('Wheel event in calendar:', { 
+          isInCalendar, 
+          isZoomKeyPressed, 
+          enableZoomScroll, 
+          metaKey: e.metaKey, 
+          altKey: e.altKey,
+          deltaY: e.deltaY 
+        });
         
         if (isZoomKeyPressed && enableZoomScroll) {
           e.preventDefault();
