@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { NavigationProps } from '../types';
 import { formatDate, navigateDate } from '../utils/dateUtils';
-import clsx from 'clsx';
 
 const Navigation: React.FC<NavigationProps> = ({
   currentDate,
@@ -32,79 +31,140 @@ const Navigation: React.FC<NavigationProps> = ({
     onDateChange(new Date());
   };
 
+  const navRef = useRef<HTMLDivElement>(null);
+  
   console.log('Navigation render - theme:', settings.theme, 'isDark:', settings.theme === 'dark');
   
-  // Debug CSS variables
-  const navBg = getComputedStyle(document.documentElement).getPropertyValue('--nav-bg');
-  const navText = getComputedStyle(document.documentElement).getPropertyValue('--nav-text');
-  console.log('CSS Variables - nav-bg:', navBg, 'nav-text:', navText);
+  // Force styles after mount and on theme change
+  useEffect(() => {
+    if (navRef.current) {
+      const element = navRef.current;
+      const isDark = settings.theme === 'dark';
+      
+      // Apply styles directly to the element
+      element.style.backgroundColor = isDark ? '#161b22' : '#ffffff';
+      element.style.color = isDark ? '#c9d1d9' : '#374151';
+      element.style.borderColor = isDark ? '#30363d' : '#d1d5db';
+      element.style.borderRadius = '12px';
+      element.style.padding = '16px';
+      element.style.marginBottom = '24px';
+      element.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+      element.style.overflow = 'hidden';
+      
+      console.log(`FORCED ${isDark ? 'DARK' : 'LIGHT'} STYLES ON NAVIGATION ELEMENT`);
+      
+      // Also apply styles to all child elements
+      const allElements = element.querySelectorAll('*');
+      allElements.forEach((el) => {
+        if (el instanceof HTMLElement) {
+          // Reset any inherited styles that might be causing issues
+          el.style.backgroundColor = 'transparent';
+          el.style.color = 'inherit';
+        }
+      });
+    }
+  }, [settings.theme]);
   
   return (
     <div 
-      className="shadow-soft rounded-xl p-4 mb-6"
+      ref={navRef}
       style={{
         backgroundColor: settings.theme === 'dark' ? '#161b22' : '#ffffff',
         color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
-        borderColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db'
+        borderColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db',
+        borderRadius: '12px',
+        padding: '16px',
+        marginBottom: '24px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        overflow: 'hidden'
       }}
     >
-      <div className="flex items-center justify-between">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Left side - Navigation controls */}
-        <div className="flex items-center space-x-4">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button
             onClick={handlePrevious}
-            className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-20"
             style={{
+              padding: '8px',
+              borderRadius: '8px',
+              transition: 'all 0.2s',
               color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
-              backgroundColor: 'transparent'
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer'
             }}
             aria-label="Previous"
           >
-            <ChevronLeft className="w-5 h-5" style={{ color: settings.theme === 'dark' ? '#c9d1d9' : '#374151' }} />
+            <ChevronLeft style={{ width: '20px', height: '20px', color: settings.theme === 'dark' ? '#c9d1d9' : '#374151' }} />
           </button>
           
           <button
             onClick={handleNext}
-            className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-20"
             style={{
+              padding: '8px',
+              borderRadius: '8px',
+              transition: 'all 0.2s',
               color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
-              backgroundColor: 'transparent'
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer'
             }}
             aria-label="Next"
           >
-            <ChevronRight className="w-5 h-5" style={{ color: settings.theme === 'dark' ? '#c9d1d9' : '#374151' }} />
+            <ChevronRight style={{ width: '20px', height: '20px', color: settings.theme === 'dark' ? '#c9d1d9' : '#374151' }} />
           </button>
           
           <button
             onClick={handleToday}
-            className="text-sm px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
             style={{
+              fontSize: '14px',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              fontWeight: '500',
+              transition: 'all 0.2s',
               backgroundColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db',
               color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
-              border: `1px solid ${settings.theme === 'dark' ? '#30363d' : '#d1d5db'}`
+              border: `1px solid ${settings.theme === 'dark' ? '#30363d' : '#d1d5db'}`,
+              cursor: 'pointer'
             }}
           >
             Today
           </button>
           
-          <h1 className="text-xl font-semibold" style={{ color: settings.theme === 'dark' ? '#c9d1d9' : '#374151' }}>
+          <h1 style={{ 
+            fontSize: '20px', 
+            fontWeight: '600',
+            color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
+            margin: 0
+          }}>
             {formatDate(currentDate, view === 'month' ? 'MMMM yyyy' : view === 'year' ? 'yyyy' : 'MMM dd, yyyy')}
           </h1>
         </div>
 
         {/* Right side - View options and add button */}
-        <div className="flex items-center space-x-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {/* View selector */}
-          <div className="flex rounded-lg p-1" style={{ backgroundColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db' }}>
+          <div style={{ 
+            display: 'flex', 
+            borderRadius: '8px', 
+            padding: '4px',
+            backgroundColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db'
+          }}>
             {viewOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => onViewChange(option.value as any)}
-                className="px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
                 style={{
+                  padding: '4px 12px',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s',
                   backgroundColor: view === option.value ? (settings.theme === 'dark' ? '#161b22' : '#ffffff') : 'transparent',
                   color: view === option.value ? '#1f6feb' : (settings.theme === 'dark' ? '#c9d1d9' : '#374151'),
-                  boxShadow: view === option.value ? '0 1px 2px 0 rgba(0, 0, 0, 0.05)' : 'none'
+                  boxShadow: view === option.value ? '0 1px 2px 0 rgba(0, 0, 0, 0.05)' : 'none',
+                  border: 'none',
+                  cursor: 'pointer'
                 }}
               >
                 {option.label}
@@ -113,13 +173,20 @@ const Navigation: React.FC<NavigationProps> = ({
           </div>
 
           {/* Add event button */}
-          <button className="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
-            style={{
-              backgroundColor: '#1f6feb',
-              color: 'white',
-              border: '1px solid #1f6feb'
-            }}>
-            <Plus className="w-4 h-4" />
+          <button style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontWeight: '500',
+            transition: 'all 0.2s',
+            backgroundColor: '#1f6feb',
+            color: 'white',
+            border: '1px solid #1f6feb',
+            cursor: 'pointer'
+          }}>
+            <Plus style={{ width: '16px', height: '16px' }} />
             <span>Add Event</span>
           </button>
         </div>
