@@ -34,13 +34,18 @@ const Navigation: React.FC<NavigationProps> = ({
 
   console.log('Navigation render - theme:', settings.theme, 'isDark:', settings.theme === 'dark');
   
+  // Debug CSS variables
+  const navBg = getComputedStyle(document.documentElement).getPropertyValue('--nav-bg');
+  const navText = getComputedStyle(document.documentElement).getPropertyValue('--nav-text');
+  console.log('CSS Variables - nav-bg:', navBg, 'nav-text:', navText);
+  
   return (
     <div 
       className="shadow-soft rounded-xl p-4 mb-6"
       style={{
-        backgroundColor: 'var(--nav-bg)',
-        color: 'var(--nav-text)',
-        borderColor: 'var(--nav-border)'
+        backgroundColor: settings.theme === 'dark' ? '#161b22' : '#ffffff',
+        color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
+        borderColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db'
       }}
     >
       <div className="flex items-center justify-between">
@@ -50,39 +55,39 @@ const Navigation: React.FC<NavigationProps> = ({
             onClick={handlePrevious}
             className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-20"
             style={{
-              color: 'var(--nav-text)',
+              color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
               backgroundColor: 'transparent'
             }}
             aria-label="Previous"
           >
-            <ChevronLeft className="w-5 h-5" style={{ color: 'var(--nav-text)' }} />
+            <ChevronLeft className="w-5 h-5" style={{ color: settings.theme === 'dark' ? '#c9d1d9' : '#374151' }} />
           </button>
           
           <button
             onClick={handleNext}
             className="p-2 rounded-lg transition-colors duration-200 hover:bg-opacity-20"
             style={{
-              color: 'var(--nav-text)',
+              color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
               backgroundColor: 'transparent'
             }}
             aria-label="Next"
           >
-            <ChevronRight className="w-5 h-5" style={{ color: 'var(--nav-text)' }} />
+            <ChevronRight className="w-5 h-5" style={{ color: settings.theme === 'dark' ? '#c9d1d9' : '#374151' }} />
           </button>
           
           <button
             onClick={handleToday}
             className="text-sm px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
             style={{
-              backgroundColor: 'var(--nav-border)',
-              color: 'var(--nav-text)',
-              border: '1px solid var(--nav-border)'
+              backgroundColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db',
+              color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
+              border: `1px solid ${settings.theme === 'dark' ? '#30363d' : '#d1d5db'}`
             }}
           >
             Today
           </button>
           
-          <h1 className="text-xl font-semibold" style={{ color: 'var(--nav-text)' }}>
+          <h1 className="text-xl font-semibold" style={{ color: settings.theme === 'dark' ? '#c9d1d9' : '#374151' }}>
             {formatDate(currentDate, view === 'month' ? 'MMMM yyyy' : view === 'year' ? 'yyyy' : 'MMM dd, yyyy')}
           </h1>
         </div>
@@ -90,15 +95,15 @@ const Navigation: React.FC<NavigationProps> = ({
         {/* Right side - View options and add button */}
         <div className="flex items-center space-x-3">
           {/* View selector */}
-          <div className="flex rounded-lg p-1" style={{ backgroundColor: 'var(--nav-border)' }}>
+          <div className="flex rounded-lg p-1" style={{ backgroundColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db' }}>
             {viewOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => onViewChange(option.value as any)}
                 className="px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
                 style={{
-                  backgroundColor: view === option.value ? 'var(--nav-bg)' : 'transparent',
-                  color: view === option.value ? '#1f6feb' : 'var(--nav-text)',
+                  backgroundColor: view === option.value ? (settings.theme === 'dark' ? '#161b22' : '#ffffff') : 'transparent',
+                  color: view === option.value ? '#1f6feb' : (settings.theme === 'dark' ? '#c9d1d9' : '#374151'),
                   boxShadow: view === option.value ? '0 1px 2px 0 rgba(0, 0, 0, 0.05)' : 'none'
                 }}
               >

@@ -51,6 +51,19 @@ function App() {
   useEffect(() => {
     console.log('Settings changed in App component:', settings);
     applyAllSettings(settings);
+    
+    // Force immediate theme application
+    if (settings.theme === 'dark') {
+      document.documentElement.style.setProperty('--nav-bg', '#161b22');
+      document.documentElement.style.setProperty('--nav-text', '#c9d1d9');
+      document.documentElement.style.setProperty('--nav-border', '#30363d');
+      console.log('Forced dark theme CSS variables in App component');
+    } else {
+      document.documentElement.style.setProperty('--nav-bg', '#ffffff');
+      document.documentElement.style.setProperty('--nav-text', '#374151');
+      document.documentElement.style.setProperty('--nav-border', '#d1d5db');
+      console.log('Forced light theme CSS variables in App component');
+    }
   }, [settings]);
 
   // Load data from localStorage on component mount
