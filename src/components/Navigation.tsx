@@ -36,7 +36,7 @@ const Navigation: React.FC<NavigationProps> = ({
     <div className={`shadow-soft rounded-xl p-4 mb-6 ${
       settings.theme === 'dark' 
         ? 'bg-[#161b22]' 
-        : 'bg-white navigation-light'
+        : 'bg-white'
     }`}>
       <div className="flex items-center justify-between">
         {/* Left side - Navigation controls */}
@@ -84,7 +84,7 @@ const Navigation: React.FC<NavigationProps> = ({
         {/* Right side - View options and add button */}
         <div className="flex items-center space-x-3">
           {/* View selector */}
-          <div className={`flex rounded-lg p-1 view-selector ${
+          <div className={`flex rounded-lg p-1 ${
             settings.theme === 'dark' 
               ? 'bg-[#21262d]' 
               : 'bg-gray-100'

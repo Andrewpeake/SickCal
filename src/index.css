@@ -249,24 +249,4 @@
     background-color: #e5e7eb;
   }
 
-  /* Light theme navigation - ensure it's always light */
-  .navigation-light {
-    @apply bg-white text-gray-900;
-  }
-  
-  .navigation-light .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-700;
-  }
-  
-  .navigation-light h1 {
-    @apply text-gray-900;
-  }
-  
-  .navigation-light button {
-    @apply text-gray-600;
-  }
-  
-  .navigation-light .view-selector {
-    @apply bg-gray-100;
-  }
 } 
