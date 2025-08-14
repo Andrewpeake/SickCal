@@ -439,6 +439,7 @@ function App() {
 
         {/* Navigation */}
         <Navigation
+          key={`nav-${settings.theme}`}
           currentDate={currentDate}
           onDateChange={handleDateChange}
           onViewChange={handleViewChange}

@@ -32,12 +32,19 @@ const Navigation: React.FC<NavigationProps> = ({
     onDateChange(new Date());
   };
 
+  console.log('Navigation render - theme:', settings.theme, 'isDark:', settings.theme === 'dark');
+  
   return (
-    <div className={`shadow-soft rounded-xl p-4 mb-6 ${
-      settings.theme === 'dark' 
-        ? 'bg-[#161b22]' 
-        : 'bg-white'
-    }`}>
+    <div 
+      className={`shadow-soft rounded-xl p-4 mb-6 ${
+        settings.theme === 'dark' 
+          ? 'bg-[#161b22]' 
+          : 'bg-white'
+      }`}
+      style={{
+        backgroundColor: settings.theme === 'dark' ? '#161b22' : '#ffffff'
+      }}
+    >
       <div className="flex items-center justify-between">
         {/* Left side - Navigation controls */}
         <div className="flex items-center space-x-4">
