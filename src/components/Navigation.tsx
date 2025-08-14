@@ -67,7 +67,11 @@ const Navigation: React.FC<NavigationProps> = ({
           
           <button
             onClick={handleToday}
-            className="btn-secondary text-sm"
+            className={`text-sm px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              settings.theme === 'dark'
+                ? 'bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] border-[#30363d] focus:ring-[#30363d]'
+                : 'bg-gray-200 hover:bg-gray-300 text-gray-700 focus:ring-gray-500'
+            }`}
           >
             Today
           </button>
@@ -106,7 +110,11 @@ const Navigation: React.FC<NavigationProps> = ({
           </div>
 
           {/* Add event button */}
-          <button className="btn-primary flex items-center space-x-2">
+          <button className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            settings.theme === 'dark'
+              ? 'bg-[#1f6feb] hover:bg-[#388bfd] text-white border-[#1f6feb] focus:ring-[#1f6feb]'
+              : 'bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500'
+          }`}>
             <Plus className="w-4 h-4" />
             <span>Add Event</span>
           </button>
