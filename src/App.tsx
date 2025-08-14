@@ -501,6 +501,7 @@ function App() {
               softDeadline: new Date(task.dueDate.getTime() - 3 * 24 * 60 * 60 * 1000),
               hardDeadline: new Date(task.dueDate.getTime() + 7 * 24 * 60 * 60 * 1000)
             })))}
+            settings={settings}
             onTaskClick={(task) => {
               // Find the original task and edit it
               const originalTask = tasks.find(t => t.id === task.id);
