@@ -89,18 +89,40 @@ export const resetSettings = (): Settings => {
 // Utility functions for applying settings
 export const applyTheme = (theme: string): void => {
   const root = document.documentElement;
+  const body = document.body;
   
+  // Set CSS custom properties for theme colors
   if (theme === 'dark') {
     root.classList.add('dark');
+    body.classList.add('dark');
+    root.style.setProperty('--nav-bg', '#161b22');
+    root.style.setProperty('--nav-text', '#c9d1d9');
+    root.style.setProperty('--nav-border', '#30363d');
+    console.log('Applied dark theme to document and body with CSS variables');
   } else if (theme === 'light') {
     root.classList.remove('dark');
+    body.classList.remove('dark');
+    root.style.setProperty('--nav-bg', '#ffffff');
+    root.style.setProperty('--nav-text', '#374151');
+    root.style.setProperty('--nav-border', '#d1d5db');
+    console.log('Applied light theme to document and body with CSS variables');
   } else if (theme === 'auto') {
     // Check system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (prefersDark) {
       root.classList.add('dark');
+      body.classList.add('dark');
+      root.style.setProperty('--nav-bg', '#161b22');
+      root.style.setProperty('--nav-text', '#c9d1d9');
+      root.style.setProperty('--nav-border', '#30363d');
+      console.log('Applied auto dark theme to document and body with CSS variables');
     } else {
       root.classList.remove('dark');
+      body.classList.remove('dark');
+      root.style.setProperty('--nav-bg', '#ffffff');
+      root.style.setProperty('--nav-text', '#374151');
+      root.style.setProperty('--nav-border', '#d1d5db');
+      console.log('Applied auto light theme to document and body with CSS variables');
     }
   }
 };

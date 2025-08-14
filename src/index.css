@@ -10,6 +10,11 @@
     --primary-700: #0284c7;
     --hour-height: 64px;
     --grid-line-opacity: 0.75;
+    
+    /* Navigation theme colors */
+    --nav-bg: #ffffff;
+    --nav-text: #374151;
+    --nav-border: #d1d5db;
   }
   
   * {
@@ -22,10 +27,29 @@
   }
   
   /* Dark theme support - Cursor-style coding aesthetic */
-  .dark {
-    @apply bg-[#0d1117] text-[#c9d1d9];
-    color-scheme: dark;
-  }
+.dark {
+  @apply bg-[#0d1117] text-[#c9d1d9];
+  color-scheme: dark;
+}
+
+/* Force navigation background in dark mode */
+.dark .navigation-dark {
+  background-color: #161b22 !important;
+}
+
+/* Force navigation background in light mode */
+.navigation-light {
+  background-color: #ffffff !important;
+}
+
+/* Force navigation background using data attributes */
+[data-theme="dark"] {
+  background-color: #161b22 !important;
+}
+
+[data-theme="light"] {
+  background-color: #ffffff !important;
+}
   
   /* Dark theme body and general elements */
   .dark body {
