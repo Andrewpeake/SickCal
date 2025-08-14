@@ -71,6 +71,30 @@
   color: #c9d1d9 !important;
   border-color: #30363d !important;
 }
+
+/* ULTIMATE OVERRIDE - Target any div that contains navigation elements */
+div[style*="backgroundColor"] {
+  background-color: #ff0000 !important;
+  border: 10px solid purple !important;
+}
+
+/* ULTIMATE OVERRIDE - Target any element with our test styles */
+div[style*="ff0000"], div[style*="00ff00"] {
+  background-color: #ff0000 !important;
+  border: 10px solid purple !important;
+}
+
+/* ULTIMATE OVERRIDE - Target the specific Navigation component */
+div[ref="navRef"], div[data-reactroot] > div > div > div {
+  background-color: #ff0000 !important;
+  border: 10px solid purple !important;
+}
+
+/* ULTIMATE OVERRIDE - Target any div that might be the navigation */
+div:has(> div > button[aria-label="Previous"]) {
+  background-color: #ff0000 !important;
+  border: 10px solid purple !important;
+}
   
   /* Dark theme body and general elements */
   .dark body {
