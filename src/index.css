@@ -99,6 +99,15 @@
     @apply bg-[#0d1117];
   }
   
+  /* Prevent white flash during theme loading */
+  .calendar-container {
+    @apply bg-white;
+  }
+  
+  .dark .calendar-container {
+    @apply bg-[#0d1117];
+  }
+  
   .dark .time-slot:hover {
     @apply bg-[#161b22];
   }

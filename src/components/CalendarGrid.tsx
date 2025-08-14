@@ -682,8 +682,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
     
     return (
-              <div ref={calendarRef} className={`shadow-soft rounded-xl overflow-hidden ${
-          settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+              <div ref={calendarRef} className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
+          settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
         }`}>
         {/* Week header - fixed */}
                         <div className={`sticky-header ${
@@ -1055,8 +1055,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     };
 
     return (
-              <div className={`shadow-soft rounded-xl p-6 ${
-          settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+              <div className={`calendar-container shadow-soft rounded-xl p-6 transition-colors duration-200 ${
+          settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
         }`}>
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
@@ -1238,8 +1238,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const yearMonths = getYearMonths(currentDate);
     
     return (
-      <div className={`shadow-soft rounded-xl overflow-hidden ${
-        settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+      <div className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
+        settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
       }`}>
         {/* Year grid - 4 rows of 3 months each */}
         <div className={`grid grid-rows-4 gap-px ${
@@ -1557,8 +1557,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const monthDays = getMonthDays(currentDate);
     
     return (
-      <div className={`shadow-soft rounded-xl overflow-hidden ${
-        settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+      <div className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
+        settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
       }`}>
         {/* Month header */}
         <div className={`grid grid-cols-7 gap-px ${
