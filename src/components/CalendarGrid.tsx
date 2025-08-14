@@ -1322,7 +1322,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           </div>
           
           {/* Row 2: Apr, May, Jun */}
-          <div className="grid grid-cols-3 gap-px bg-gray-200">
+          <div className={`grid grid-cols-3 gap-px ${
+            settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
+          }`}>
             {yearMonths.slice(3, 6).map((month, index) => {
               const monthEvents = getMonthEvents(events, month);
               const monthTasks = getMonthTasks(tasks, month);
@@ -1333,12 +1335,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   key={index + 3}
                   onClick={() => onDateSelect(month)}
                   className={clsx(
-                    'bg-white p-3 min-h-[140px] cursor-pointer hover:bg-gray-50 transition-colors duration-200',
-                    isCurrentMonthDay && 'bg-primary-50 border-2 border-primary-600'
+                    `p-3 min-h-[140px] cursor-pointer transition-colors duration-200 ${
+                      settings.theme === 'dark' ? 'bg-[#0d1117] hover:bg-[#161b22]' : 'bg-white hover:bg-gray-50'
+                    }`,
+                    isCurrentMonthDay && (settings.theme === 'dark' ? 'bg-[#1f6feb] bg-opacity-10 border-2 border-[#1f6feb]' : 'bg-primary-50 border-2 border-primary-600')
                   )}
                 >
                   {/* Month name */}
-                  <div className="text-xs font-medium text-gray-600 mb-2">
+                  <div className={`text-xs font-medium mb-2 ${
+                    settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
+                  }`}>
                     {formatDate(month, 'MMM')}
                   </div>
                   
@@ -1392,7 +1398,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           </div>
           
           {/* Row 3: Jul, Aug, Sep */}
-          <div className="grid grid-cols-3 gap-px bg-gray-200">
+          <div className={`grid grid-cols-3 gap-px ${
+            settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
+          }`}>
             {yearMonths.slice(6, 9).map((month, index) => {
               const monthEvents = getMonthEvents(events, month);
               const monthTasks = getMonthTasks(tasks, month);
@@ -1403,12 +1411,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   key={index + 6}
                   onClick={() => onDateSelect(month)}
                   className={clsx(
-                    'bg-white p-3 min-h-[140px] cursor-pointer hover:bg-gray-50 transition-colors duration-200',
-                    isCurrentMonthDay && 'bg-primary-50 border-2 border-primary-600'
+                    `p-3 min-h-[140px] cursor-pointer transition-colors duration-200 ${
+                      settings.theme === 'dark' ? 'bg-[#0d1117] hover:bg-[#161b22]' : 'bg-white hover:bg-gray-50'
+                    }`,
+                    isCurrentMonthDay && (settings.theme === 'dark' ? 'bg-[#1f6feb] bg-opacity-10 border-2 border-[#1f6feb]' : 'bg-primary-50 border-2 border-primary-600')
                   )}
                 >
                   {/* Month name */}
-                  <div className="text-xs font-medium text-gray-600 mb-2">
+                  <div className={`text-xs font-medium mb-2 ${
+                    settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
+                  }`}>
                     {formatDate(month, 'MMM')}
                   </div>
                   
@@ -1462,7 +1474,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           </div>
           
           {/* Row 4: Oct, Nov, Dec */}
-          <div className="grid grid-cols-3 gap-px bg-gray-200">
+          <div className={`grid grid-cols-3 gap-px ${
+            settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
+          }`}>
             {yearMonths.slice(9, 12).map((month, index) => {
               const monthEvents = getMonthEvents(events, month);
               const monthTasks = getMonthTasks(tasks, month);
@@ -1473,12 +1487,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   key={index + 9}
                   onClick={() => onDateSelect(month)}
                   className={clsx(
-                    'bg-white p-3 min-h-[140px] cursor-pointer hover:bg-gray-50 transition-colors duration-200',
-                    isCurrentMonthDay && 'bg-primary-50 border-2 border-primary-600'
+                    `p-3 min-h-[140px] cursor-pointer transition-colors duration-200 ${
+                      settings.theme === 'dark' ? 'bg-[#0d1117] hover:bg-[#161b22]' : 'bg-white hover:bg-gray-50'
+                    }`,
+                    isCurrentMonthDay && (settings.theme === 'dark' ? 'bg-[#1f6feb] bg-opacity-10 border-2 border-[#1f6feb]' : 'bg-primary-50 border-2 border-primary-600')
                   )}
                 >
                   {/* Month name */}
-                  <div className="text-xs font-medium text-gray-600 mb-2">
+                  <div className={`text-xs font-medium mb-2 ${
+                    settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
+                  }`}>
                     {formatDate(month, 'MMM')}
                   </div>
                   
