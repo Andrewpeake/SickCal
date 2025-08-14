@@ -32,7 +32,7 @@ const Navigation: React.FC<NavigationProps> = ({
   };
 
   return (
-    <div className="bg-white shadow-soft rounded-xl p-4 mb-6">
+    <div className="bg-white shadow-soft rounded-xl p-4 mb-6 navigation-light">
       <div className="flex items-center justify-between">
         {/* Left side - Navigation controls */}
         <div className="flex items-center space-x-4">
@@ -67,7 +67,7 @@ const Navigation: React.FC<NavigationProps> = ({
         {/* Right side - View options and add button */}
         <div className="flex items-center space-x-3">
           {/* View selector */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 rounded-lg p-1 view-selector">
             {viewOptions.map((option) => (
               <button
                 key={option.value}
