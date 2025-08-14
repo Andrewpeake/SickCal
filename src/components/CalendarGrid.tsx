@@ -1059,20 +1059,28 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
         }`}>
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className={`text-2xl font-bold mb-2 ${
+            settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+          }`}>
             {formatDate(selectedDate, 'EEEE, MMMM dd, yyyy')}
           </h2>
-          <p className="text-gray-600">
+          <p className={settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'}>
             {dayEvents.length} events, {dayTasks.length} tasks
           </p>
         </div>
 
         {/* Daily Events Board (All-day) */}
         <div
-          className="mb-8 border border-gray-200 rounded-lg p-3 bg-gray-50"
+          className={`mb-8 border rounded-lg p-3 ${
+            settings.theme === 'dark' 
+              ? 'border-[#30363d] bg-[#161b22]' 
+              : 'border-gray-200 bg-gray-50'
+          }`}
           onContextMenu={(e) => handleContextMenu(e, 'empty', { date: selectedDate, allDay: true })}
         >
-          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+          <h3 className={`text-lg font-semibold mb-3 flex items-center ${
+            settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+          }`}>
             <Clock className="w-5 h-5 mr-2 text-primary-600" />
             Daily Events
           </h3>
@@ -1084,7 +1092,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 style={{ gridTemplateColumns: `repeat(${totalCols}, minmax(0, 1fr))` }}
               >
                 {row.length === 0 ? (
-                  <div className="col-span-full text-center text-xs text-gray-400">Right-click here to add a daily event</div>
+                  <div className={`col-span-full text-center text-xs ${
+                    settings.theme === 'dark' ? 'text-[#484f58]' : 'text-gray-400'
+                  }`}>Right-click here to add a daily event</div>
                 ) : (
                   row.map((evt, i) => (
                     <div
@@ -1113,7 +1123,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
         {/* Events */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <h3 className={`text-lg font-semibold mb-4 flex items-center ${
+            settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+          }`}>
             <Clock className="w-5 h-5 mr-2 text-primary-600" />
             Events
           </h3>
@@ -1134,25 +1146,35 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   }}
                 >
                   <div className="flex items-center justify-between">
-                    <h4 className="font-medium text-gray-900">{event.title}</h4>
-                    <span className="text-sm text-gray-500">
+                    <h4 className={`font-medium ${
+                      settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+                    }`}>{event.title}</h4>
+                    <span className={`text-sm ${
+                      settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
+                    }`}>
                       {formatTime(new Date(event.startDate))} - {formatTime(new Date(event.endDate))}
                     </span>
                   </div>
                   {event.description && (
-                    <p className="text-sm text-gray-600 mt-1">{event.description}</p>
+                    <p className={`text-sm mt-1 ${
+                      settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
+                    }`}>{event.description}</p>
                   )}
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">No events scheduled</p>
+            <p className={`text-center py-8 ${
+              settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
+            }`}>No events scheduled</p>
           )}
         </div>
 
         {/* Tasks */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <h3 className={`text-lg font-semibold mb-4 flex items-center ${
+            settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+          }`}>
             <CheckCircle className="w-5 h-5 mr-2 text-primary-600" />
             Tasks
           </h3>
@@ -1162,8 +1184,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 <div
                   key={task.id}
                   className={clsx(
-                    'p-4 rounded-lg border border-gray-200',
-                    task.completed && 'bg-gray-50'
+                    'p-4 rounded-lg border',
+                    settings.theme === 'dark' 
+                      ? 'border-[#30363d]' 
+                      : 'border-gray-200',
+                    task.completed && (settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50')
                   )}
                 >
                   <div className="flex items-center space-x-3">
@@ -1175,12 +1200,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     <div className="flex-1">
                       <h4 className={clsx(
                         'font-medium',
-                        task.completed ? 'text-gray-500 line-through' : 'text-gray-900'
+                        task.completed 
+                          ? (settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500') + ' line-through'
+                          : (settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900')
                       )}>
                         {task.title}
                       </h4>
                       {task.description && (
-                        <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+                        <p className={`text-sm mt-1 ${
+                          settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
+                        }`}>{task.description}</p>
                       )}
                     </div>
                     <span className={clsx(
@@ -1196,7 +1225,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-8">No tasks due</p>
+            <p className={`text-center py-8 ${
+              settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
+            }`}>No tasks due</p>
           )}
         </div>
       </div>
@@ -1211,9 +1242,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
       }`}>
         {/* Year grid - 4 rows of 3 months each */}
-        <div className="grid grid-rows-4 gap-px bg-gray-200">
+        <div className={`grid grid-rows-4 gap-px ${
+          settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
+        }`}>
           {/* Row 1: Jan, Feb, Mar */}
-          <div className="grid grid-cols-3 gap-px bg-gray-200">
+          <div className={`grid grid-cols-3 gap-px ${
+            settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
+          }`}>
             {yearMonths.slice(0, 3).map((month, index) => {
               const monthEvents = getMonthEvents(events, month);
               const monthTasks = getMonthTasks(tasks, month);
@@ -1224,12 +1259,16 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   key={index}
                   onClick={() => onDateSelect(month)}
                   className={clsx(
-                    'bg-white p-3 min-h-[140px] cursor-pointer hover:bg-gray-50 transition-colors duration-200',
-                    isCurrentMonthDay && 'bg-primary-50 border-2 border-primary-600'
+                    `p-3 min-h-[140px] cursor-pointer transition-colors duration-200 ${
+                      settings.theme === 'dark' ? 'bg-[#0d1117] hover:bg-[#161b22]' : 'bg-white hover:bg-gray-50'
+                    }`,
+                    isCurrentMonthDay && (settings.theme === 'dark' ? 'bg-[#1f6feb] bg-opacity-10 border-2 border-[#1f6feb]' : 'bg-primary-50 border-2 border-primary-600')
                   )}
                 >
                   {/* Month name */}
-                  <div className="text-xs font-medium text-gray-600 mb-2">
+                  <div className={`text-xs font-medium mb-2 ${
+                    settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
+                  }`}>
                     {formatDate(month, 'MMM')}
                   </div>
                   
