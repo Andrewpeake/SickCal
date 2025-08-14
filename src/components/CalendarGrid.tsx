@@ -682,9 +682,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
     
     return (
-              <div ref={calendarRef} className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
-          settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
-        }`}>
+              <div ref={calendarRef} className={`shadow-soft rounded-xl overflow-hidden transition-colors duration-200`}>
         {/* Week header - fixed */}
                         <div className={`sticky-header ${
                   settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
@@ -1055,9 +1053,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     };
 
     return (
-              <div className={`calendar-container shadow-soft rounded-xl p-6 transition-colors duration-200 ${
-          settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
-        }`}>
+              <div className={`shadow-soft rounded-xl p-6 transition-colors duration-200`}>
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
             settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
@@ -1238,9 +1234,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const yearMonths = getYearMonths(currentDate);
     
     return (
-      <div className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
-        settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
-      }`}>
+      <div className={`shadow-soft rounded-xl overflow-hidden transition-colors duration-200`}>
         {/* Year grid - 4 rows of 3 months each */}
         <div className={`grid grid-rows-4 gap-px ${
           settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
@@ -1557,9 +1551,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const monthDays = getMonthDays(currentDate);
     
     return (
-      <div className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
-        settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
-      }`}>
+      <div className={`shadow-soft rounded-xl overflow-hidden transition-colors duration-200`}>
         {/* Month header */}
         <div className={`grid grid-cols-7 gap-px ${
           settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
@@ -1599,7 +1591,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   };
 
   return (
-    <>
+    <div className={`calendar-container transition-colors duration-200 ${
+      settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+    }`}>
       {renderContent()}
       <ContextMenu
         isOpen={contextMenu.isOpen}
@@ -1608,7 +1602,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         items={getContextMenuItems()}
         onClose={closeContextMenu}
       />
-    </>
+    </div>
   );
 };
 
