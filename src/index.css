@@ -47,8 +47,10 @@
   
   /* Dark theme calendar grid */
   .dark .calendar-grid {
-    @apply bg-[#161b22];
+    background-color: rgba(48, 54, 61, var(--grid-line-opacity, 0.75));
   }
+  
+
   
   /* Dark theme calendar days */
   .dark .calendar-day {
@@ -210,7 +212,12 @@
 
 @layer components {
   .calendar-grid {
-    @apply grid grid-cols-7 gap-px bg-gray-200 rounded-lg overflow-hidden;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background-color: rgba(156, 163, 175, var(--grid-line-opacity, 0.75));
+    border-radius: 0.5rem;
+    overflow: hidden;
   }
   
   .calendar-day {

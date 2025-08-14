@@ -1586,7 +1586,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         </div>
 
         {/* Calendar grid */}
-        <div className="calendar-grid">
+        <div 
+          className="calendar-grid"
+          style={{
+            '--grid-line-opacity': settings.gridLineOpacity || 0.75
+          } as React.CSSProperties}
+        >
           {monthDays.map((date) => renderDayCell(date))}
         </div>
       </div>
