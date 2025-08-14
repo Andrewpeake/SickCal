@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { NavigationProps } from '../types';
 import { formatDate, navigateDate } from '../utils/dateUtils';
