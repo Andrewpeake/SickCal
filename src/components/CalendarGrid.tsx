@@ -682,11 +682,17 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
     
     return (
-              <div ref={calendarRef} className="bg-white shadow-soft rounded-xl overflow-hidden">
+              <div ref={calendarRef} className={`shadow-soft rounded-xl overflow-hidden ${
+          settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+        }`}>
         {/* Week header - fixed */}
-                        <div className="sticky-header bg-gray-50">
+                        <div className={`sticky-header ${
+                  settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
+                }`}>
                   {/* Expand/Collapse button - positioned above header */}
-                  <div className="flex justify-end p-2 border-b border-gray-200">
+                  <div className={`flex justify-end p-2 border-b ${
+                    settings.theme === 'dark' ? 'border-[#30363d]' : 'border-gray-200'
+                  }`}>
             <button
               onClick={() => {
                 // Single click: toggle normal expand
@@ -730,21 +736,28 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           
           {/* Day headers - now properly aligned */}
                             <div className="flex">
-                    <div className="w-20 bg-gray-50 p-3"></div>
+                    <div className={`w-20 p-3 ${
+                      settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
+                    }`}></div>
             {weekDays.map((date) => (
               <div
                 key={date.toISOString()}
                 className={clsx(
-                  'flex-1 bg-gray-50 p-3 text-center',
-                  isToday(date) && 'bg-primary-50'
+                  'flex-1 p-3 text-center',
+                  settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50',
+                  isToday(date) && (settings.theme === 'dark' ? 'bg-[#1f6feb] bg-opacity-10' : 'bg-primary-50')
                 )}
               >
-                <div className="text-sm font-medium text-gray-600">
+                <div className={`text-sm font-medium ${
+                  settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
+                }`}>
                   {getDayName(date)}
                 </div>
                 <div className={clsx(
                   'text-lg font-bold',
-                  isToday(date) ? 'text-primary-600' : 'text-gray-900'
+                  isToday(date) 
+                    ? (settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600')
+                    : (settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900')
                 )}>
                   {date.getDate()}
                 </div>
@@ -786,18 +799,26 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
           {/* Time column - sticky */}
           <div 
-            className="w-20 bg-gray-50 sticky-time-column border-r border-gray-300"
+            className={`w-20 sticky-time-column border-r ${
+              settings.theme === 'dark' ? 'bg-[#161b22] border-[#30363d]' : 'bg-gray-50 border-gray-300'
+            }`}
             style={{ 
-              borderRightColor: `rgba(209, 213, 219, ${settings.gridLineOpacity})` 
+              borderRightColor: settings.theme === 'dark' 
+                ? `rgba(48, 54, 61, ${settings.gridLineOpacity})` 
+                : `rgba(209, 213, 219, ${settings.gridLineOpacity})` 
             }}
           >
             {timeSlots.map((time, index) => (
                               <div
                   key={index}
-                  className="flex items-center justify-end pr-2 bg-gray-50"
+                  className={`flex items-center justify-end pr-2 ${
+                    settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
+                  }`}
                   style={{ height: `${hourHeight}px` }}
                 >
-                                  <span className="text-xs text-gray-500 font-medium">
+                                  <span className={`text-xs font-medium ${
+                    settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
+                  }`}>
                     {formatTime(time)}
                   </span>
               </div>
@@ -808,17 +829,27 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           {weekDays.map((date) => (
             <div 
               key={date.toISOString()} 
-              className="bg-white relative border-l border-gray-300"
+              className={`relative border-l ${
+                settings.theme === 'dark' ? 'bg-[#0d1117] border-[#30363d]' : 'bg-white border-gray-300'
+              }`}
               style={{ 
-                borderLeftColor: `rgba(209, 213, 219, ${settings.gridLineOpacity})` 
+                borderLeftColor: settings.theme === 'dark' 
+                  ? `rgba(48, 54, 61, ${settings.gridLineOpacity})` 
+                  : `rgba(209, 213, 219, ${settings.gridLineOpacity})` 
               }}
             >
               {timeSlots.map((time, index) => (
                 <div
                   key={index}
-                  className="relative group cursor-pointer hover:bg-gray-50 transition-colors duration-150 border-b border-gray-300 overflow-visible"
+                  className={`relative group cursor-pointer transition-colors duration-150 border-b overflow-visible ${
+                    settings.theme === 'dark' 
+                      ? 'hover:bg-[#161b22] border-[#30363d]' 
+                      : 'hover:bg-gray-50 border-gray-300'
+                  }`}
                   style={{ 
-                    borderBottomColor: `rgba(209, 213, 219, ${settings.gridLineOpacity})`,
+                    borderBottomColor: settings.theme === 'dark' 
+                      ? `rgba(48, 54, 61, ${settings.gridLineOpacity})` 
+                      : `rgba(209, 213, 219, ${settings.gridLineOpacity})`,
                     height: `${hourHeight}px` 
                   }}
                   title="Click to create event, Double-click to create task"
@@ -1024,7 +1055,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     };
 
     return (
-      <div className="bg-white shadow-soft rounded-xl p-6">
+              <div className={`shadow-soft rounded-xl p-6 ${
+          settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+        }`}>
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             {formatDate(selectedDate, 'EEEE, MMMM dd, yyyy')}
@@ -1174,7 +1207,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const yearMonths = getYearMonths(currentDate);
     
     return (
-      <div className="bg-white shadow-soft rounded-xl overflow-hidden">
+      <div className={`shadow-soft rounded-xl overflow-hidden ${
+        settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+      }`}>
         {/* Year grid - 4 rows of 3 months each */}
         <div className="grid grid-rows-4 gap-px bg-gray-200">
           {/* Row 1: Jan, Feb, Mar */}
@@ -1465,7 +1500,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const monthDays = getMonthDays(currentDate);
     
     return (
-      <div className="bg-white shadow-soft rounded-xl overflow-hidden">
+      <div className={`shadow-soft rounded-xl overflow-hidden ${
+        settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+      }`}>
         {/* Month header */}
         <div className="grid grid-cols-7 gap-px bg-gray-200">
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
