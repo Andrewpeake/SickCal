@@ -33,7 +33,7 @@ const Navigation: React.FC<NavigationProps> = ({
 
   const navRef = useRef<HTMLDivElement>(null);
   
-  console.log('Navigation render - theme:', settings.theme, 'isDark:', settings.theme === 'dark');
+  console.log('Navigation render - theme:', settings.theme, 'isDark:', settings.theme === 'dark', 'settings object:', settings);
   
   // Force styles after mount and on theme change
   useEffect(() => {
@@ -66,19 +66,19 @@ const Navigation: React.FC<NavigationProps> = ({
   }, [settings.theme]);
   
   return (
-    <div 
-      ref={navRef}
-      style={{
-        backgroundColor: settings.theme === 'dark' ? '#161b22' : '#ffffff',
-        color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
-        borderColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db',
-        borderRadius: '12px',
-        padding: '16px',
-        marginBottom: '24px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        overflow: 'hidden'
-      }}
-    >
+          <div 
+        ref={navRef}
+        style={{
+          backgroundColor: settings.theme === 'dark' ? '#ff0000' : '#00ff00', // TEST: Red for dark, green for light
+          color: settings.theme === 'dark' ? '#ffffff' : '#000000',
+          borderColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db',
+          borderRadius: '12px',
+          padding: '16px',
+          marginBottom: '24px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          overflow: 'hidden'
+        }}
+      >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Left side - Navigation controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
