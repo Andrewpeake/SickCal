@@ -36,12 +36,17 @@ function App() {
   const [selectedProject, setSelectedProject] = useState<Project | undefined>();
 
   // Settings state
-  const [settings, setSettings] = useState<Settings>(() => loadSettings());
+  const [settings, setSettings] = useState<Settings>(() => {
+    const savedSettings = loadSettings();
+    console.log('Initial settings loaded:', savedSettings);
+    return savedSettings;
+  });
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // Load and apply settings from localStorage on mount
   useEffect(() => {
     const savedSettings = loadSettings();
+    console.log('useEffect settings loaded:', savedSettings);
     setSettings(savedSettings);
     // Apply settings immediately on mount
     applyAllSettings(savedSettings);
@@ -426,7 +431,7 @@ function App() {
 
   return (
     <div className={`min-h-screen ${settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-gray-50'}`}>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8" style={{ backgroundColor: 'yellow' }}> {/* TEST: Yellow background */}
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>

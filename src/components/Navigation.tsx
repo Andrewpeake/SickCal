@@ -71,7 +71,7 @@ const Navigation: React.FC<NavigationProps> = ({
         style={{
           backgroundColor: settings.theme === 'dark' ? '#ff0000' : '#00ff00', // TEST: Red for dark, green for light
           color: settings.theme === 'dark' ? '#ffffff' : '#000000',
-          borderColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db',
+          border: '5px solid blue', // TEST: Very obvious border
           borderRadius: '12px',
           padding: '16px',
           marginBottom: '24px',
