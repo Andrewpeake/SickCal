@@ -39,13 +39,15 @@ function App() {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  // Load settings from localStorage on mount
+  // Load and apply settings from localStorage on mount
   useEffect(() => {
     const savedSettings = loadSettings();
     setSettings(savedSettings);
+    // Apply settings immediately on mount
+    applyAllSettings(savedSettings);
   }, []);
 
-  // Apply settings on load and when settings change
+  // Apply settings when they change
   useEffect(() => {
     console.log('Settings changed in App component:', settings);
     applyAllSettings(settings);
