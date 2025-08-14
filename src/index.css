@@ -15,6 +15,10 @@
     --nav-bg: #ffffff;
     --nav-text: #374151;
     --nav-border: #d1d5db;
+    
+    /* Calendar background colors */
+    --calendar-bg: #ffffff;
+    --calendar-bg-dark: #0d1117;
   }
   
   * {
@@ -85,6 +89,37 @@
     @apply border-[#1f6feb] ring-[#1f6feb] ring-opacity-20;
   }
   
+  /* Settings modal specific dark theme styles */
+  .dark .modal-content {
+    @apply bg-[#0d1117] text-[#c9d1d9];
+  }
+  
+  .dark .modal-overlay {
+    @apply bg-black bg-opacity-70;
+  }
+  
+  /* Dark theme select dropdowns */
+  .dark select.input-field {
+    @apply bg-[#0d1117] border-[#30363d] text-[#c9d1d9];
+  }
+  
+  .dark select.input-field option {
+    @apply bg-[#0d1117] text-[#c9d1d9];
+  }
+  
+  /* Dark theme range sliders */
+  .dark input[type="range"] {
+    @apply bg-[#30363d];
+  }
+  
+  .dark input[type="range"]::-webkit-slider-thumb {
+    @apply bg-[#1f6feb];
+  }
+  
+  .dark input[type="range"]::-moz-range-thumb {
+    @apply bg-[#1f6feb];
+  }
+  
   /* Dark theme buttons */
   .dark .btn-primary {
     @apply bg-[#1f6feb] hover:bg-[#388bfd] text-white border-[#1f6feb];
@@ -101,11 +136,25 @@
   
   /* Prevent white flash during theme loading */
   .calendar-container {
-    @apply bg-white;
+    @apply bg-white !important;
   }
   
   .dark .calendar-container {
-    @apply bg-[#0d1117];
+    @apply bg-[#0d1117] !important;
+  }
+  
+  /* Force immediate background application */
+  .calendar-container * {
+    background-color: inherit !important;
+  }
+  
+  /* Prevent any white backgrounds during transitions */
+  .calendar-container {
+    background-color: var(--calendar-bg, white) !important;
+  }
+  
+  .dark .calendar-container {
+    background-color: var(--calendar-bg-dark, #0d1117) !important;
   }
   
   .dark .time-slot:hover {

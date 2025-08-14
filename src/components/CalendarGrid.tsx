@@ -92,6 +92,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   // Local zoom state for session-only zooming
   const [localZoomHeight, setLocalZoomHeight] = useState(settings.hourHeight);
   
+  // Theme loading state to prevent white flash
+  const [isThemeLoaded, setIsThemeLoaded] = useState(false);
+  
   // Use settings for various features
   const hourHeight = localZoomHeight; // Use local zoom height instead of settings
   const showLiveTimeIndicator = settings.showLiveTimeIndicator;
@@ -117,6 +120,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   useEffect(() => {
     setLocalZoomHeight(settings.hourHeight);
   }, [settings.hourHeight]);
+  
+  // Mark theme as loaded when settings are available
+  useEffect(() => {
+    if (settings && settings.theme) {
+      setIsThemeLoaded(true);
+    }
+  }, [settings]);
   
   // Context menu state
   const [contextMenu, setContextMenu] = useState<{
@@ -682,7 +692,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
     
     return (
-              <div ref={calendarRef} className={`shadow-soft rounded-xl overflow-hidden transition-colors duration-200`}>
+              <div ref={calendarRef} className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
+          settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+        }`}>
         {/* Week header - fixed */}
                         <div className={`sticky-header ${
                   settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
@@ -1053,7 +1065,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     };
 
     return (
-              <div className={`shadow-soft rounded-xl p-6 transition-colors duration-200`}>
+              <div className={`calendar-container shadow-soft rounded-xl p-6 transition-colors duration-200 ${
+          settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+        }`}>
         <div className="mb-6">
           <h2 className={`text-2xl font-bold mb-2 ${
             settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
@@ -1234,7 +1248,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const yearMonths = getYearMonths(currentDate);
     
     return (
-      <div className={`shadow-soft rounded-xl overflow-hidden transition-colors duration-200`}>
+      <div className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
+        settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+      }`}>
         {/* Year grid - 4 rows of 3 months each */}
         <div className={`grid grid-rows-4 gap-px ${
           settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
@@ -1551,7 +1567,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const monthDays = getMonthDays(currentDate);
     
     return (
-      <div className={`shadow-soft rounded-xl overflow-hidden transition-colors duration-200`}>
+      <div className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
+        settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+      }`}>
         {/* Month header */}
         <div className={`grid grid-cols-7 gap-px ${
           settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
@@ -1590,10 +1608,21 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
   };
 
+  // Show loading state until theme is loaded to prevent white flash
+  if (!isThemeLoaded) {
+    return (
+      <div className={`calendar-container shadow-soft rounded-xl overflow-hidden ${
+        settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+      }`}>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`calendar-container transition-colors duration-200 ${
-      settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
-    }`}>
+    <>
       {renderContent()}
       <ContextMenu
         isOpen={contextMenu.isOpen}
@@ -1602,7 +1631,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         items={getContextMenuItems()}
         onClose={closeContextMenu}
       />
-    </div>
+    </>
   );
 };
 

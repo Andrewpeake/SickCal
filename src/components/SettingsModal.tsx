@@ -110,23 +110,33 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden bg-white text-gray-900" onClick={e => e.stopPropagation()}>
+      <div className={`modal-content max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden ${
+        localSettings.theme === 'dark' ? 'bg-[#0d1117] text-[#c9d1d9]' : 'bg-white text-gray-900'
+      }`} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+          <h2 className={`text-xl font-semibold flex items-center gap-2 ${
+            localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+          }`}>
             <Settings className="w-5 h-5" />
             Settings
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className={`p-2 rounded-lg transition-colors duration-200 ${
+              localSettings.theme === 'dark' ? 'hover:bg-[#161b22]' : 'hover:bg-gray-100'
+            }`}
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className={`w-5 h-5 ${
+              localSettings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
+            }`} />
           </button>
         </div>
 
         <div className="flex gap-6 h-[calc(90vh-180px)]">
           {/* Sidebar */}
-          <div className="w-48 bg-gray-50 rounded-lg p-4">
+          <div className={`w-48 rounded-lg p-4 ${
+            localSettings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
+          }`}>
             <nav className="space-y-2">
               {tabs.map((tab) => (
                 <button
@@ -135,7 +145,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                     activeTab === tab.id
                       ? 'bg-primary-600 text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      : localSettings.theme === 'dark' 
+                        ? 'text-[#c9d1d9] hover:bg-[#21262d]' 
+                        : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
                   {tab.icon}
@@ -150,10 +162,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             {activeTab === 'appearance' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Theme & Colors</h3>
+                  <h3 className={`text-lg font-medium mb-4 ${
+                    localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+                  }`}>Theme & Colors</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className={`block text-sm font-medium mb-2 ${
+                        localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'
+                      }`}>
                         Theme
                       </label>
                       <select
@@ -167,7 +183,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className={`block text-sm font-medium mb-2 ${
+                        localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'
+                      }`}>
                         Primary Color
                       </label>
                       <div className="grid grid-cols-4 gap-2">
@@ -177,8 +195,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                             onClick={() => setLocalSettings(prev => ({ ...prev, primaryColor: color.value }))}
                             className={`w-8 h-8 rounded-lg border-2 transition-all duration-200 ${
                               localSettings.primaryColor === color.value
-                                ? 'border-gray-900 scale-110'
-                                : 'border-gray-300 hover:scale-105'
+                                ? localSettings.theme === 'dark' ? 'border-[#c9d1d9] scale-110' : 'border-gray-900 scale-110'
+                                : localSettings.theme === 'dark' ? 'border-[#30363d] hover:scale-105' : 'border-gray-300 hover:scale-105'
                             }`}
                             style={{ backgroundColor: color.value }}
                             title={color.name}
@@ -190,10 +208,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Display Options</h3>
+                  <h3 className={`text-lg font-medium mb-4 ${
+                    localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+                  }`}>Display Options</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className={`block text-sm font-medium mb-2 ${
+                        localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'
+                      }`}>
                         Default Hour Height (px)
                       </label>
                       <input
@@ -205,10 +227,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         onChange={(e) => setLocalSettings(prev => ({ ...prev, hourHeight: parseInt(e.target.value) }))}
                         className="w-full"
                       />
-                      <div className="text-sm text-gray-500 mt-1">{localSettings.hourHeight}px</div>
+                      <div className={`text-sm mt-1 ${
+                        localSettings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
+                      }`}>{localSettings.hourHeight}px</div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className={`block text-sm font-medium mb-2 ${
+                        localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'
+                      }`}>
                         Grid Line Opacity
                       </label>
                       <input
@@ -220,7 +246,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         onChange={(e) => setLocalSettings(prev => ({ ...prev, gridLineOpacity: parseFloat(e.target.value) }))}
                         className="w-full"
                       />
-                      <div className="text-sm text-gray-500 mt-1">{Math.round(localSettings.gridLineOpacity * 100)}%</div>
+                      <div className={`text-sm mt-1 ${
+                        localSettings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
+                      }`}>{Math.round(localSettings.gridLineOpacity * 100)}%</div>
                     </div>
                     <div className="space-y-3">
                       <label className="flex items-center">
@@ -230,7 +258,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                           onChange={(e) => setLocalSettings(prev => ({ ...prev, showWeekNumbers: e.target.checked }))}
                           className="mr-2"
                         />
-                        <span className="text-sm text-gray-700">Show week numbers</span>
+                        <span className={`text-sm ${
+                          localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'
+                        }`}>Show week numbers</span>
                       </label>
                       <label className="flex items-center">
                         <input
@@ -239,7 +269,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                           onChange={(e) => setLocalSettings(prev => ({ ...prev, showTodayHighlight: e.target.checked }))}
                           className="mr-2"
                         />
-                        <span className="text-sm text-gray-700">Highlight today</span>
+                        <span className={`text-sm ${
+                          localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'
+                        }`}>Highlight today</span>
                       </label>
                       <label className="flex items-center">
                         <input
@@ -248,7 +280,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                           onChange={(e) => setLocalSettings(prev => ({ ...prev, showLiveTimeIndicator: e.target.checked }))}
                           className="mr-2"
                         />
-                        <span className="text-sm text-gray-700">Show live time indicator</span>
+                        <span className={`text-sm ${
+                          localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'
+                        }`}>Show live time indicator</span>
                       </label>
                     </div>
                   </div>
@@ -259,10 +293,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             {activeTab === 'calendar' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Default View</h3>
+                  <h3 className={`text-lg font-medium mb-4 ${
+                    localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+                  }`}>Default View</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className={`block text-sm font-medium mb-2 ${
+                        localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'
+                      }`}>
                         Default Calendar View
                       </label>
                       <select
@@ -589,17 +627,27 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
-                      <button
-              onClick={handleReset}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
-            >
+        <div className={`flex items-center justify-between pt-6 border-t mt-6 ${
+          localSettings.theme === 'dark' ? 'border-[#30363d]' : 'border-gray-200'
+        }`}>
+          <button
+            onClick={handleReset}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+              localSettings.theme === 'dark' 
+                ? 'text-[#c9d1d9] bg-[#21262d] hover:bg-[#30363d]' 
+                : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
+            }`}
+          >
             Reset to Defaults
           </button>
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                localSettings.theme === 'dark' 
+                  ? 'text-[#c9d1d9] bg-[#21262d] hover:bg-[#30363d]' 
+                  : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
+              }`}
             >
               Cancel
             </button>
