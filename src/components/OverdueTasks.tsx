@@ -19,10 +19,10 @@ const OverdueTasks: React.FC<OverdueTasksProps> = ({
   
   if (overdueTasks.length === 0) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-        <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
-        <h3 className="text-green-800 font-medium">All caught up!</h3>
-        <p className="text-green-600 text-sm">No overdue tasks at the moment.</p>
+      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-center">
+        <CheckCircle className="w-8 h-8 text-green-500 dark:text-green-400 mx-auto mb-2" />
+        <h3 className="text-green-800 dark:text-green-200 font-medium">All caught up!</h3>
+        <p className="text-green-600 dark:text-green-300 text-sm">No overdue tasks at the moment.</p>
       </div>
     );
   }
@@ -41,11 +41,11 @@ const OverdueTasks: React.FC<OverdueTasksProps> = ({
   const getStatusColor = (status: OverdueTask['overdueStatus']) => {
     switch (status) {
       case 'soft-overdue':
-        return 'border-yellow-200 bg-yellow-50 hover:bg-yellow-100';
+        return 'border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30';
       case 'hard-overdue':
-        return 'border-red-200 bg-red-50 hover:bg-red-100';
+        return 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30';
       default:
-        return 'border-green-200 bg-green-50 hover:bg-green-100';
+        return 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30';
     }
   };
 
@@ -63,24 +63,24 @@ const OverdueTasks: React.FC<OverdueTasksProps> = ({
   const getPriorityColor = (priority: OverdueTask['priority']) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-700';
+        return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-700';
+        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300';
       case 'low':
-        return 'bg-green-100 text-green-700';
+        return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300';
     }
   };
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-          <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-[#c9d1d9] flex items-center">
+          <AlertTriangle className="w-5 h-5 text-red-500 dark:text-red-400 mr-2" />
           Overdue Tasks
         </h3>
-        <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-sm font-medium">
+        <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-1 rounded-full text-sm font-medium">
           {overdueTasks.length}
         </span>
       </div>
