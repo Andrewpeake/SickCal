@@ -18,6 +18,7 @@ import clsx from 'clsx';
 
 interface ProjectManagerProps {
   projects: Project[];
+  settings: any; // Settings type
   onProjectClick?: (project: Project) => void;
   onProjectCreate?: () => void;
   onProjectUpdate?: (projectId: string, updates: Partial<Project>) => void;
@@ -25,6 +26,7 @@ interface ProjectManagerProps {
 
 const ProjectManager: React.FC<ProjectManagerProps> = ({
   projects,
+  settings,
   onProjectClick,
   onProjectCreate,
   onProjectUpdate
@@ -112,8 +114,8 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-          <FolderOpen className="w-6 h-6 mr-2 text-primary-600" />
+        <h2 className={`text-2xl font-bold flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
+          <FolderOpen className={`w-6 h-6 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
           Projects
         </h2>
         <button
@@ -134,12 +136,18 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({
             className={clsx(
               'px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors duration-200',
               selectedStatus === status
-                ? 'bg-primary-100 text-primary-700 border-2 border-primary-300'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? settings.theme === 'dark'
+                  ? 'bg-[#1f6feb] bg-opacity-20 text-[#1f6feb] border-2 border-[#1f6feb]'
+                  : 'bg-primary-100 text-primary-700 border-2 border-primary-300'
+                : settings.theme === 'dark'
+                  ? 'bg-[#21262d] text-[#8b949e] hover:bg-[#30363d]'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             )}
           >
             {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
-            <span className="ml-2 bg-white px-2 py-0.5 rounded-full text-xs">
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+              settings.theme === 'dark' ? 'bg-[#0d1117] text-[#c9d1d9]' : 'bg-white'
+            }`}>
               {statusCounts[status]}
             </span>
           </button>
@@ -155,24 +163,38 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({
           return (
             <div
               key={project.id}
-              className="bg-white dark:bg-[#161b22] rounded-xl shadow-soft border border-gray-200 dark:border-[#30363d] hover:shadow-medium transition-all duration-200 cursor-pointer"
+              className={`rounded-xl shadow-soft border hover:shadow-medium transition-all duration-200 cursor-pointer ${
+                settings.theme === 'dark' 
+                  ? 'bg-[#161b22] border-[#30363d]' 
+                  : 'bg-white border-gray-200'
+              }`}
               onClick={() => onProjectClick?.(project)}
             >
               {/* Project Header */}
-              <div className="p-6 border-b border-gray-100">
+              <div className={`p-6 border-b ${
+                settings.theme === 'dark' ? 'border-[#30363d]' : 'border-gray-100'
+              }`}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">
+                    <h3 className={`text-lg font-semibold truncate ${
+                      settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+                    }`}>
                       {project.name}
                     </h3>
                     {project.description && (
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                      <p className={`text-sm mt-1 line-clamp-2 ${
+                        settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
+                      }`}>
                         {project.description}
                       </p>
                     )}
                   </div>
-                  <button className="ml-2 p-1 hover:bg-gray-100 rounded">
-                    <MoreVertical className="w-4 h-4 text-gray-400" />
+                  <button className={`ml-2 p-1 rounded ${
+                    settings.theme === 'dark' ? 'hover:bg-[#21262d]' : 'hover:bg-gray-100'
+                  }`}>
+                    <MoreVertical className={`w-4 h-4 ${
+                      settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-400'
+                    }`} />
                   </button>
                 </div>
 
@@ -195,20 +217,28 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({
 
                 {/* Progress Bar */}
                 <div className="mb-3">
-                  <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+                  <div className={`flex items-center justify-between text-sm mb-1 ${
+                    settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
+                  }`}>
                     <span>Progress</span>
                     <span>{progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className={`w-full rounded-full h-2 ${
+                    settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
+                  }`}>
                     <div
-                      className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        settings.theme === 'dark' ? 'bg-[#1f6feb]' : 'bg-primary-600'
+                      }`}
                       style={{ width: `${progress}%` }}
                     />
                   </div>
                 </div>
 
                 {/* Project Stats */}
-                <div className="flex items-center justify-between text-sm text-gray-500">
+                <div className={`flex items-center justify-between text-sm ${
+                  settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
+                }`}>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-1">
                       <Users className="w-4 h-4" />
@@ -227,19 +257,27 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({
               </div>
 
               {/* Project Footer */}
-              <div className="p-4 bg-gray-50 rounded-b-xl">
+              <div className={`p-4 rounded-b-xl ${
+                settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-gray-50'
+              }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     {project.tags.slice(0, 2).map((tag, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-white text-xs text-gray-600 rounded border"
+                        className={`px-2 py-1 text-xs rounded border ${
+                          settings.theme === 'dark' 
+                            ? 'bg-[#161b22] text-[#8b949e] border-[#30363d]' 
+                            : 'bg-white text-gray-600'
+                        }`}
                       >
                         {tag}
                       </span>
                     ))}
                     {project.tags.length > 2 && (
-                      <span className="text-xs text-gray-500">
+                      <span className={`text-xs ${
+                        settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
+                      }`}>
                         +{project.tags.length - 2} more
                       </span>
                     )}
@@ -261,11 +299,15 @@ const ProjectManager: React.FC<ProjectManagerProps> = ({
       {/* Empty State */}
       {filteredProjects.length === 0 && (
         <div className="text-center py-12">
-          <FolderOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <FolderOpen className={`w-16 h-16 mx-auto mb-4 ${
+            settings.theme === 'dark' ? 'text-[#484f58]' : 'text-gray-300'
+          }`} />
+          <h3 className={`text-lg font-medium mb-2 ${
+            settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
+          }`}>
             {selectedStatus === 'all' ? 'No projects yet' : `No ${selectedStatus} projects`}
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className={`mb-4 ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'}`}>
             {selectedStatus === 'all' 
               ? 'Get started by creating your first project.'
               : `No projects are currently ${selectedStatus}.`

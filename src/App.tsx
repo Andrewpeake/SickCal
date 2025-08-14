@@ -521,6 +521,7 @@ function App() {
         <div className="mt-8">
           <ProjectManager
             projects={projectManager.getAllProjects()}
+            settings={settings}
             onProjectClick={handleProjectClick}
             onProjectCreate={handleProjectCreate}
             onProjectUpdate={(projectId, updates) => {
