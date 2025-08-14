@@ -32,69 +32,9 @@
   color-scheme: dark;
 }
 
-/* Force navigation background in dark mode */
-.dark .navigation-dark {
-  background-color: #161b22 !important;
-}
 
-/* Force navigation background in light mode */
-.navigation-light {
-  background-color: #ffffff !important;
-}
 
-/* NUCLEAR OVERRIDE - Force navigation background using data attributes */
-[data-theme="dark"] {
-  background-color: #161b22 !important;
-}
 
-[data-theme="light"] {
-  background-color: #ffffff !important;
-}
-
-/* NUCLEAR OVERRIDE - Force navigation styles with unique class */
-.SICKCAL-NAVIGATION-FIX {
-  background-color: #161b22 !important;
-  color: #c9d1d9 !important;
-  border-color: #30363d !important;
-}
-
-/* NUCLEAR OVERRIDE - Force light mode navigation */
-.SICKCAL-NAVIGATION-FIX.light-mode {
-  background-color: #ffffff !important;
-  color: #374151 !important;
-  border-color: #d1d5db !important;
-}
-
-/* NUCLEAR OVERRIDE - Force dark mode navigation */
-.SICKCAL-NAVIGATION-FIX.dark-mode {
-  background-color: #161b22 !important;
-  color: #c9d1d9 !important;
-  border-color: #30363d !important;
-}
-
-/* ULTIMATE OVERRIDE - Target any div that contains navigation elements */
-div[style*="backgroundColor"] {
-  background-color: #ff0000 !important;
-  border: 10px solid purple !important;
-}
-
-/* ULTIMATE OVERRIDE - Target any element with our test styles */
-div[style*="ff0000"], div[style*="00ff00"] {
-  background-color: #ff0000 !important;
-  border: 10px solid purple !important;
-}
-
-/* ULTIMATE OVERRIDE - Target the specific Navigation component */
-div[ref="navRef"], div[data-reactroot] > div > div > div {
-  background-color: #ff0000 !important;
-  border: 10px solid purple !important;
-}
-
-/* ULTIMATE OVERRIDE - Target any div that might be the navigation */
-div:has(> div > button[aria-label="Previous"]) {
-  background-color: #ff0000 !important;
-  border: 10px solid purple !important;
-}
   
   /* Dark theme body and general elements */
   .dark body {

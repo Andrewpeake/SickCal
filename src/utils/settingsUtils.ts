@@ -91,38 +91,21 @@ export const applyTheme = (theme: string): void => {
   const root = document.documentElement;
   const body = document.body;
   
-  // Set CSS custom properties for theme colors
   if (theme === 'dark') {
     root.classList.add('dark');
     body.classList.add('dark');
-    root.style.setProperty('--nav-bg', '#161b22');
-    root.style.setProperty('--nav-text', '#c9d1d9');
-    root.style.setProperty('--nav-border', '#30363d');
-    console.log('Applied dark theme to document and body with CSS variables');
   } else if (theme === 'light') {
     root.classList.remove('dark');
     body.classList.remove('dark');
-    root.style.setProperty('--nav-bg', '#ffffff');
-    root.style.setProperty('--nav-text', '#374151');
-    root.style.setProperty('--nav-border', '#d1d5db');
-    console.log('Applied light theme to document and body with CSS variables');
   } else if (theme === 'auto') {
     // Check system preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (prefersDark) {
       root.classList.add('dark');
       body.classList.add('dark');
-      root.style.setProperty('--nav-bg', '#161b22');
-      root.style.setProperty('--nav-text', '#c9d1d9');
-      root.style.setProperty('--nav-border', '#30363d');
-      console.log('Applied auto dark theme to document and body with CSS variables');
     } else {
       root.classList.remove('dark');
       body.classList.remove('dark');
-      root.style.setProperty('--nav-bg', '#ffffff');
-      root.style.setProperty('--nav-text', '#374151');
-      root.style.setProperty('--nav-border', '#d1d5db');
-      console.log('Applied auto light theme to document and body with CSS variables');
     }
   }
 };
@@ -136,35 +119,26 @@ export const applyPrimaryColor = (color: string): void => {
 
 // Apply all settings at once
 export const applyAllSettings = (settings: Settings): void => {
-  console.log('applyAllSettings called with:', settings);
-  
   // Apply theme
   applyTheme(settings.theme);
-  console.log('Theme applied:', settings.theme);
   
   // Apply primary color
   applyPrimaryColor(settings.primaryColor);
-  console.log('Primary color applied:', settings.primaryColor);
   
   // Apply CSS custom properties for other appearance settings
   const root = document.documentElement;
   root.style.setProperty('--hour-height', `${settings.hourHeight}px`);
-  console.log('CSS custom property set: --hour-height =', `${settings.hourHeight}px`);
   
   // Apply settings to body as well for broader compatibility
   document.body.style.setProperty('--hour-height', `${settings.hourHeight}px`);
   
   // Store settings in localStorage for components to access
   localStorage.setItem(APPLIED_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-  console.log('Settings stored in localStorage');
   
   // Dispatch custom event to notify components of settings change
   window.dispatchEvent(new CustomEvent('sickcal-settings-changed', { 
     detail: settings 
   }));
-  console.log('Custom event dispatched');
-  
-  console.log('All settings applied successfully');
 };
 
 // Get applied settings from localStorage

@@ -33,45 +33,13 @@ const Navigation: React.FC<NavigationProps> = ({
 
   const navRef = useRef<HTMLDivElement>(null);
   
-  console.log('Navigation render - theme:', settings.theme, 'isDark:', settings.theme === 'dark', 'settings object:', settings);
-  
-  // Force styles after mount and on theme change
-  useEffect(() => {
-    if (navRef.current) {
-      const element = navRef.current;
-      const isDark = settings.theme === 'dark';
-      
-      // Apply styles directly to the element
-      element.style.backgroundColor = isDark ? '#161b22' : '#ffffff';
-      element.style.color = isDark ? '#c9d1d9' : '#374151';
-      element.style.borderColor = isDark ? '#30363d' : '#d1d5db';
-      element.style.borderRadius = '12px';
-      element.style.padding = '16px';
-      element.style.marginBottom = '24px';
-      element.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
-      element.style.overflow = 'hidden';
-      
-      console.log(`FORCED ${isDark ? 'DARK' : 'LIGHT'} STYLES ON NAVIGATION ELEMENT`);
-      
-      // Also apply styles to all child elements
-      const allElements = element.querySelectorAll('*');
-      allElements.forEach((el) => {
-        if (el instanceof HTMLElement) {
-          // Reset any inherited styles that might be causing issues
-          el.style.backgroundColor = 'transparent';
-          el.style.color = 'inherit';
-        }
-      });
-    }
-  }, [settings.theme]);
-  
   return (
           <div 
         ref={navRef}
         style={{
-          backgroundColor: settings.theme === 'dark' ? '#ff0000' : '#00ff00', // TEST: Red for dark, green for light
-          color: settings.theme === 'dark' ? '#ffffff' : '#000000',
-          border: '5px solid blue', // TEST: Very obvious border
+          backgroundColor: settings.theme === 'dark' ? '#161b22' : '#ffffff',
+          color: settings.theme === 'dark' ? '#c9d1d9' : '#374151',
+          borderColor: settings.theme === 'dark' ? '#30363d' : '#d1d5db',
           borderRadius: '12px',
           padding: '16px',
           marginBottom: '24px',

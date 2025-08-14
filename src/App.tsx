@@ -36,17 +36,12 @@ function App() {
   const [selectedProject, setSelectedProject] = useState<Project | undefined>();
 
   // Settings state
-  const [settings, setSettings] = useState<Settings>(() => {
-    const savedSettings = loadSettings();
-    console.log('Initial settings loaded:', savedSettings);
-    return savedSettings;
-  });
+  const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // Load and apply settings from localStorage on mount
   useEffect(() => {
     const savedSettings = loadSettings();
-    console.log('useEffect settings loaded:', savedSettings);
     setSettings(savedSettings);
     // Apply settings immediately on mount
     applyAllSettings(savedSettings);
@@ -54,21 +49,7 @@ function App() {
 
   // Apply settings when they change
   useEffect(() => {
-    console.log('Settings changed in App component:', settings);
     applyAllSettings(settings);
-    
-    // Force immediate theme application
-    if (settings.theme === 'dark') {
-      document.documentElement.style.setProperty('--nav-bg', '#161b22');
-      document.documentElement.style.setProperty('--nav-text', '#c9d1d9');
-      document.documentElement.style.setProperty('--nav-border', '#30363d');
-      console.log('Forced dark theme CSS variables in App component');
-    } else {
-      document.documentElement.style.setProperty('--nav-bg', '#ffffff');
-      document.documentElement.style.setProperty('--nav-text', '#374151');
-      document.documentElement.style.setProperty('--nav-border', '#d1d5db');
-      console.log('Forced light theme CSS variables in App component');
-    }
   }, [settings]);
 
   // Load data from localStorage on component mount
@@ -431,7 +412,7 @@ function App() {
 
   return (
     <div className={`min-h-screen ${settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-gray-50'}`}>
-      <div className="container mx-auto px-4 py-8" style={{ backgroundColor: 'yellow' }}> {/* TEST: Yellow background */}
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
