@@ -43,6 +43,7 @@ export interface NavigationProps {
   onDateChange: (date: Date) => void;
   onViewChange: (view: CalendarView) => void;
   view: CalendarView;
+  settings: Settings;
 }
 
 export interface CalendarGridProps {

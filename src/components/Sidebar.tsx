@@ -8,6 +8,7 @@ import ContextMenu from './ContextMenu';
 interface SidebarProps {
   events: Event[];
   tasks: Task[];
+  settings: any; // Settings type
   onAddEvent: () => void;
   onAddTask: () => void;
   onEventOpen: (event: Event) => void;
@@ -18,6 +19,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({
   events,
   tasks,
+  settings,
   onAddEvent,
   onAddTask,
   onEventOpen,
@@ -46,10 +48,14 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <div className="w-80 bg-white shadow-soft rounded-xl p-6 h-fit">
+      <div className={`w-80 shadow-soft rounded-xl p-6 h-fit ${
+        settings.theme === 'dark' 
+          ? 'bg-[#161b22]' 
+          : 'bg-white'
+      }`}>
       {/* Quick Actions */}
       <div className="mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <h3 className={`text-lg font-semibold mb-4 ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>Quick Actions</h3>
         <div className="space-y-3">
           <button
             onClick={onAddEvent}
@@ -70,22 +76,22 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Task Summary */}
       <div className="mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <TrendingUp className="w-5 h-5 mr-2 text-primary-600" />
+        <h3 className={`text-lg font-semibold mb-4 flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
+          <TrendingUp className={`w-5 h-5 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
           Task Progress
         </h3>
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className={`rounded-lg p-4 ${settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-gray-50'}`}>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600">Completion Rate</span>
-            <span className="text-lg font-bold text-primary-600">{completionRate}%</span>
+            <span className={`text-sm ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'}`}>Completion Rate</span>
+            <span className={`text-lg font-bold ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`}>{completionRate}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className={`w-full rounded-full h-2 ${settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'}`}>
             <div
-              className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+              className={`h-2 rounded-full transition-all duration-300 ${settings.theme === 'dark' ? 'bg-[#1f6feb]' : 'bg-primary-600'}`}
               style={{ width: `${completionRate}%` }}
             />
           </div>
-          <div className="flex justify-between mt-2 text-xs text-gray-500">
+          <div className={`flex justify-between mt-2 text-xs ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'}`}>
             <span>{completedTasks} completed</span>
             <span>{totalTasks - completedTasks} pending</span>
           </div>
@@ -94,8 +100,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Upcoming Events */}
       <div className="mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <Calendar className="w-5 h-5 mr-2 text-primary-600" />
+        <h3 className={`text-lg font-semibold mb-4 flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
+          <Calendar className={`w-5 h-5 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
           Upcoming Events
         </h3>
         {upcomingEvents.length > 0 ? (
@@ -103,7 +109,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             {upcomingEvents.map((event) => (
               <div
                 key={event.id}
-                  className="p-3 rounded-lg border-l-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                  className={`p-3 rounded-lg border-l-4 cursor-pointer transition-colors duration-200 ${
+                  settings.theme === 'dark' ? 'hover:bg-[#21262d]' : 'hover:bg-gray-50'
+                }`}
                 style={{ 
                   backgroundColor: `${event.color}10`,
                   borderLeftColor: event.color
@@ -116,8 +124,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate">{event.title}</h4>
-                    <p className="text-sm text-gray-500">
+                    <h4 className={`font-medium truncate ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>{event.title}</h4>
+                    <p className={`text-sm ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'}`}>
                       {formatDate(new Date(event.startDate), 'MMM dd')} at {formatTime(new Date(event.startDate))}
                     </p>
                   </div>
@@ -126,14 +134,14 @@ const Sidebar: React.FC<SidebarProps> = ({
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-center py-4">No upcoming events</p>
+          <p className={`text-center py-4 ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'}`}>No upcoming events</p>
         )}
       </div>
 
       {/* Pending Tasks */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <CheckSquare className="w-5 h-5 mr-2 text-primary-600" />
+        <h3 className={`text-lg font-semibold mb-4 flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
+          <CheckSquare className={`w-5 h-5 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
           Pending Tasks
         </h3>
         {pendingTasks.length > 0 ? (
@@ -141,17 +149,23 @@ const Sidebar: React.FC<SidebarProps> = ({
             {pendingTasks.map((task) => (
               <div
                 key={task.id}
-                className="p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                className={`p-3 rounded-lg border cursor-pointer transition-colors duration-200 ${
+                  settings.theme === 'dark' 
+                    ? 'border-[#30363d] hover:bg-[#21262d]' 
+                    : 'border-gray-200 hover:bg-gray-50'
+                }`}
               >
                 <div className="flex items-start space-x-3">
                   <div className="flex-shrink-0 mt-0.5">
-                    <div className="w-4 h-4 border-2 border-gray-300 rounded"></div>
+                    <div className={`w-4 h-4 border-2 rounded ${
+                      settings.theme === 'dark' ? 'border-[#484f58]' : 'border-gray-300'
+                    }`}></div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate">{task.title}</h4>
+                    <h4 className={`font-medium truncate ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>{task.title}</h4>
                     <div className="flex items-center space-x-2 mt-1">
-                      <Clock className="w-3 h-3 text-gray-400" />
-                      <span className="text-sm text-gray-500">
+                      <Clock className={`w-3 h-3 ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-400'}`} />
+                      <span className={`text-sm ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'}`}>
                         Due {formatDate(new Date(task.dueDate), 'MMM dd')}
                       </span>
                       <span className={clsx(
@@ -169,7 +183,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-center py-4">No pending tasks</p>
+          <p className={`text-center py-4 ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'}`}>No pending tasks</p>
         )}
       </div>
     </div>
