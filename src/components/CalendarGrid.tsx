@@ -961,32 +961,33 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       className={`absolute text-xs p-2 overflow-hidden cursor-move transition-all duration-200 group ${
                         eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
                       }`}
-                      style={{ 
-                        top: `${top}px`,
-                        left: leftOffset,
-                        width: eventWidth,
-                        height: `${height}px`,
-                        zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                        borderRadius: '6px',
-                        backgroundColor: `${event.color}20`,
-                        borderTop: `1px solid ${event.color}`,
-                        borderBottom: `1px solid ${event.color}`,
-                        borderLeft: `1px solid ${event.color}`,
-                        borderRight: `1px solid ${event.color}`,
-                        boxShadow: `0 2px 4px rgba(0,0,0,0.1)`
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = `${event.color}40`;
-                        e.currentTarget.style.boxShadow = `0 6px 12px rgba(0,0,0,0.2)`;
-                        e.currentTarget.style.transform = 'scale(1.02)';
-                        e.currentTarget.style.zIndex = '10';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = `${event.color}20`;
-                        e.currentTarget.style.boxShadow = `0 2px 4px rgba(0,0,0,0.1)`;
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
-                      }}
+                                             style={{ 
+                         top: `${top}px`,
+                         left: leftOffset,
+                         width: eventWidth,
+                         height: `${height}px`,
+                         zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
+                         borderRadius: '6px',
+                         backgroundColor: `${event.color}15`,
+                         backdropFilter: 'blur(8px)',
+                         borderTop: `1px solid ${event.color}40`,
+                         borderBottom: `1px solid ${event.color}40`,
+                         borderLeft: `1px solid ${event.color}40`,
+                         borderRight: `1px solid ${event.color}40`,
+                         boxShadow: `0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)`
+                       }}
+                                             onMouseEnter={(e) => {
+                         e.currentTarget.style.backgroundColor = `${event.color}25`;
+                         e.currentTarget.style.boxShadow = `0 8px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.3)`;
+                         e.currentTarget.style.transform = 'scale(1.02)';
+                         e.currentTarget.style.zIndex = '10';
+                       }}
+                       onMouseLeave={(e) => {
+                         e.currentTarget.style.backgroundColor = `${event.color}15`;
+                         e.currentTarget.style.boxShadow = `0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)`;
+                         e.currentTarget.style.transform = 'scale(1)';
+                         e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
+                       }}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (onEventOpen) {
