@@ -978,12 +978,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       // Enhanced glassy effect with better opacity and blur
                       const eventColor = event.color || '#0ea5e9'; // Fallback to primary blue
                       const glassyBackground = isStartOfEvent 
-                        ? `${eventColor}30` 
-                        : `${eventColor}20`;
+                        ? `${eventColor}90` 
+                        : `${eventColor}80`;
                       
                       const glassyBorder = isStartOfEvent 
-                        ? `1px solid ${eventColor}50` 
-                        : `1px solid ${eventColor}30`;
+                        ? `1px solid ${eventColor}` 
+                        : `1px solid ${eventColor}80`;
 
                       return (
                         <div
@@ -995,11 +995,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             top: `${top}px`,
                             height: `${actualHeight}px`,
                             backgroundColor: glassyBackground,
-                            color: eventColor,
+                            color: '#ffffff',
                             borderLeft: isStartOfEvent ? `3px solid ${eventColor}` : 'none',
                             border: glassyBorder,
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                            boxShadow: '0 3px 12px rgba(0,0,0,0.2)',
                             overflow: 'visible',
                             borderRadius: '4px',
                             backdropFilter: 'blur(4px)',
@@ -1013,7 +1013,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             e.currentTarget.style.borderTop = '1px solid rgba(0,0,0,0.1)';
                             e.currentTarget.style.borderBottom = '1px solid rgba(0,0,0,0.1)';
                             e.currentTarget.style.borderRight = '1px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
                             e.currentTarget.style.backdropFilter = 'blur(8px)';
                           }}
                           onMouseLeave={(e) => {
@@ -1021,7 +1021,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             e.currentTarget.style.borderTop = isStartOfEvent ? '1px solid transparent' : 'none';
                             e.currentTarget.style.borderBottom = '1px solid transparent';
                             e.currentTarget.style.borderRight = '1px solid transparent';
-                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+                            e.currentTarget.style.boxShadow = '0 3px 12px rgba(0,0,0,0.2)';
                             e.currentTarget.style.backdropFilter = 'blur(4px)';
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
