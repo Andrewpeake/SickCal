@@ -937,6 +937,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
                     if (eventsInSlot.length === 0) return null;
 
+                    // Sort events by start time for proper positioning
+                    eventsInSlot.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
                     const slotHeight = hourHeight;
                     const padding = 4;
                     const availableHeight = slotHeight - (padding * 2);
@@ -950,7 +953,17 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       const isStartOfEvent = eventStart >= currentHourStart && eventStart < currentHourEnd;
                       const isEndOfEvent = eventEnd > currentHourStart && eventEnd <= currentHourEnd;
                       
-                      const top = padding + (index * eventHeight);
+                      // Calculate position and width for overlapping events
+                      const totalEvents = eventsInSlot.length;
+                      const eventWidth = totalEvents > 1 ? `calc(100% / ${totalEvents} - 2px)` : 'calc(100% - 2px)';
+                      const leftOffset = totalEvents > 1 ? `calc(${index} * (100% / ${totalEvents}))` : '0px';
+                      
+                      let top = padding;
+                      if (isStartOfEvent) {
+                        // Event starts in this hour - position based on start time
+                        const startMinutes = eventStart.getMinutes();
+                        top = padding + (startMinutes / 60) * hourHeight;
+                      }
                       
                       let actualHeight = eventHeight;
                       
@@ -967,11 +980,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       return (
                         <div
                           key={event.id}
-                          className={`absolute left-1 right-1 text-xs p-2 overflow-hidden cursor-move transition-all duration-200 group ${
+                          className={`absolute text-xs p-2 overflow-hidden cursor-move transition-all duration-200 group ${
                             eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
                           }`}
                           style={{ 
                             top: `${top}px`,
+                            left: leftOffset,
+                            width: eventWidth,
                             height: `${actualHeight}px`,
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                             borderRadius: '6px',
