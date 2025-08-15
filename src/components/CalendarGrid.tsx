@@ -980,7 +980,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                             borderRadius: '6px',
                             backgroundColor: `${event.color}20`,
-                            border: `1px solid ${event.color}`,
+                            borderTop: `1px solid ${event.color}`,
+                            borderBottom: `1px solid ${event.color}`,
+                            borderLeft: `1px solid ${event.color}`,
+                            borderRight: `1px solid ${event.color}`,
                             boxShadow: `0 2px 4px rgba(0,0,0,0.1)`
                           }}
                           onMouseEnter={(e) => {
