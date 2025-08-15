@@ -848,6 +848,46 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   : `rgba(209, 213, 219, ${settings.gridLineOpacity})` 
               }}
             >
+              {/* Tasks for this day - show at the top */}
+              {(() => {
+                const dayTasks = getTasksForDate(tasks, date);
+                if (dayTasks.length === 0) return null;
+                
+                return (
+                  <div className="absolute top-0 left-0 right-0 z-10 bg-yellow-50 border-b border-yellow-200 p-1">
+                    <div className="text-xs font-medium text-yellow-800 mb-1">Tasks ({dayTasks.length})</div>
+                    <div className="space-y-1">
+                      {dayTasks.slice(0, 3).map((task: any) => (
+                        <div
+                          key={task.id}
+                          className={`flex items-center space-x-1 text-xs cursor-pointer p-1 rounded ${
+                            task.completed ? 'opacity-60' : ''
+                          }`}
+                          onClick={() => onTaskEdit && onTaskEdit(task)}
+                          onContextMenu={(e) => {
+                            e.stopPropagation();
+                            handleContextMenu(e, 'task', task);
+                          }}
+                        >
+                          {task.completed ? (
+                            <CheckCircle className="w-3 h-3 text-green-500" />
+                          ) : (
+                            <Circle className="w-3 h-3 text-blue-500" />
+                          )}
+                          <span className={`truncate ${task.completed ? 'line-through' : ''}`}>
+                            {task.title}
+                          </span>
+                        </div>
+                      ))}
+                      {dayTasks.length > 3 && (
+                        <div className="text-xs text-yellow-600">
+                          +{dayTasks.length - 3} more tasks
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
               {timeSlots.map((time, index) => (
                 <div
                   key={index}
@@ -892,7 +932,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 >
 
                   
-                  {/* Events and Tasks for this time slot */}
+                                    {/* Events for this time slot */}
                   {(() => {
                     // Get all events that are active in this time slot (start here OR continue from previous time)
                     const eventsInSlot = events.filter((event) => {
@@ -912,22 +952,18 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       return startsHere || continuesFromPrevious;
                     });
 
-                    // Get tasks for this date (tasks don't have specific time slots, so show them in the first hour)
-                    const tasksForDate = time.getHours() === 0 ? getTasksForDate(tasks, date) : [];
+                    if (eventsInSlot.length === 0) return null;
 
-                    if (eventsInSlot.length === 0 && tasksForDate.length === 0) return null;
-
-                    // Calculate the height for each event and task based on total count
+                    // Calculate the height for each event based on number of events
                     const slotHeight = hourHeight; // Dynamic hour height
                     const padding = 4; // 4px top padding
                     const availableHeight = slotHeight - (padding * 2);
-                    const totalItems = eventsInSlot.length + tasksForDate.length;
-                    const itemHeight = Math.max(20, availableHeight / totalItems);
+                    const eventHeight = Math.max(20, availableHeight / eventsInSlot.length);
 
-                    // Show count indicator if multiple items
-                    const showCountIndicator = totalItems > 1;
+                    // Show event count indicator if multiple events
+                    const showEventCount = eventsInSlot.length > 1;
 
-                                          return eventsInSlot.map((event, index) => {
+                    return eventsInSlot.map((event, index) => {
                         const eventStart = new Date(event.startDate);
                         const eventEnd = new Date(event.endDate);
                         const currentTime = new Date(date);
