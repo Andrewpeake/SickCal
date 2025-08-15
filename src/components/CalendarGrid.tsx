@@ -38,7 +38,28 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
   // Find the time slot that matches the current hour
   const currentTimeSlot = timeSlots.find(time => time.getHours() === currentHour);
   
-  if (!currentTimeSlot) return null;
+  // If current time is not in visible range, show it at 12:00 for visibility
+  if (!currentTimeSlot) {
+    const testTimeSlot = timeSlots.find(time => time.getHours() === 12);
+    if (testTimeSlot) {
+      const timeSlotIndex = timeSlots.findIndex(time => time.getHours() === 12);
+      const topPosition = timeSlotIndex * hourHeight;
+      
+      return (
+        <div 
+          className="absolute left-0 right-0 z-20 pointer-events-none"
+          style={{ top: `${topPosition}px` }}
+        >
+          <div className="h-0.5 bg-red-500 w-full"></div>
+          <div className="absolute -left-1 -top-1 w-2 h-2 bg-red-500 rounded-full"></div>
+          <div className="absolute -left-16 top-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
+            Current Time
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }
 
   // Calculate position based on current time within the hour
   const timeSlotIndex = timeSlots.findIndex(time => time.getHours() === currentHour);
