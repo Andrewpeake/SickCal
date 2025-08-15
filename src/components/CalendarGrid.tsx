@@ -920,24 +920,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   
                   {/* Events for this time slot */}
                   {(() => {
+                    const currentHourStart = new Date(date);
+                    currentHourStart.setHours(time.getHours(), 0, 0, 0);
+                    const currentHourEnd = new Date(date);
+                    currentHourEnd.setHours(time.getHours() + 1, 0, 0, 0);
+                    
                     const eventsInSlot = events.filter((event) => {
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
-                      const currentTime = new Date(date);
-                      currentTime.setHours(time.getHours(), 0, 0, 0);
-                      const nextHour = new Date(date);
-                      nextHour.setHours(time.getHours() + 1, 0, 0, 0);
                       
-                      const startsHere = eventStart.toDateString() === date.toDateString() && 
-                                       eventStart.getHours() === time.getHours();
-                      
-                      const continuesFromPrevious = eventStart.getTime() < currentTime.getTime() && 
-                                                  eventEnd.getTime() > currentTime.getTime();
-                      
-                      const endsHere = eventEnd.getTime() > currentTime.getTime() && 
-                                     eventEnd.getTime() <= nextHour.getTime();
-                      
-                      return startsHere || continuesFromPrevious || endsHere;
+                      // Event overlaps with this time slot if:
+                      // 1. Event starts before this hour ends AND
+                      // 2. Event ends after this hour starts
+                      return eventStart < currentHourEnd && eventEnd > currentHourStart;
                     });
 
                     if (eventsInSlot.length === 0) return null;
@@ -951,27 +946,21 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     return eventsInSlot.map((event, index) => {
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
-                      const currentTime = new Date(date);
-                      currentTime.setHours(time.getHours(), 0, 0, 0);
                       
-                      const isStartOfEvent = eventStart.toDateString() === date.toDateString() && 
-                                           eventStart.getHours() === time.getHours();
-                      
-                      const isFirstSlotOfDay = time.getHours() === 0;
+                      const isStartOfEvent = eventStart >= currentHourStart && eventStart < currentHourEnd;
+                      const isEndOfEvent = eventEnd > currentHourStart && eventEnd <= currentHourEnd;
                       
                       const top = padding + (index * eventHeight);
                       
                       let actualHeight = eventHeight;
                       
                       if (isStartOfEvent) {
-                        // For start of event, calculate height based on how long it extends
-                        const endOfHour = new Date(date);
-                        endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
-                        const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
+                        // Event starts in this hour - calculate height based on duration
+                        const effectiveEndTime = eventEnd < currentHourEnd ? eventEnd : currentHourEnd;
                         const durationMinutes = Math.ceil((effectiveEndTime.getTime() - eventStart.getTime()) / (60 * 1000));
                         actualHeight = Math.max(eventHeight, Math.min((durationMinutes / 60) * hourHeight, slotHeight - padding));
                       } else {
-                        // For continuation events, use full slot height
+                        // Event continues from previous hour - use full height
                         actualHeight = slotHeight - padding;
                       }
 
@@ -1027,12 +1016,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                                 {formatTime(eventStart)} - {formatTime(eventEnd)}
                               </div>
                             </>
-                          ) : isFirstSlotOfDay ? (
+                          ) : (
                             <div className="font-semibold truncate text-gray-900" style={{ fontSize: '11px' }}>
                               {event.title}
                             </div>
-                          ) : (
-                            <div></div>
                           )}
                           {showEventCount && index === 0 && isStartOfEvent && (
                             <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg border-2 border-white">
