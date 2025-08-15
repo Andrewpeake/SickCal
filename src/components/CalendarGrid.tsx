@@ -19,42 +19,6 @@ import { Circle, CheckCircle, Clock, Plus, Edit, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
 
-// Helper function to organize overlapping events in the same time slot
-const organizeOverlappingEvents = (events: CalendarEvent[], date: Date, time: Date) => {
-  const eventsInSlot = events.filter((event) => {
-    const eventStart = new Date(event.startDate);
-    const eventEnd = new Date(event.endDate);
-    const currentTime = new Date(date);
-    currentTime.setHours(time.getHours(), 0, 0, 0);
-    
-    // Event starts in this exact time slot
-    const startsHere = eventStart.toDateString() === date.toDateString() && 
-                     eventStart.getHours() === time.getHours();
-    
-    // Event continues from previous time (same day or previous day)
-    const continuesFromPrevious = eventStart.getTime() < currentTime.getTime() && 
-                                eventEnd.getTime() > currentTime.getTime();
-    
-    return startsHere || continuesFromPrevious;
-  });
-
-  // Sort events by start time and priority
-  return eventsInSlot.sort((a, b) => {
-    const aStart = new Date(a.startDate);
-    const bStart = new Date(b.startDate);
-    
-    // First sort by start time
-    if (aStart.getTime() !== bStart.getTime()) {
-      return aStart.getTime() - bStart.getTime();
-    }
-    
-    // Then by duration (longer events first)
-    const aDuration = new Date(a.endDate).getTime() - aStart.getTime();
-    const bDuration = new Date(b.endDate).getTime() - bStart.getTime();
-    return bDuration - aDuration;
-  });
-};
-
 // Live Time Indicator Component
 const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = ({ timeSlots, hourHeight }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -930,8 +894,23 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   
                   {/* Events for this time slot */}
                   {(() => {
-                    // Use the helper function to organize overlapping events
-                    const eventsInSlot = organizeOverlappingEvents(events, date, time);
+                    // Get all events that are active in this time slot (start here OR continue from previous time)
+                    const eventsInSlot = events.filter((event) => {
+                      const eventStart = new Date(event.startDate);
+                      const eventEnd = new Date(event.endDate);
+                      const currentTime = new Date(date);
+                      currentTime.setHours(time.getHours(), 0, 0, 0);
+                      
+                      // Event starts in this exact time slot
+                      const startsHere = eventStart.toDateString() === date.toDateString() && 
+                                       eventStart.getHours() === time.getHours();
+                      
+                      // Event continues from previous time (same day or previous day)
+                      const continuesFromPrevious = eventStart.getTime() < currentTime.getTime() && 
+                                                  eventEnd.getTime() > currentTime.getTime();
+                      
+                      return startsHere || continuesFromPrevious;
+                    });
 
                     if (eventsInSlot.length === 0) return null;
 
@@ -975,54 +954,41 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         actualHeight = Math.max(eventHeight, Math.min((remainingMinutes / 60) * hourHeight, slotHeight - padding));
                       }
 
-                      // Enhanced glassy effect with better opacity and blur
-                      const eventColor = event.color || '#0ea5e9'; // Fallback to primary blue
-                      const glassyBackground = isStartOfEvent 
-                        ? `${eventColor}90` 
-                        : `${eventColor}80`;
-                      
-                      const glassyBorder = isStartOfEvent 
-                        ? `1px solid ${eventColor}` 
-                        : `1px solid ${eventColor}80`;
-
                       return (
                         <div
                           key={event.id}
-                          className={`absolute left-1 right-1 text-xs p-1 overflow-hidden cursor-move transition-all duration-200 group calendar-event-glassy ${
+                          className={`absolute left-1 right-1 text-xs p-1 overflow-hidden cursor-move transition-all duration-200 group ${
                             eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
                           }`}
                           style={{ 
                             top: `${top}px`,
                             height: `${actualHeight}px`,
-                            backgroundColor: glassyBackground,
-                            color: '#ffffff',
-                            borderLeft: isStartOfEvent ? `3px solid ${eventColor}` : 'none',
-                            border: glassyBorder,
+                            backgroundColor: isStartOfEvent ? `${event.color}20` : `${event.color}15`,
+                            color: event.color,
+                            borderLeft: isStartOfEvent ? `3px solid ${event.color}` : 'none',
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                            boxShadow: '0 3px 12px rgba(0,0,0,0.2)',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                             overflow: 'visible',
-                            borderRadius: '4px',
-                            backdropFilter: 'blur(4px)',
+                            // Remove rounded corners for seamless appearance
+                            borderRadius: '0px',
                             // Add hover effects that reveal hour boundaries
-                            borderTop: isStartOfEvent ? '1px solid transparent' : 'none',
-                            borderBottom: '1px solid transparent',
-                            borderRight: '1px solid transparent'
+                            borderTop: isStartOfEvent ? '2px solid transparent' : 'none',
+                            borderBottom: '2px solid transparent',
+                            borderRight: '2px solid transparent'
                           }}
                           onMouseEnter={(e) => {
-                            // On hover, show hour boundaries and enhance glassy effect
-                            e.currentTarget.style.borderTop = '1px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.borderBottom = '1px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.borderRight = '1px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-                            e.currentTarget.style.backdropFilter = 'blur(8px)';
+                            // On hover, show hour boundaries
+                            e.currentTarget.style.borderTop = '2px solid rgba(0,0,0,0.1)';
+                            e.currentTarget.style.borderBottom = '2px solid rgba(0,0,0,0.1)';
+                            e.currentTarget.style.borderRight = '2px solid rgba(0,0,0,0.1)';
+                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
                           }}
                           onMouseLeave={(e) => {
-                            // On leave, hide hour boundaries and restore normal glassy effect
-                            e.currentTarget.style.borderTop = isStartOfEvent ? '1px solid transparent' : 'none';
-                            e.currentTarget.style.borderBottom = '1px solid transparent';
-                            e.currentTarget.style.borderRight = '1px solid transparent';
-                            e.currentTarget.style.boxShadow = '0 3px 12px rgba(0,0,0,0.2)';
-                            e.currentTarget.style.backdropFilter = 'blur(4px)';
+                            // On leave, hide hour boundaries
+                            e.currentTarget.style.borderTop = isStartOfEvent ? '2px solid transparent' : 'none';
+                            e.currentTarget.style.borderBottom = '2px solid transparent';
+                            e.currentTarget.style.borderRight = '2px solid transparent';
+                            e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
@@ -1048,20 +1014,20 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           )}
                           {/* Event count indicator for multiple events */}
                           {showEventCount && index === 0 && isStartOfEvent && (
-                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">
+                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                               {eventsInSlot.length}
                             </div>
                           )}
                           {/* Hover tooltip for compressed events */}
                           {showEventCount && (
-                            <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
+                            <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                               {event.title} ({formatTime(eventStart)} - {formatTime(eventEnd)})
                             </div>
                           )}
                         </div>
                       );
                     });
-                  })()}
+                                    })()}
                 </div>
               ))}
             </div>
@@ -1620,12 +1586,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         </div>
 
         {/* Calendar grid */}
-        <div 
-          className="calendar-grid"
-          style={{
-            '--grid-line-opacity': settings.gridLineOpacity || 0.75
-          } as React.CSSProperties}
-        >
+        <div className="calendar-grid">
           {monthDays.map((date) => renderDayCell(date))}
         </div>
       </div>

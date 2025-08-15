@@ -128,9 +128,11 @@ export const applyAllSettings = (settings: Settings): void => {
   // Apply CSS custom properties for other appearance settings
   const root = document.documentElement;
   root.style.setProperty('--hour-height', `${settings.hourHeight}px`);
+  root.style.setProperty('--grid-line-opacity', settings.gridLineOpacity.toString());
   
   // Apply settings to body as well for broader compatibility
   document.body.style.setProperty('--hour-height', `${settings.hourHeight}px`);
+  document.body.style.setProperty('--grid-line-opacity', settings.gridLineOpacity.toString());
   
   // Store settings in localStorage for components to access
   localStorage.setItem(APPLIED_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
