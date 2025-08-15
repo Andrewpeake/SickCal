@@ -1015,14 +1015,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           {isStartOfEvent ? (
                             <>
                               <div className="font-bold truncate text-gray-800" style={{ 
-                                textShadow: '0 1px 2px rgba(255,255,255,0.8)',
                                 fontSize: '11px',
                                 lineHeight: '1.2'
                               }}>
                                 {event.title}
                               </div>
                               <div className="text-xs truncate text-gray-600 mt-1" style={{ 
-                                textShadow: '0 1px 1px rgba(255,255,255,0.6)',
                                 fontSize: '10px',
                                 lineHeight: '1.1'
                               }}>
@@ -1031,7 +1029,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             </>
                           ) : isFirstSlotOfDay ? (
                             <div className="font-bold truncate text-gray-800" style={{ 
-                              textShadow: '0 1px 2px rgba(255,255,255,0.8)',
                               fontSize: '11px',
                               lineHeight: '1.2'
                             }}>
