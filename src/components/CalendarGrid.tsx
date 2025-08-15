@@ -874,10 +874,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   : `rgba(209, 213, 219, ${settings.gridLineOpacity})` 
               }}
             >
+              {/* Time slot grid */}
               {timeSlots.map((time, index) => (
                 <div
                   key={index}
-                  className={`relative group cursor-pointer transition-colors duration-150 border-b overflow-visible ${
+                  className={`relative group cursor-pointer transition-colors duration-150 border-b ${
                     settings.theme === 'dark' 
                       ? 'hover:bg-[#161b22] border-[#30363d]' 
                       : 'hover:bg-gray-50 border-gray-300'
@@ -886,27 +887,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     borderBottomColor: settings.theme === 'dark' 
                       ? `rgba(48, 54, 61, ${settings.gridLineOpacity})` 
                       : `rgba(209, 213, 219, ${settings.gridLineOpacity})`,
-                    height: `${hourHeight}px`,
-                    overflow: 'visible'
+                    height: `${hourHeight}px`
                   }}
                   title="Click to create event, Double-click to create task"
-
                   onClick={(e) => {
-                    // Create event at clicked time - only hour increments
                     const clickedTime = new Date(date);
                     clickedTime.setHours(time.getHours(), 0, 0, 0);
-                    
-                    // Trigger event creation
                     if (onDateSelect) {
                       onDateSelect(clickedTime);
                     }
                   }}
                   onDoubleClick={(e) => {
-                    // Create task at clicked time - only hour increments
                     const clickedTime = new Date(date);
                     clickedTime.setHours(time.getHours(), 0, 0, 0);
-                    
-                    // Trigger task creation
                     if (onTaskCreate) {
                       onTaskCreate(clickedTime);
                     }
@@ -916,127 +909,117 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     clickedTime.setHours(time.getHours(), 0, 0, 0);
                     handleContextMenu(e, 'empty', clickedTime);
                   }}
-                >
-
-                  
-                  {/* Events for this time slot */}
-                  {(() => {
-                    const currentHourStart = new Date(date);
-                    currentHourStart.setHours(time.getHours(), 0, 0, 0);
-                    const currentHourEnd = new Date(date);
-                    currentHourEnd.setHours(time.getHours() + 1, 0, 0, 0);
-                    
-                    // Only render events that START in this hour
-                    const eventsStartingInThisHour = events.filter((event) => {
-                      const eventStart = new Date(event.startDate);
-                      return eventStart >= currentHourStart && eventStart < currentHourEnd;
-                    });
-
-                    if (eventsStartingInThisHour.length === 0) return null;
-
-                    // Sort events by start time for proper positioning
-                    eventsStartingInThisHour.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-
-                    const slotHeight = hourHeight;
-                    const padding = 4;
-                    const availableHeight = slotHeight - (padding * 2);
-                    const eventHeight = Math.max(20, availableHeight / eventsStartingInThisHour.length);
-                    const showEventCount = eventsStartingInThisHour.length > 1;
-
-                    return eventsStartingInThisHour.map((event, index) => {
-                      const eventStart = new Date(event.startDate);
-                      const eventEnd = new Date(event.endDate);
-                      
-                      // Calculate position and width for overlapping events
-                      const totalEvents = eventsStartingInThisHour.length;
-                      const eventWidth = totalEvents > 1 ? `calc(100% / ${totalEvents} - 2px)` : 'calc(100% - 2px)';
-                      const leftOffset = totalEvents > 1 ? `calc(${index} * (100% / ${totalEvents}))` : '0px';
-                      
-                      // Position based on start time within this hour
-                      const startMinutes = eventStart.getMinutes();
-                      const top = padding + (startMinutes / 60) * hourHeight;
-                      
-                      // For multi-hour events, extend beyond this hour
-                      let actualHeight = eventHeight;
-                      if (eventEnd > currentHourEnd) {
-                        // Event continues beyond this hour - extend to bottom of container
-                        actualHeight = slotHeight - padding - top;
-                      } else {
-                        // Event ends in this hour - calculate based on duration
-                        const durationMinutes = Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 1000));
-                        actualHeight = Math.max(eventHeight, Math.min((durationMinutes / 60) * hourHeight, slotHeight - padding));
-                      }
-
-                      return (
-                        <div
-                          key={event.id}
-                          className={`absolute text-xs p-2 overflow-hidden cursor-move transition-all duration-200 group ${
-                            eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
-                          }`}
-                          style={{ 
-                            top: `${top}px`,
-                            left: leftOffset,
-                            width: eventWidth,
-                            height: `${actualHeight}px`,
-                            zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                            borderRadius: '6px',
-                            backgroundColor: `${event.color}20`,
-                            borderTop: `1px solid ${event.color}`,
-                            borderBottom: `1px solid ${event.color}`,
-                            borderLeft: `1px solid ${event.color}`,
-                            borderRight: `1px solid ${event.color}`,
-                            boxShadow: `0 2px 4px rgba(0,0,0,0.1)`,
-                            overflow: 'visible'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = `${event.color}40`;
-                            e.currentTarget.style.boxShadow = `0 6px 12px rgba(0,0,0,0.2)`;
-                            e.currentTarget.style.transform = 'scale(1.02)';
-                            e.currentTarget.style.zIndex = '10';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = `${event.color}20`;
-                            e.currentTarget.style.boxShadow = `0 2px 4px rgba(0,0,0,0.1)`;
-                            e.currentTarget.style.transform = 'scale(1)';
-                            e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (onEventOpen) {
-                              onEventOpen(event);
-                            }
-                          }}
-                          onMouseDown={(e) => handleEventMouseDown(e, event)}
-                          onContextMenu={(e) => {
-                            e.stopPropagation();
-                            handleDoubleRightClick(e, event);
-                            handleContextMenu(e, 'event', event);
-                          }}
-                        >
-                          <div className="font-semibold truncate text-gray-900" style={{ fontSize: '11px' }}>
-                            {event.title}
-                          </div>
-                          <div className="text-xs truncate text-gray-700 mt-1" style={{ fontSize: '10px' }}>
-                            {formatTime(eventStart)} - {formatTime(eventEnd)}
-                          </div>
-                          {showEventCount && index === 0 && (
-                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg border-2 border-white">
-                              {eventsStartingInThisHour.length}
-                            </div>
-                          )}
-                          {showEventCount && (
-                            <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl border border-gray-700">
-                              <div className="font-semibold text-white">{event.title}</div>
-                              <div className="text-gray-300 text-xs">{formatTime(eventStart)} - {formatTime(eventEnd)}</div>
-                              <div className="text-gray-400 text-xs mt-1">Click to open • Right-click for menu</div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    });
-                  })()}
-                </div>
+                />
               ))}
+              
+              {/* Events for this day - rendered at day level */}
+              {(() => {
+                const dayStart = new Date(date);
+                dayStart.setHours(0, 0, 0, 0);
+                const dayEnd = new Date(date);
+                dayEnd.setHours(23, 59, 59, 999);
+                
+                const eventsForThisDay = events.filter((event) => {
+                  const eventStart = new Date(event.startDate);
+                  const eventEnd = new Date(event.endDate);
+                  return eventStart < dayEnd && eventEnd > dayStart;
+                });
+
+                if (eventsForThisDay.length === 0) return null;
+
+                // Sort events by start time
+                eventsForThisDay.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+                return eventsForThisDay.map((event, index) => {
+                  const eventStart = new Date(event.startDate);
+                  const eventEnd = new Date(event.endDate);
+                  
+                  // Calculate position relative to day start
+                  const dayStartTime = new Date(date);
+                  dayStartTime.setHours(0, 0, 0, 0);
+                  const startOffset = eventStart.getTime() - dayStartTime.getTime();
+                  const top = (startOffset / (1000 * 60 * 60)) * hourHeight;
+                  
+                  // Calculate height based on event duration
+                  const duration = eventEnd.getTime() - eventStart.getTime();
+                  const height = (duration / (1000 * 60 * 60)) * hourHeight;
+                  
+                  // Calculate width for overlapping events
+                  const overlappingEvents = eventsForThisDay.filter(e => {
+                    const eStart = new Date(e.startDate);
+                    const eEnd = new Date(e.endDate);
+                    return eStart < eventEnd && eEnd > eventStart;
+                  });
+                  
+                  const totalOverlapping = overlappingEvents.length;
+                  const eventWidth = totalOverlapping > 1 ? `calc(100% / ${totalOverlapping} - 2px)` : 'calc(100% - 2px)';
+                  const leftOffset = totalOverlapping > 1 ? `calc(${index % totalOverlapping} * (100% / ${totalOverlapping}))` : '0px';
+
+                  return (
+                    <div
+                      key={event.id}
+                      className={`absolute text-xs p-2 overflow-hidden cursor-move transition-all duration-200 group ${
+                        eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
+                      }`}
+                      style={{ 
+                        top: `${top}px`,
+                        left: leftOffset,
+                        width: eventWidth,
+                        height: `${height}px`,
+                        zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
+                        borderRadius: '6px',
+                        backgroundColor: `${event.color}20`,
+                        borderTop: `1px solid ${event.color}`,
+                        borderBottom: `1px solid ${event.color}`,
+                        borderLeft: `1px solid ${event.color}`,
+                        borderRight: `1px solid ${event.color}`,
+                        boxShadow: `0 2px 4px rgba(0,0,0,0.1)`
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = `${event.color}40`;
+                        e.currentTarget.style.boxShadow = `0 6px 12px rgba(0,0,0,0.2)`;
+                        e.currentTarget.style.transform = 'scale(1.02)';
+                        e.currentTarget.style.zIndex = '10';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = `${event.color}20`;
+                        e.currentTarget.style.boxShadow = `0 2px 4px rgba(0,0,0,0.1)`;
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onEventOpen) {
+                          onEventOpen(event);
+                        }
+                      }}
+                      onMouseDown={(e) => handleEventMouseDown(e, event)}
+                      onContextMenu={(e) => {
+                        e.stopPropagation();
+                        handleDoubleRightClick(e, event);
+                        handleContextMenu(e, 'event', event);
+                      }}
+                    >
+                      <div className="font-semibold truncate text-gray-900" style={{ fontSize: '11px' }}>
+                        {event.title}
+                      </div>
+                      <div className="text-xs truncate text-gray-700 mt-1" style={{ fontSize: '10px' }}>
+                        {formatTime(eventStart)} - {formatTime(eventEnd)}
+                      </div>
+                      {totalOverlapping > 1 && index === 0 && (
+                        <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg border-2 border-white">
+                          {totalOverlapping}
+                        </div>
+                      )}
+                      <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl border border-gray-700">
+                        <div className="font-semibold text-white">{event.title}</div>
+                        <div className="text-gray-300 text-xs">{formatTime(eventStart)} - {formatTime(eventEnd)}</div>
+                        <div className="text-gray-400 text-xs mt-1">Click to open • Right-click for menu</div>
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           ))}
         </div>
