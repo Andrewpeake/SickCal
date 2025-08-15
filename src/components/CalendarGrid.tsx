@@ -387,6 +387,23 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
 
 
+  // Event resize state
+  const [eventResize, setEventResize] = useState<{
+    isActive: boolean;
+    event: CalendarEvent | null;
+    resizeType: 'top' | 'bottom' | null;
+    originalStartDate: Date | null;
+    originalEndDate: Date | null;
+    startY: number;
+  }>({
+    isActive: false,
+    event: null,
+    resizeType: null,
+    originalStartDate: null,
+    originalEndDate: null,
+    startY: 0
+  });
+
   // Event dragging handlers
   const handleEventMouseDown = useCallback((e: React.MouseEvent, event: CalendarEvent) => {
     if (!enableDragAndDrop) return;
@@ -451,6 +468,84 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       dragStartHour: hourIndex
     }));
   }, [eventDrag.isActive, eventDrag.event, eventDrag.originalStartDate, eventDrag.originalEndDate, currentDate, enableDragAndDrop, settings.hourHeight]);
+
+  // Event resize handlers
+  const handleEventResizeStart = useCallback((e: React.MouseEvent, event: CalendarEvent, resizeType: 'top' | 'bottom') => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setEventResize({
+      isActive: true,
+      event,
+      resizeType,
+      originalStartDate: new Date(event.startDate),
+      originalEndDate: new Date(event.endDate),
+      startY: e.clientY
+    });
+  }, []);
+
+  const handleEventResizeMove = useCallback((e: MouseEvent) => {
+    if (!eventResize.isActive || !eventResize.event || !timeGridRef.current) return;
+
+    const rect = timeGridRef.current.getBoundingClientRect();
+    const y = e.clientY - rect.top + timeGridRef.current.scrollTop;
+    const hourHeight = settings.hourHeight;
+    
+    // Calculate hour change
+    const deltaY = e.clientY - eventResize.startY;
+    const hourChange = Math.round(deltaY / hourHeight);
+    
+    if (eventResize.resizeType === 'top') {
+      // Resize from top - adjust start time
+      const newStartDate = new Date(eventResize.originalStartDate!);
+      newStartDate.setHours(newStartDate.getHours() + hourChange);
+      
+      // Ensure start time doesn't go after end time
+      if (newStartDate < eventResize.originalEndDate!) {
+        setEventResize(prev => ({
+          ...prev,
+          event: {
+            ...prev.event!,
+            startDate: newStartDate
+          }
+        }));
+      }
+    } else if (eventResize.resizeType === 'bottom') {
+      // Resize from bottom - adjust end time
+      const newEndDate = new Date(eventResize.originalEndDate!);
+      newEndDate.setHours(newEndDate.getHours() + hourChange);
+      
+      // Ensure end time doesn't go before start time
+      if (newEndDate > eventResize.originalStartDate!) {
+        setEventResize(prev => ({
+          ...prev,
+          event: {
+            ...prev.event!,
+            endDate: newEndDate
+          }
+        }));
+      }
+    }
+  }, [eventResize.isActive, eventResize.event, eventResize.resizeType, eventResize.originalStartDate, eventResize.originalEndDate, eventResize.startY, settings.hourHeight]);
+
+  const handleEventResizeEnd = useCallback(() => {
+    if (!eventResize.isActive || !eventResize.event) return;
+
+    // Update the actual event
+    if (onEventEdit) {
+      onEventEdit(eventResize.event);
+    }
+
+    // Reset resize state
+    setEventResize({
+      isActive: false,
+      event: null,
+      resizeType: null,
+      originalStartDate: null,
+      originalEndDate: null,
+      startY: 0
+    });
+  }, [eventResize.isActive, eventResize.event, onEventEdit]);
 
   const handleEventMouseUp = useCallback((e: React.MouseEvent | MouseEvent) => {
     if (!eventDrag.isActive || !eventDrag.event) return;
@@ -579,10 +674,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
     const handleGlobalMouseMove = (e: MouseEvent) => {
       handleEventMouseMove(e);
+      handleEventResizeMove(e);
     };
 
     const handleGlobalMouseUp = (e: MouseEvent) => {
       handleEventMouseUp(e);
+      handleEventResizeEnd();
     };
 
     document.addEventListener('wheel', handleWheel, { passive: false });
@@ -594,7 +691,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [handleEventMouseMove, handleEventMouseUp, isFull24Hours, enableZoomScroll]);
+  }, [handleEventMouseMove, handleEventMouseUp, handleEventResizeMove, handleEventResizeEnd, isFull24Hours, enableZoomScroll]);
 
   const renderDayCell = (date: Date) => {
     const dayEvents = getEventsForDate(events, date);
@@ -930,9 +1027,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 // Sort events by start time
                 eventsForThisDay.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
-                return eventsForThisDay.map((event, index) => {
-                  const eventStart = new Date(event.startDate);
-                  const eventEnd = new Date(event.endDate);
+                                    return eventsForThisDay.map((event, index) => {
+                      // Use resize state if this event is being resized
+                      const isResizing = eventResize.isActive && eventResize.event?.id === event.id;
+                      const eventStart = isResizing ? new Date(eventResize.event!.startDate) : new Date(event.startDate);
+                      const eventEnd = isResizing ? new Date(eventResize.event!.endDate) : new Date(event.endDate);
                   
                   // Calculate position relative to day start
                   const dayStartTime = new Date(date);
@@ -1012,10 +1111,22 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           {totalOverlapping}
                         </div>
                       )}
+                      {/* Resize handles */}
+                      <div 
+                        className="absolute top-0 left-0 right-0 h-2 cursor-ns-resize bg-transparent hover:bg-white hover:bg-opacity-20 transition-colors duration-150"
+                        onMouseDown={(e) => handleEventResizeStart(e, event, 'top')}
+                        title="Drag to resize event start time"
+                      />
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize bg-transparent hover:bg-white hover:bg-opacity-20 transition-colors duration-150"
+                        onMouseDown={(e) => handleEventResizeStart(e, event, 'bottom')}
+                        title="Drag to resize event end time"
+                      />
+                      
                       <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl border border-gray-700">
                         <div className="font-semibold text-white">{event.title}</div>
                         <div className="text-gray-300 text-xs">{formatTime(eventStart)} - {formatTime(eventEnd)}</div>
-                        <div className="text-gray-400 text-xs mt-1">Click to open • Right-click for menu</div>
+                        <div className="text-gray-400 text-xs mt-1">Click to open • Right-click for menu • Drag borders to resize</div>
                       </div>
                     </div>
                   );
