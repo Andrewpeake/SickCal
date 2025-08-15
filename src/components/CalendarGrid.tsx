@@ -968,11 +968,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           style={{ 
                             top: `${top}px`,
                             height: `${actualHeight}px`,
-                            backgroundColor: isStartOfEvent ? `${event.color}40` : `${event.color}30`,
+                            backgroundColor: isStartOfEvent ? `${event.color}60` : `${event.color}50`,
                             color: event.color,
                             borderLeft: isStartOfEvent ? `3px solid ${event.color}` : `1px solid ${event.color}60`,
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                            boxShadow: `0 2px 4px ${event.color}30`,
+                            boxShadow: `0 2px 4px ${event.color}40`,
                             overflow: 'visible',
                             // Remove rounded corners for seamless appearance
                             borderRadius: '0px',
@@ -982,28 +982,28 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             borderRight: '2px solid transparent',
                             // Add gradient texture for more visual depth
                             background: isStartOfEvent 
-                              ? `linear-gradient(135deg, ${event.color}40 0%, ${event.color}30 50%, ${event.color}20 100%)`
-                              : `linear-gradient(135deg, ${event.color}30 0%, ${event.color}20 50%, ${event.color}15 100%)`
+                              ? `linear-gradient(135deg, ${event.color}60 0%, ${event.color}50 50%, ${event.color}40 100%)`
+                              : `linear-gradient(135deg, ${event.color}50 0%, ${event.color}40 50%, ${event.color}30 100%)`
                           }}
                           onMouseEnter={(e) => {
                             // On hover, show hour boundaries and enhance color
                             e.currentTarget.style.borderTop = '2px solid rgba(0,0,0,0.1)';
                             e.currentTarget.style.borderBottom = '2px solid rgba(0,0,0,0.1)';
                             e.currentTarget.style.borderRight = '2px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.boxShadow = `0 4px 12px ${event.color}40`;
+                            e.currentTarget.style.boxShadow = `0 4px 12px ${event.color}50`;
                             e.currentTarget.style.background = isStartOfEvent 
-                              ? `linear-gradient(135deg, ${event.color}60 0%, ${event.color}50 50%, ${event.color}40 100%)`
-                              : `linear-gradient(135deg, ${event.color}50 0%, ${event.color}40 50%, ${event.color}30 100%)`;
+                              ? `linear-gradient(135deg, ${event.color}80 0%, ${event.color}70 50%, ${event.color}60 100%)`
+                              : `linear-gradient(135deg, ${event.color}70 0%, ${event.color}60 50%, ${event.color}50 100%)`;
                           }}
                           onMouseLeave={(e) => {
                             // On leave, hide hour boundaries and restore original colors
                             e.currentTarget.style.borderTop = isStartOfEvent ? '2px solid transparent' : 'none';
                             e.currentTarget.style.borderBottom = '2px solid transparent';
                             e.currentTarget.style.borderRight = '2px solid transparent';
-                            e.currentTarget.style.boxShadow = `0 2px 4px ${event.color}30`;
+                            e.currentTarget.style.boxShadow = `0 2px 4px ${event.color}40`;
                             e.currentTarget.style.background = isStartOfEvent 
-                              ? `linear-gradient(135deg, ${event.color}40 0%, ${event.color}30 50%, ${event.color}20 100%)`
-                              : `linear-gradient(135deg, ${event.color}30 0%, ${event.color}20 50%, ${event.color}15 100%)`;
+                              ? `linear-gradient(135deg, ${event.color}60 0%, ${event.color}50 50%, ${event.color}40 100%)`
+                              : `linear-gradient(135deg, ${event.color}50 0%, ${event.color}40 50%, ${event.color}30 100%)`;
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
@@ -1015,14 +1015,14 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           {isStartOfEvent ? (
                             // For start of event, show full details
                             <>
-                              <div className="font-medium truncate" style={{ color: event.color }}>{event.title}</div>
-                              <div className="text-xs truncate" style={{ color: event.color, opacity: 0.8 }}>
+                              <div className="font-semibold truncate text-white" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{event.title}</div>
+                              <div className="text-xs truncate text-white" style={{ opacity: 0.9, textShadow: '0 1px 1px rgba(0,0,0,0.3)' }}>
                                 {formatTime(eventStart)} - {formatTime(eventEnd)}
                               </div>
                             </>
                           ) : isFirstSlotOfDay ? (
                             // For first slot of day (but not start of event), show title only
-                            <div className="font-medium truncate" style={{ color: event.color, opacity: 0.8 }}>{event.title}</div>
+                            <div className="font-semibold truncate text-white" style={{ opacity: 0.9, textShadow: '0 1px 1px rgba(0,0,0,0.3)' }}>{event.title}</div>
                           ) : (
                             // For continuation slots, show no content
                             <div></div>
@@ -1042,7 +1042,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         </div>
                       );
                     });
-                                    })()}
+                  })()}
                 </div>
               ))}
             </div>
