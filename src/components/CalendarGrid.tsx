@@ -899,18 +899,15 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   
                   {/* Events for this time slot */}
                   {(() => {
-                    // Get all events that are active in this time slot (start here OR continue from previous time)
                     const eventsInSlot = events.filter((event) => {
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
                       const currentTime = new Date(date);
                       currentTime.setHours(time.getHours(), 0, 0, 0);
                       
-                      // Event starts in this exact time slot
                       const startsHere = eventStart.toDateString() === date.toDateString() && 
                                        eventStart.getHours() === time.getHours();
                       
-                      // Event continues from previous time (same day or previous day)
                       const continuesFromPrevious = eventStart.getTime() < currentTime.getTime() && 
                                                   eventEnd.getTime() > currentTime.getTime();
                       
@@ -919,13 +916,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
                     if (eventsInSlot.length === 0) return null;
 
-                    // Calculate the height for each event based on number of events
-                    const slotHeight = hourHeight; // Dynamic hour height
-                    const padding = 4; // 4px top padding
+                    const slotHeight = hourHeight;
+                    const padding = 4;
                     const availableHeight = slotHeight - (padding * 2);
                     const eventHeight = Math.max(20, availableHeight / eventsInSlot.length);
-
-                    // Show event count indicator if multiple events
                     const showEventCount = eventsInSlot.length > 1;
 
                     return eventsInSlot.map((event, index) => {
@@ -934,24 +928,18 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       const currentTime = new Date(date);
                       currentTime.setHours(time.getHours(), 0, 0, 0);
                       
-                      // Determine if this is the start of the event or a continuation
                       const isStartOfEvent = eventStart.toDateString() === date.toDateString() && 
                                            eventStart.getHours() === time.getHours();
                       
-                      // Determine if this is the first time slot of the day for this event
                       const isFirstSlotOfDay = time.getHours() === 0;
                       
-                      // Calculate position for this event - no gap for seamless appearance
                       const top = padding + (index * eventHeight);
                       
-                      // Calculate height based on whether this is start or continuation
                       let actualHeight = eventHeight;
                       
                       if (isStartOfEvent) {
-                        // For start of event, ensure the height doesn't exceed the current slot height
                         actualHeight = Math.min(eventHeight, slotHeight - padding);
                       } else {
-                        // For continuation, calculate remaining time from current slot to end of hour
                         const endOfHour = new Date(date);
                         endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
                         const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
@@ -981,7 +969,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                               : `linear-gradient(135deg, ${event.color}50 0%, ${event.color}40 50%, ${event.color}30 100%)`
                           }}
                           onMouseEnter={(e) => {
-                            // On hover, show hour boundaries and enhance color
                             e.currentTarget.style.borderTop = '2px solid rgba(0,0,0,0.1)';
                             e.currentTarget.style.borderBottom = '2px solid rgba(0,0,0,0.1)';
                             e.currentTarget.style.borderRight = '2px solid rgba(0,0,0,0.1)';
@@ -991,7 +978,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                               : `linear-gradient(135deg, ${event.color}70 0%, ${event.color}60 50%, ${event.color}50 100%)`;
                           }}
                           onMouseLeave={(e) => {
-                            // On leave, hide hour boundaries and restore original colors
                             e.currentTarget.style.borderTop = isStartOfEvent ? '2px solid transparent' : 'none';
                             e.currentTarget.style.borderBottom = '2px solid transparent';
                             e.currentTarget.style.borderRight = '2px solid transparent';
@@ -1008,7 +994,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           }}
                         >
                           {isStartOfEvent ? (
-                            // For start of event, show full details
                             <>
                               <div className="font-semibold truncate text-white" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{event.title}</div>
                               <div className="text-xs truncate text-white" style={{ opacity: 0.9, textShadow: '0 1px 1px rgba(0,0,0,0.3)' }}>
@@ -1016,19 +1001,15 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                               </div>
                             </>
                           ) : isFirstSlotOfDay ? (
-                            // For first slot of day (but not start of event), show title only
                             <div className="font-semibold truncate text-white" style={{ opacity: 0.9, textShadow: '0 1px 1px rgba(0,0,0,0.3)' }}>{event.title}</div>
                           ) : (
-                            // For continuation slots, show no content
                             <div></div>
                           )}
-                          {/* Event count indicator for multiple events */}
                           {showEventCount && index === 0 && isStartOfEvent && (
                             <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                               {eventsInSlot.length}
                             </div>
                           )}
-                          {/* Hover tooltip for compressed events */}
                           {showEventCount && (
                             <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                               {event.title} ({formatTime(eventStart)} - {formatTime(eventEnd)})
