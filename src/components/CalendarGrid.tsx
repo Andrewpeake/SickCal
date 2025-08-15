@@ -977,21 +977,21 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         const isFirstSlotOfDay = time.getHours() === 0;
                         
                         // Calculate position for this event - no gap for seamless appearance
-                        const top = padding + (index * itemHeight);
+                        const top = padding + (index * eventHeight);
                         
                         // Calculate height based on whether this is start or continuation
-                        let actualHeight = itemHeight;
+                        let actualHeight = eventHeight;
                       
                                               if (isStartOfEvent) {
                           // For start of event, ensure the height doesn't exceed the current slot height
-                          actualHeight = Math.min(itemHeight, slotHeight - padding);
+                          actualHeight = Math.min(eventHeight, slotHeight - padding);
                         } else {
                           // For continuation, calculate remaining time from current slot to end of hour
                           const endOfHour = new Date(date);
                           endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
                           const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
                           const remainingMinutes = Math.ceil((effectiveEndTime.getTime() - currentTime.getTime()) / (60 * 1000));
-                          actualHeight = Math.max(itemHeight, Math.min((remainingMinutes / 60) * hourHeight, slotHeight - padding));
+                          actualHeight = Math.max(eventHeight, Math.min((remainingMinutes / 60) * hourHeight, slotHeight - padding));
                         }
 
                       return (
@@ -1053,13 +1053,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             <div></div>
                           )}
                           {/* Event count indicator for multiple events */}
-                          {showCountIndicator && index === 0 && isStartOfEvent && (
+                          {showEventCount && index === 0 && isStartOfEvent && (
                             <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                              {totalItems}
+                              {eventsInSlot.length}
                             </div>
                           )}
                           {/* Hover tooltip for compressed events */}
-                          {showCountIndicator && (
+                          {showEventCount && (
                             <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                               {event.title} ({formatTime(eventStart)} - {formatTime(eventEnd)})
                             </div>
