@@ -925,6 +925,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       const eventEnd = new Date(event.endDate);
                       const currentTime = new Date(date);
                       currentTime.setHours(time.getHours(), 0, 0, 0);
+                      const nextHour = new Date(date);
+                      nextHour.setHours(time.getHours() + 1, 0, 0, 0);
                       
                       const startsHere = eventStart.toDateString() === date.toDateString() && 
                                        eventStart.getHours() === time.getHours();
@@ -932,7 +934,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       const continuesFromPrevious = eventStart.getTime() < currentTime.getTime() && 
                                                   eventEnd.getTime() > currentTime.getTime();
                       
-                      return startsHere || continuesFromPrevious;
+                      const endsHere = eventEnd.getTime() > currentTime.getTime() && 
+                                     eventEnd.getTime() <= nextHour.getTime();
+                      
+                      return startsHere || continuesFromPrevious || endsHere;
                     });
 
                     if (eventsInSlot.length === 0) return null;
@@ -959,13 +964,15 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       let actualHeight = eventHeight;
                       
                       if (isStartOfEvent) {
-                        actualHeight = Math.min(eventHeight, slotHeight - padding);
-                      } else {
+                        // For start of event, calculate height based on how long it extends
                         const endOfHour = new Date(date);
                         endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
                         const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
-                        const remainingMinutes = Math.ceil((effectiveEndTime.getTime() - currentTime.getTime()) / (60 * 1000));
-                        actualHeight = Math.max(eventHeight, Math.min((remainingMinutes / 60) * hourHeight, slotHeight - padding));
+                        const durationMinutes = Math.ceil((effectiveEndTime.getTime() - eventStart.getTime()) / (60 * 1000));
+                        actualHeight = Math.max(eventHeight, Math.min((durationMinutes / 60) * hourHeight, slotHeight - padding));
+                      } else {
+                        // For continuation events, use full slot height
+                        actualHeight = slotHeight - padding;
                       }
 
                       return (
