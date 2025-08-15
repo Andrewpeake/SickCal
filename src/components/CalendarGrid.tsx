@@ -984,12 +984,22 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             boxShadow: `0 2px 4px rgba(0,0,0,0.1)`
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = `${event.color}30`;
-                            e.currentTarget.style.boxShadow = `0 4px 8px rgba(0,0,0,0.15)`;
+                            e.currentTarget.style.backgroundColor = `${event.color}40`;
+                            e.currentTarget.style.boxShadow = `0 6px 12px rgba(0,0,0,0.2)`;
+                            e.currentTarget.style.transform = 'scale(1.02)';
+                            e.currentTarget.style.zIndex = '10';
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = `${event.color}20`;
                             e.currentTarget.style.boxShadow = `0 2px 4px rgba(0,0,0,0.1)`;
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (onEventOpen) {
+                              onEventOpen(event);
+                            }
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
@@ -1015,13 +1025,15 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             <div></div>
                           )}
                           {showEventCount && index === 0 && isStartOfEvent && (
-                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg border-2 border-white">
                               {eventsInSlot.length}
                             </div>
                           )}
                           {showEventCount && (
-                            <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                              {event.title} ({formatTime(eventStart)} - {formatTime(eventEnd)})
+                            <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl border border-gray-700">
+                              <div className="font-semibold text-white">{event.title}</div>
+                              <div className="text-gray-300 text-xs">{formatTime(eventStart)} - {formatTime(eventEnd)}</div>
+                              <div className="text-gray-400 text-xs mt-1">Click to open • Right-click for menu</div>
                             </div>
                           )}
                         </div>
