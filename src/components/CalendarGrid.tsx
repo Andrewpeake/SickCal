@@ -640,7 +640,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 background: `linear-gradient(135deg, ${event.color}30 0%, ${event.color}20 50%, ${event.color}15 100%)`,
                 color: event.color,
                 borderLeft: `3px solid ${event.color}`,
-                boxShadow: `0 1px 3px ${event.color}20`
+                boxShadow: `0 1px 3px ${event.color}20`,
+                textShadow: `0 1px 1px ${event.color}20`
               }}
               onContextMenu={(e) => {
                 e.stopPropagation();
@@ -1014,14 +1015,14 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           {isStartOfEvent ? (
                             // For start of event, show full details
                             <>
-                              <div className="font-medium truncate">{event.title}</div>
-                              <div className="text-xs opacity-75 truncate">
+                              <div className="font-medium truncate" style={{ color: event.color }}>{event.title}</div>
+                              <div className="text-xs truncate" style={{ color: event.color, opacity: 0.8 }}>
                                 {formatTime(eventStart)} - {formatTime(eventEnd)}
                               </div>
                             </>
                           ) : isFirstSlotOfDay ? (
                             // For first slot of day (but not start of event), show title only
-                            <div className="font-medium truncate opacity-75">{event.title}</div>
+                            <div className="font-medium truncate" style={{ color: event.color, opacity: 0.8 }}>{event.title}</div>
                           ) : (
                             // For continuation slots, show no content
                             <div></div>
@@ -1129,7 +1130,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         background: `linear-gradient(135deg, ${evt.color}40 0%, ${evt.color}30 50%, ${evt.color}20 100%)`,
                         color: evt.color,
                         border: `2px solid ${evt.color}`,
-                        boxShadow: `0 2px 4px ${evt.color}30`
+                        boxShadow: `0 2px 4px ${evt.color}30`,
+                        textShadow: `0 1px 2px ${evt.color}20`
                       }}
                       onClick={() => onEventEdit && onEventEdit(evt)}
                       onContextMenu={(e) => {
@@ -1173,19 +1175,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   }}
                 >
                   <div className="flex items-center justify-between">
-                    <h4 className={`font-medium ${
-                      settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'
-                    }`}>{event.title}</h4>
-                    <span className={`text-sm ${
-                      settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'
-                    }`}>
+                    <h4 className="font-medium" style={{ color: event.color }}>{event.title}</h4>
+                    <span className="text-sm" style={{ color: event.color, opacity: 0.8 }}>
                       {formatTime(new Date(event.startDate))} - {formatTime(new Date(event.endDate))}
                     </span>
                   </div>
                   {event.description && (
-                    <p className={`text-sm mt-1 ${
-                      settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
-                    }`}>{event.description}</p>
+                    <p className="text-sm mt-1" style={{ color: event.color, opacity: 0.7 }}>{event.description}</p>
                   )}
                 </div>
               ))}
