@@ -976,26 +976,27 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       }
 
                       // Enhanced glassy effect with better opacity and blur
+                      const eventColor = event.color || '#0ea5e9'; // Fallback to primary blue
                       const glassyBackground = isStartOfEvent 
-                        ? `${event.color}25` 
-                        : `${event.color}15`;
+                        ? `${eventColor}30` 
+                        : `${eventColor}20`;
                       
                       const glassyBorder = isStartOfEvent 
-                        ? `1px solid ${event.color}40` 
-                        : 'none';
+                        ? `1px solid ${eventColor}50` 
+                        : `1px solid ${eventColor}30`;
 
                       return (
                         <div
                           key={event.id}
-                          className={`absolute left-1 right-1 text-xs p-1 overflow-hidden cursor-move transition-all duration-200 group backdrop-blur-sm ${
+                          className={`absolute left-1 right-1 text-xs p-1 overflow-hidden cursor-move transition-all duration-200 group calendar-event-glassy ${
                             eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
                           }`}
                           style={{ 
                             top: `${top}px`,
                             height: `${actualHeight}px`,
                             backgroundColor: glassyBackground,
-                            color: event.color,
-                            borderLeft: isStartOfEvent ? `3px solid ${event.color}` : 'none',
+                            color: eventColor,
+                            borderLeft: isStartOfEvent ? `3px solid ${eventColor}` : 'none',
                             border: glassyBorder,
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',

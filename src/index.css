@@ -325,5 +325,26 @@
     gap: 0;
     background-color: #e5e7eb;
   }
+  
+  /* Enhanced glassy event styling */
+  .calendar-event-glassy {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+  
+  .calendar-event-glassy:hover {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  
+  /* Ensure backdrop-filter works across browsers */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
 
 } 
