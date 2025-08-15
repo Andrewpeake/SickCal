@@ -928,7 +928,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     // Show event count indicator if multiple events
                     const showEventCount = eventsInSlot.length > 1;
 
-                    return eventsInSlot.map((event, index) => {
+                    return (
+                      <>
+                        {eventsInSlot.map((event, index) => {
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
                       const currentTime = new Date(date);
@@ -1041,7 +1043,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           )}
                         </div>
                       );
-                    });
+                    })}
+                      </>
+                    );
                   })()}
                 </div>
               ))}
