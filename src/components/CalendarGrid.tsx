@@ -19,6 +19,42 @@ import { Circle, CheckCircle, Clock, Plus, Edit, Trash2 } from 'lucide-react';
 import clsx from 'clsx';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
 
+// Helper function to organize overlapping events in the same time slot
+const organizeOverlappingEvents = (events: CalendarEvent[], date: Date, time: Date) => {
+  const eventsInSlot = events.filter((event) => {
+    const eventStart = new Date(event.startDate);
+    const eventEnd = new Date(event.endDate);
+    const currentTime = new Date(date);
+    currentTime.setHours(time.getHours(), 0, 0, 0);
+    
+    // Event starts in this exact time slot
+    const startsHere = eventStart.toDateString() === date.toDateString() && 
+                     eventStart.getHours() === time.getHours();
+    
+    // Event continues from previous time (same day or previous day)
+    const continuesFromPrevious = eventStart.getTime() < currentTime.getTime() && 
+                                eventEnd.getTime() > currentTime.getTime();
+    
+    return startsHere || continuesFromPrevious;
+  });
+
+  // Sort events by start time and priority
+  return eventsInSlot.sort((a, b) => {
+    const aStart = new Date(a.startDate);
+    const bStart = new Date(b.startDate);
+    
+    // First sort by start time
+    if (aStart.getTime() !== bStart.getTime()) {
+      return aStart.getTime() - bStart.getTime();
+    }
+    
+    // Then by duration (longer events first)
+    const aDuration = new Date(a.endDate).getTime() - aStart.getTime();
+    const bDuration = new Date(b.endDate).getTime() - bStart.getTime();
+    return bDuration - aDuration;
+  });
+};
+
 // Live Time Indicator Component
 const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = ({ timeSlots, hourHeight }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -848,46 +884,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   : `rgba(209, 213, 219, ${settings.gridLineOpacity})` 
               }}
             >
-              {/* Tasks for this day - show at the top */}
-              {(() => {
-                const dayTasks = getTasksForDate(tasks, date);
-                if (dayTasks.length === 0) return null;
-                
-                return (
-                  <div className="absolute top-0 left-0 right-0 z-10 bg-yellow-50 border-b border-yellow-200 p-1">
-                    <div className="text-xs font-medium text-yellow-800 mb-1">Tasks ({dayTasks.length})</div>
-                    <div className="space-y-1">
-                      {dayTasks.slice(0, 3).map((task: any) => (
-                        <div
-                          key={task.id}
-                          className={`flex items-center space-x-1 text-xs cursor-pointer p-1 rounded ${
-                            task.completed ? 'opacity-60' : ''
-                          }`}
-                          onClick={() => onTaskEdit && onTaskEdit(task)}
-                          onContextMenu={(e) => {
-                            e.stopPropagation();
-                            handleContextMenu(e, 'task', task);
-                          }}
-                        >
-                          {task.completed ? (
-                            <CheckCircle className="w-3 h-3 text-green-500" />
-                          ) : (
-                            <Circle className="w-3 h-3 text-blue-500" />
-                          )}
-                          <span className={`truncate ${task.completed ? 'line-through' : ''}`}>
-                            {task.title}
-                          </span>
-                        </div>
-                      ))}
-                      {dayTasks.length > 3 && (
-                        <div className="text-xs text-yellow-600">
-                          +{dayTasks.length - 3} more tasks
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
               {timeSlots.map((time, index) => (
                 <div
                   key={index}
@@ -932,25 +928,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 >
 
                   
-                                    {/* Events for this time slot */}
+                  {/* Events for this time slot */}
                   {(() => {
-                    // Get all events that are active in this time slot (start here OR continue from previous time)
-                    const eventsInSlot = events.filter((event) => {
-                      const eventStart = new Date(event.startDate);
-                      const eventEnd = new Date(event.endDate);
-                      const currentTime = new Date(date);
-                      currentTime.setHours(time.getHours(), 0, 0, 0);
-                      
-                      // Event starts in this exact time slot
-                      const startsHere = eventStart.toDateString() === date.toDateString() && 
-                                       eventStart.getHours() === time.getHours();
-                      
-                      // Event continues from previous time (same day or previous day)
-                      const continuesFromPrevious = eventStart.getTime() < currentTime.getTime() && 
-                                                  eventEnd.getTime() > currentTime.getTime();
-                      
-                      return startsHere || continuesFromPrevious;
-                    });
+                    // Use the helper function to organize overlapping events
+                    const eventsInSlot = organizeOverlappingEvents(events, date, time);
 
                     if (eventsInSlot.length === 0) return null;
 
@@ -964,71 +945,83 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     const showEventCount = eventsInSlot.length > 1;
 
                     return eventsInSlot.map((event, index) => {
-                        const eventStart = new Date(event.startDate);
-                        const eventEnd = new Date(event.endDate);
-                        const currentTime = new Date(date);
-                        currentTime.setHours(time.getHours(), 0, 0, 0);
-                        
-                        // Determine if this is the start of the event or a continuation
-                        const isStartOfEvent = eventStart.toDateString() === date.toDateString() && 
-                                             eventStart.getHours() === time.getHours();
-                        
-                        // Determine if this is the first time slot of the day for this event
-                        const isFirstSlotOfDay = time.getHours() === 0;
-                        
-                        // Calculate position for this event - no gap for seamless appearance
-                        const top = padding + (index * eventHeight);
-                        
-                        // Calculate height based on whether this is start or continuation
-                        let actualHeight = eventHeight;
+                      const eventStart = new Date(event.startDate);
+                      const eventEnd = new Date(event.endDate);
+                      const currentTime = new Date(date);
+                      currentTime.setHours(time.getHours(), 0, 0, 0);
                       
-                                              if (isStartOfEvent) {
-                          // For start of event, ensure the height doesn't exceed the current slot height
-                          actualHeight = Math.min(eventHeight, slotHeight - padding);
-                        } else {
-                          // For continuation, calculate remaining time from current slot to end of hour
-                          const endOfHour = new Date(date);
-                          endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
-                          const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
-                          const remainingMinutes = Math.ceil((effectiveEndTime.getTime() - currentTime.getTime()) / (60 * 1000));
-                          actualHeight = Math.max(eventHeight, Math.min((remainingMinutes / 60) * hourHeight, slotHeight - padding));
-                        }
+                      // Determine if this is the start of the event or a continuation
+                      const isStartOfEvent = eventStart.toDateString() === date.toDateString() && 
+                                           eventStart.getHours() === time.getHours();
+                      
+                      // Determine if this is the first time slot of the day for this event
+                      const isFirstSlotOfDay = time.getHours() === 0;
+                      
+                      // Calculate position for this event - no gap for seamless appearance
+                      const top = padding + (index * eventHeight);
+                      
+                      // Calculate height based on whether this is start or continuation
+                      let actualHeight = eventHeight;
+                      
+                      if (isStartOfEvent) {
+                        // For start of event, ensure the height doesn't exceed the current slot height
+                        actualHeight = Math.min(eventHeight, slotHeight - padding);
+                      } else {
+                        // For continuation, calculate remaining time from current slot to end of hour
+                        const endOfHour = new Date(date);
+                        endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
+                        const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
+                        const remainingMinutes = Math.ceil((effectiveEndTime.getTime() - currentTime.getTime()) / (60 * 1000));
+                        actualHeight = Math.max(eventHeight, Math.min((remainingMinutes / 60) * hourHeight, slotHeight - padding));
+                      }
+
+                      // Enhanced glassy effect with better opacity and blur
+                      const glassyBackground = isStartOfEvent 
+                        ? `${event.color}25` 
+                        : `${event.color}15`;
+                      
+                      const glassyBorder = isStartOfEvent 
+                        ? `1px solid ${event.color}40` 
+                        : 'none';
 
                       return (
                         <div
                           key={event.id}
-                          className={`absolute left-1 right-1 text-xs p-1 overflow-hidden cursor-move transition-all duration-200 group ${
+                          className={`absolute left-1 right-1 text-xs p-1 overflow-hidden cursor-move transition-all duration-200 group backdrop-blur-sm ${
                             eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
                           }`}
                           style={{ 
                             top: `${top}px`,
                             height: `${actualHeight}px`,
-                            backgroundColor: isStartOfEvent ? `${event.color}20` : `${event.color}15`,
+                            backgroundColor: glassyBackground,
                             color: event.color,
                             borderLeft: isStartOfEvent ? `3px solid ${event.color}` : 'none',
+                            border: glassyBorder,
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                             overflow: 'visible',
-                            // Remove rounded corners for seamless appearance
-                            borderRadius: '0px',
+                            borderRadius: '4px',
+                            backdropFilter: 'blur(4px)',
                             // Add hover effects that reveal hour boundaries
-                            borderTop: isStartOfEvent ? '2px solid transparent' : 'none',
-                            borderBottom: '2px solid transparent',
-                            borderRight: '2px solid transparent'
+                            borderTop: isStartOfEvent ? '1px solid transparent' : 'none',
+                            borderBottom: '1px solid transparent',
+                            borderRight: '1px solid transparent'
                           }}
                           onMouseEnter={(e) => {
-                            // On hover, show hour boundaries
-                            e.currentTarget.style.borderTop = '2px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.borderBottom = '2px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.borderRight = '2px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+                            // On hover, show hour boundaries and enhance glassy effect
+                            e.currentTarget.style.borderTop = '1px solid rgba(0,0,0,0.1)';
+                            e.currentTarget.style.borderBottom = '1px solid rgba(0,0,0,0.1)';
+                            e.currentTarget.style.borderRight = '1px solid rgba(0,0,0,0.1)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                            e.currentTarget.style.backdropFilter = 'blur(8px)';
                           }}
                           onMouseLeave={(e) => {
-                            // On leave, hide hour boundaries
-                            e.currentTarget.style.borderTop = isStartOfEvent ? '2px solid transparent' : 'none';
-                            e.currentTarget.style.borderBottom = '2px solid transparent';
-                            e.currentTarget.style.borderRight = '2px solid transparent';
-                            e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                            // On leave, hide hour boundaries and restore normal glassy effect
+                            e.currentTarget.style.borderTop = isStartOfEvent ? '1px solid transparent' : 'none';
+                            e.currentTarget.style.borderBottom = '1px solid transparent';
+                            e.currentTarget.style.borderRight = '1px solid transparent';
+                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+                            e.currentTarget.style.backdropFilter = 'blur(4px)';
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
@@ -1054,19 +1047,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           )}
                           {/* Event count indicator for multiple events */}
                           {showEventCount && index === 0 && isStartOfEvent && (
-                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold shadow-sm">
                               {eventsInSlot.length}
                             </div>
                           )}
                           {/* Hover tooltip for compressed events */}
                           {showEventCount && (
-                            <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                            <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
                               {event.title} ({formatTime(eventStart)} - {formatTime(eventEnd)})
                             </div>
                           )}
                         </div>
                       );
-                    })}
+                    });
                   })()}
                 </div>
               ))}
