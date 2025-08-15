@@ -892,7 +892,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 >
 
                   
-                  {/* Events for this time slot */}
+                  {/* Events and Tasks for this time slot */}
                   {(() => {
                     // Get all events that are active in this time slot (start here OR continue from previous time)
                     const eventsInSlot = events.filter((event) => {
@@ -912,47 +912,51 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       return startsHere || continuesFromPrevious;
                     });
 
-                    if (eventsInSlot.length === 0) return null;
+                    // Get tasks for this date (tasks don't have specific time slots, so show them in the first hour)
+                    const tasksForDate = time.getHours() === 0 ? getTasksForDate(tasks, date) : [];
 
-                    // Calculate the height for each event based on number of events
+                    if (eventsInSlot.length === 0 && tasksForDate.length === 0) return null;
+
+                    // Calculate the height for each event and task based on total count
                     const slotHeight = hourHeight; // Dynamic hour height
                     const padding = 4; // 4px top padding
                     const availableHeight = slotHeight - (padding * 2);
-                    const eventHeight = Math.max(20, availableHeight / eventsInSlot.length);
+                    const totalItems = eventsInSlot.length + tasksForDate.length;
+                    const itemHeight = Math.max(20, availableHeight / totalItems);
 
-                    // Show event count indicator if multiple events
-                    const showEventCount = eventsInSlot.length > 1;
+                    // Show count indicator if multiple items
+                    const showCountIndicator = totalItems > 1;
 
-                    return eventsInSlot.map((event, index) => {
-                      const eventStart = new Date(event.startDate);
-                      const eventEnd = new Date(event.endDate);
-                      const currentTime = new Date(date);
-                      currentTime.setHours(time.getHours(), 0, 0, 0);
+                                          return eventsInSlot.map((event, index) => {
+                        const eventStart = new Date(event.startDate);
+                        const eventEnd = new Date(event.endDate);
+                        const currentTime = new Date(date);
+                        currentTime.setHours(time.getHours(), 0, 0, 0);
+                        
+                        // Determine if this is the start of the event or a continuation
+                        const isStartOfEvent = eventStart.toDateString() === date.toDateString() && 
+                                             eventStart.getHours() === time.getHours();
+                        
+                        // Determine if this is the first time slot of the day for this event
+                        const isFirstSlotOfDay = time.getHours() === 0;
+                        
+                        // Calculate position for this event - no gap for seamless appearance
+                        const top = padding + (index * itemHeight);
+                        
+                        // Calculate height based on whether this is start or continuation
+                        let actualHeight = itemHeight;
                       
-                      // Determine if this is the start of the event or a continuation
-                      const isStartOfEvent = eventStart.toDateString() === date.toDateString() && 
-                                           eventStart.getHours() === time.getHours();
-                      
-                      // Determine if this is the first time slot of the day for this event
-                      const isFirstSlotOfDay = time.getHours() === 0;
-                      
-                      // Calculate position for this event - no gap for seamless appearance
-                      const top = padding + (index * eventHeight);
-                      
-                      // Calculate height based on whether this is start or continuation
-                      let actualHeight = eventHeight;
-                      
-                      if (isStartOfEvent) {
-                        // For start of event, ensure the height doesn't exceed the current slot height
-                        actualHeight = Math.min(eventHeight, slotHeight - padding);
-                      } else {
-                        // For continuation, calculate remaining time from current slot to end of hour
-                        const endOfHour = new Date(date);
-                        endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
-                        const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
-                        const remainingMinutes = Math.ceil((effectiveEndTime.getTime() - currentTime.getTime()) / (60 * 1000));
-                        actualHeight = Math.max(eventHeight, Math.min((remainingMinutes / 60) * hourHeight, slotHeight - padding));
-                      }
+                                              if (isStartOfEvent) {
+                          // For start of event, ensure the height doesn't exceed the current slot height
+                          actualHeight = Math.min(itemHeight, slotHeight - padding);
+                        } else {
+                          // For continuation, calculate remaining time from current slot to end of hour
+                          const endOfHour = new Date(date);
+                          endOfHour.setHours(time.getHours() + 1, 0, 0, 0);
+                          const effectiveEndTime = eventEnd < endOfHour ? eventEnd : endOfHour;
+                          const remainingMinutes = Math.ceil((effectiveEndTime.getTime() - currentTime.getTime()) / (60 * 1000));
+                          actualHeight = Math.max(itemHeight, Math.min((remainingMinutes / 60) * hourHeight, slotHeight - padding));
+                        }
 
                       return (
                         <div
@@ -1013,20 +1017,20 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             <div></div>
                           )}
                           {/* Event count indicator for multiple events */}
-                          {showEventCount && index === 0 && isStartOfEvent && (
+                          {showCountIndicator && index === 0 && isStartOfEvent && (
                             <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                              {eventsInSlot.length}
+                              {totalItems}
                             </div>
                           )}
                           {/* Hover tooltip for compressed events */}
-                          {showEventCount && (
+                          {showCountIndicator && (
                             <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                               {event.title} ({formatTime(eventStart)} - {formatTime(eventEnd)})
                             </div>
                           )}
                         </div>
                       );
-                    });
+                    })}
                   })()}
                 </div>
               ))}
