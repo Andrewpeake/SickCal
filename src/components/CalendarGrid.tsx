@@ -1001,12 +1001,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         handleContextMenu(e, 'event', event);
                       }}
                     >
-                      <div className="font-semibold truncate text-gray-900" style={{ fontSize: '11px' }}>
-                        {event.title}
-                      </div>
-                      <div className="text-xs truncate text-gray-700 mt-1" style={{ fontSize: '10px' }}>
-                        {formatTime(eventStart)} - {formatTime(eventEnd)}
-                      </div>
+                                             <div className={`font-semibold truncate ${settings?.theme === 'dark' ? 'text-white' : 'text-gray-900'}`} style={{ fontSize: '11px' }}>
+                         {event.title}
+                       </div>
+                       <div className={`text-xs truncate mt-1 ${settings?.theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`} style={{ fontSize: '10px' }}>
+                         {formatTime(eventStart)} - {formatTime(eventEnd)}
+                       </div>
                       {totalOverlapping > 1 && index === 0 && (
                         <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg border-2 border-white">
                           {totalOverlapping}
