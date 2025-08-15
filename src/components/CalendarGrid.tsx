@@ -617,7 +617,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 <div
                   key={index}
                   className="event-dot"
-                  style={{ backgroundColor: event.color }}
+                  style={{ 
+                    backgroundColor: event.color,
+                    boxShadow: `0 1px 3px ${event.color}60`
+                  }}
                 />
               ))}
               {dayEvents.length > 3 && (
@@ -634,9 +637,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               key={event.id}
               className="text-xs p-1 rounded truncate cursor-pointer"
               style={{ 
-                backgroundColor: `${event.color}20`,
+                background: `linear-gradient(135deg, ${event.color}30 0%, ${event.color}20 50%, ${event.color}15 100%)`,
                 color: event.color,
-                borderLeft: `3px solid ${event.color}`
+                borderLeft: `3px solid ${event.color}`,
+                boxShadow: `0 1px 3px ${event.color}20`
               }}
               onContextMenu={(e) => {
                 e.stopPropagation();
@@ -963,32 +967,42 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           style={{ 
                             top: `${top}px`,
                             height: `${actualHeight}px`,
-                            backgroundColor: isStartOfEvent ? `${event.color}20` : `${event.color}15`,
+                            backgroundColor: isStartOfEvent ? `${event.color}40` : `${event.color}30`,
                             color: event.color,
-                            borderLeft: isStartOfEvent ? `3px solid ${event.color}` : 'none',
+                            borderLeft: isStartOfEvent ? `3px solid ${event.color}` : `1px solid ${event.color}60`,
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                            boxShadow: `0 2px 4px ${event.color}30`,
                             overflow: 'visible',
                             // Remove rounded corners for seamless appearance
                             borderRadius: '0px',
                             // Add hover effects that reveal hour boundaries
                             borderTop: isStartOfEvent ? '2px solid transparent' : 'none',
                             borderBottom: '2px solid transparent',
-                            borderRight: '2px solid transparent'
+                            borderRight: '2px solid transparent',
+                            // Add gradient texture for more visual depth
+                            background: isStartOfEvent 
+                              ? `linear-gradient(135deg, ${event.color}40 0%, ${event.color}30 50%, ${event.color}20 100%)`
+                              : `linear-gradient(135deg, ${event.color}30 0%, ${event.color}20 50%, ${event.color}15 100%)`
                           }}
                           onMouseEnter={(e) => {
-                            // On hover, show hour boundaries
+                            // On hover, show hour boundaries and enhance color
                             e.currentTarget.style.borderTop = '2px solid rgba(0,0,0,0.1)';
                             e.currentTarget.style.borderBottom = '2px solid rgba(0,0,0,0.1)';
                             e.currentTarget.style.borderRight = '2px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+                            e.currentTarget.style.boxShadow = `0 4px 12px ${event.color}40`;
+                            e.currentTarget.style.background = isStartOfEvent 
+                              ? `linear-gradient(135deg, ${event.color}60 0%, ${event.color}50 50%, ${event.color}40 100%)`
+                              : `linear-gradient(135deg, ${event.color}50 0%, ${event.color}40 50%, ${event.color}30 100%)`;
                           }}
                           onMouseLeave={(e) => {
-                            // On leave, hide hour boundaries
+                            // On leave, hide hour boundaries and restore original colors
                             e.currentTarget.style.borderTop = isStartOfEvent ? '2px solid transparent' : 'none';
                             e.currentTarget.style.borderBottom = '2px solid transparent';
                             e.currentTarget.style.borderRight = '2px solid transparent';
-                            e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                            e.currentTarget.style.boxShadow = `0 2px 4px ${event.color}30`;
+                            e.currentTarget.style.background = isStartOfEvent 
+                              ? `linear-gradient(135deg, ${event.color}40 0%, ${event.color}30 50%, ${event.color}20 100%)`
+                              : `linear-gradient(135deg, ${event.color}30 0%, ${event.color}20 50%, ${event.color}15 100%)`;
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
@@ -1112,9 +1126,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       className="px-3 py-1 rounded-full text-xs font-medium cursor-pointer select-none justify-self-center"
                       style={{
                         gridColumn: `${getCenterOutColumn(i)} / span 1`,
-                        backgroundColor: `${evt.color}20`,
+                        background: `linear-gradient(135deg, ${evt.color}40 0%, ${evt.color}30 50%, ${evt.color}20 100%)`,
                         color: evt.color,
-                        border: `1px solid ${evt.color}`
+                        border: `2px solid ${evt.color}`,
+                        boxShadow: `0 2px 4px ${evt.color}30`
                       }}
                       onClick={() => onEventEdit && onEventEdit(evt)}
                       onContextMenu={(e) => {
@@ -1146,8 +1161,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   key={event.id}
                   className="p-4 rounded-lg border-l-4"
                   style={{ 
-                    backgroundColor: `${event.color}10`,
-                    borderLeftColor: event.color
+                    background: `linear-gradient(135deg, ${event.color}20 0%, ${event.color}15 50%, ${event.color}10 100%)`,
+                    borderLeftColor: event.color,
+                    boxShadow: `0 2px 4px ${event.color}20`,
+                    borderLeft: `4px solid ${event.color}`
                   }}
                   onClick={() => onEventEdit && onEventEdit(event)}
                   onContextMenu={(e) => {
