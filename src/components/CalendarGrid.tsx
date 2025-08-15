@@ -971,7 +971,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       return (
                         <div
                           key={event.id}
-                          className={`absolute left-1 right-1 text-xs p-1 overflow-hidden cursor-move transition-all duration-200 group ${
+                          className={`absolute left-1 right-1 text-xs p-2 overflow-hidden cursor-move transition-all duration-300 group ${
                             eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
                           }`}
                           style={{ 
@@ -979,33 +979,31 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             height: `${actualHeight}px`,
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                             overflow: 'visible',
-                            borderRadius: '0px',
-                            borderTop: isStartOfEvent ? '2px solid transparent' : 'none',
+                            borderRadius: '8px',
+                            border: `2px solid ${event.color}`,
+                            boxShadow: `0 4px 12px ${event.color}30, 0 2px 4px rgba(0,0,0,0.1)`,
+                            background: `linear-gradient(135deg, ${event.color}15 0%, ${event.color}10 50%, ${event.color}05 100%)`,
+                            backdropFilter: 'blur(10px)',
+                            borderTop: isStartOfEvent ? `2px solid ${event.color}` : '2px solid transparent',
                             borderBottom: '2px solid transparent',
                             borderRight: '2px solid transparent',
-                            borderLeft: isStartOfEvent ? `3px solid ${event.color}` : `1px solid ${event.color}60`,
-                            boxShadow: `0 2px 4px ${event.color}40`,
-                            background: isStartOfEvent 
-                              ? `linear-gradient(135deg, ${event.color}60 0%, ${event.color}50 50%, ${event.color}40 100%)`
-                              : `linear-gradient(135deg, ${event.color}50 0%, ${event.color}40 50%, ${event.color}30 100%)`
+                            borderLeft: `3px solid ${event.color}`
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.borderTop = '2px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.borderBottom = '2px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.borderRight = '2px solid rgba(0,0,0,0.1)';
-                            e.currentTarget.style.boxShadow = `0 4px 12px ${event.color}50`;
-                            e.currentTarget.style.background = isStartOfEvent 
-                              ? `linear-gradient(135deg, ${event.color}80 0%, ${event.color}70 50%, ${event.color}60 100%)`
-                              : `linear-gradient(135deg, ${event.color}70 0%, ${event.color}60 50%, ${event.color}50 100%)`;
+                            e.currentTarget.style.transform = 'scale(1.02)';
+                            e.currentTarget.style.boxShadow = `0 8px 25px ${event.color}40, 0 4px 8px rgba(0,0,0,0.15)`;
+                            e.currentTarget.style.background = `linear-gradient(135deg, ${event.color}25 0%, ${event.color}20 50%, ${event.color}15 100%)`;
+                            e.currentTarget.style.borderTop = `2px solid ${event.color}`;
+                            e.currentTarget.style.borderBottom = `2px solid ${event.color}80`;
+                            e.currentTarget.style.borderRight = `2px solid ${event.color}80`;
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.borderTop = isStartOfEvent ? '2px solid transparent' : 'none';
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = `0 4px 12px ${event.color}30, 0 2px 4px rgba(0,0,0,0.1)`;
+                            e.currentTarget.style.background = `linear-gradient(135deg, ${event.color}15 0%, ${event.color}10 50%, ${event.color}05 100%)`;
+                            e.currentTarget.style.borderTop = isStartOfEvent ? `2px solid ${event.color}` : '2px solid transparent';
                             e.currentTarget.style.borderBottom = '2px solid transparent';
                             e.currentTarget.style.borderRight = '2px solid transparent';
-                            e.currentTarget.style.boxShadow = `0 2px 4px ${event.color}40`;
-                            e.currentTarget.style.background = isStartOfEvent 
-                              ? `linear-gradient(135deg, ${event.color}60 0%, ${event.color}50 50%, ${event.color}40 100%)`
-                              : `linear-gradient(135deg, ${event.color}50 0%, ${event.color}40 50%, ${event.color}30 100%)`;
                           }}
                           onMouseDown={(e) => handleEventMouseDown(e, event)}
                           onContextMenu={(e) => {
@@ -1016,24 +1014,41 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         >
                           {isStartOfEvent ? (
                             <>
-                              <div className="font-semibold truncate text-white" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>{event.title}</div>
-                              <div className="text-xs truncate text-white" style={{ opacity: 0.9, textShadow: '0 1px 1px rgba(0,0,0,0.3)' }}>
+                              <div className="font-bold truncate text-gray-800" style={{ 
+                                textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+                                fontSize: '11px',
+                                lineHeight: '1.2'
+                              }}>
+                                {event.title}
+                              </div>
+                              <div className="text-xs truncate text-gray-600 mt-1" style={{ 
+                                textShadow: '0 1px 1px rgba(255,255,255,0.6)',
+                                fontSize: '10px',
+                                lineHeight: '1.1'
+                              }}>
                                 {formatTime(eventStart)} - {formatTime(eventEnd)}
                               </div>
                             </>
                           ) : isFirstSlotOfDay ? (
-                            <div className="font-semibold truncate text-white" style={{ opacity: 0.9, textShadow: '0 1px 1px rgba(0,0,0,0.3)' }}>{event.title}</div>
+                            <div className="font-bold truncate text-gray-800" style={{ 
+                              textShadow: '0 1px 2px rgba(255,255,255,0.8)',
+                              fontSize: '11px',
+                              lineHeight: '1.2'
+                            }}>
+                              {event.title}
+                            </div>
                           ) : (
                             <div></div>
                           )}
                           {showEventCount && index === 0 && isStartOfEvent && (
-                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg">
                               {eventsInSlot.length}
                             </div>
                           )}
                           {showEventCount && (
-                            <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                              {event.title} ({formatTime(eventStart)} - {formatTime(eventEnd)})
+                            <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl">
+                              <div className="font-semibold">{event.title}</div>
+                              <div className="text-gray-300">{formatTime(eventStart)} - {formatTime(eventEnd)}</div>
                             </div>
                           )}
                         </div>
