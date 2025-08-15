@@ -886,7 +886,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     borderBottomColor: settings.theme === 'dark' 
                       ? `rgba(48, 54, 61, ${settings.gridLineOpacity})` 
                       : `rgba(209, 213, 219, ${settings.gridLineOpacity})`,
-                    height: `${hourHeight}px` 
+                    height: `${hourHeight}px`,
+                    overflow: 'visible'
                   }}
                   title="Click to create event, Double-click to create task"
 
@@ -925,56 +926,45 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     const currentHourEnd = new Date(date);
                     currentHourEnd.setHours(time.getHours() + 1, 0, 0, 0);
                     
-                    const eventsInSlot = events.filter((event) => {
+                    // Only render events that START in this hour
+                    const eventsStartingInThisHour = events.filter((event) => {
                       const eventStart = new Date(event.startDate);
-                      const eventEnd = new Date(event.endDate);
-                      
-                      // Event overlaps with this time slot if:
-                      // 1. Event starts before this hour ends AND
-                      // 2. Event ends after this hour starts
-                      return eventStart < currentHourEnd && eventEnd > currentHourStart;
+                      return eventStart >= currentHourStart && eventStart < currentHourEnd;
                     });
 
-                    if (eventsInSlot.length === 0) return null;
+                    if (eventsStartingInThisHour.length === 0) return null;
 
                     // Sort events by start time for proper positioning
-                    eventsInSlot.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+                    eventsStartingInThisHour.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
                     const slotHeight = hourHeight;
                     const padding = 4;
                     const availableHeight = slotHeight - (padding * 2);
-                    const eventHeight = Math.max(20, availableHeight / eventsInSlot.length);
-                    const showEventCount = eventsInSlot.length > 1;
+                    const eventHeight = Math.max(20, availableHeight / eventsStartingInThisHour.length);
+                    const showEventCount = eventsStartingInThisHour.length > 1;
 
-                    return eventsInSlot.map((event, index) => {
+                    return eventsStartingInThisHour.map((event, index) => {
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
                       
-                      const isStartOfEvent = eventStart >= currentHourStart && eventStart < currentHourEnd;
-                      const isEndOfEvent = eventEnd > currentHourStart && eventEnd <= currentHourEnd;
-                      
                       // Calculate position and width for overlapping events
-                      const totalEvents = eventsInSlot.length;
+                      const totalEvents = eventsStartingInThisHour.length;
                       const eventWidth = totalEvents > 1 ? `calc(100% / ${totalEvents} - 2px)` : 'calc(100% - 2px)';
                       const leftOffset = totalEvents > 1 ? `calc(${index} * (100% / ${totalEvents}))` : '0px';
                       
-                      let top = padding;
-                      if (isStartOfEvent) {
-                        // Event starts in this hour - position based on start time
-                        const startMinutes = eventStart.getMinutes();
-                        top = padding + (startMinutes / 60) * hourHeight;
-                      }
+                      // Position based on start time within this hour
+                      const startMinutes = eventStart.getMinutes();
+                      const top = padding + (startMinutes / 60) * hourHeight;
                       
+                      // For multi-hour events, extend beyond this hour
                       let actualHeight = eventHeight;
-                      
-                      if (isStartOfEvent) {
-                        // Event starts in this hour - calculate height based on duration
-                        const effectiveEndTime = eventEnd < currentHourEnd ? eventEnd : currentHourEnd;
-                        const durationMinutes = Math.ceil((effectiveEndTime.getTime() - eventStart.getTime()) / (60 * 1000));
-                        actualHeight = Math.max(eventHeight, Math.min((durationMinutes / 60) * hourHeight, slotHeight - padding));
+                      if (eventEnd > currentHourEnd) {
+                        // Event continues beyond this hour - extend to bottom of container
+                        actualHeight = slotHeight - padding - top;
                       } else {
-                        // Event continues from previous hour - use full height
-                        actualHeight = slotHeight - padding;
+                        // Event ends in this hour - calculate based on duration
+                        const durationMinutes = Math.ceil((eventEnd.getTime() - eventStart.getTime()) / (60 * 1000));
+                        actualHeight = Math.max(eventHeight, Math.min((durationMinutes / 60) * hourHeight, slotHeight - padding));
                       }
 
                       return (
@@ -995,7 +985,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             borderBottom: `1px solid ${event.color}`,
                             borderLeft: `1px solid ${event.color}`,
                             borderRight: `1px solid ${event.color}`,
-                            boxShadow: `0 2px 4px rgba(0,0,0,0.1)`
+                            boxShadow: `0 2px 4px rgba(0,0,0,0.1)`,
+                            overflow: 'visible'
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = `${event.color}40`;
@@ -1022,23 +1013,15 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                             handleContextMenu(e, 'event', event);
                           }}
                         >
-                          {isStartOfEvent ? (
-                            <>
-                              <div className="font-semibold truncate text-gray-900" style={{ fontSize: '11px' }}>
-                                {event.title}
-                              </div>
-                              <div className="text-xs truncate text-gray-700 mt-1" style={{ fontSize: '10px' }}>
-                                {formatTime(eventStart)} - {formatTime(eventEnd)}
-                              </div>
-                            </>
-                          ) : (
-                            <div className="font-semibold truncate text-gray-900" style={{ fontSize: '11px' }}>
-                              {event.title}
-                            </div>
-                          )}
-                          {showEventCount && index === 0 && isStartOfEvent && (
+                          <div className="font-semibold truncate text-gray-900" style={{ fontSize: '11px' }}>
+                            {event.title}
+                          </div>
+                          <div className="text-xs truncate text-gray-700 mt-1" style={{ fontSize: '10px' }}>
+                            {formatTime(eventStart)} - {formatTime(eventEnd)}
+                          </div>
+                          {showEventCount && index === 0 && (
                             <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg border-2 border-white">
-                              {eventsInSlot.length}
+                              {eventsStartingInThisHour.length}
                             </div>
                           )}
                           {showEventCount && (
