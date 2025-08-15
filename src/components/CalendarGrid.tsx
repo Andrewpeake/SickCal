@@ -928,9 +928,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     // Show event count indicator if multiple events
                     const showEventCount = eventsInSlot.length > 1;
 
-                    return (
-                      <>
-                        {eventsInSlot.map((event, index) => {
+                    return eventsInSlot.map((event, index) => {
                       const eventStart = new Date(event.startDate);
                       const eventEnd = new Date(event.endDate);
                       const currentTime = new Date(date);
@@ -970,19 +968,14 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           style={{ 
                             top: `${top}px`,
                             height: `${actualHeight}px`,
-                            backgroundColor: isStartOfEvent ? `${event.color}60` : `${event.color}50`,
-                            color: event.color,
-                            borderLeft: isStartOfEvent ? `3px solid ${event.color}` : `1px solid ${event.color}60`,
                             zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                            boxShadow: `0 2px 4px ${event.color}40`,
                             overflow: 'visible',
-                            // Remove rounded corners for seamless appearance
                             borderRadius: '0px',
-                            // Add hover effects that reveal hour boundaries
                             borderTop: isStartOfEvent ? '2px solid transparent' : 'none',
                             borderBottom: '2px solid transparent',
                             borderRight: '2px solid transparent',
-                            // Add gradient texture for more visual depth
+                            borderLeft: isStartOfEvent ? `3px solid ${event.color}` : `1px solid ${event.color}60`,
+                            boxShadow: `0 2px 4px ${event.color}40`,
                             background: isStartOfEvent 
                               ? `linear-gradient(135deg, ${event.color}60 0%, ${event.color}50 50%, ${event.color}40 100%)`
                               : `linear-gradient(135deg, ${event.color}50 0%, ${event.color}40 50%, ${event.color}30 100%)`
@@ -1043,9 +1036,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                           )}
                         </div>
                       );
-                    })}
-                      </>
-                    );
+                    });
                   })()}
                 </div>
               ))}
