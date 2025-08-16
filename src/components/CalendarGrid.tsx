@@ -50,9 +50,9 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
           className="absolute left-0 right-0 z-20 pointer-events-none"
           style={{ top: `${topPosition}px` }}
         >
-          <div className="h-0.5 bg-red-500 w-full"></div>
-          <div className="absolute -left-1 -top-1 w-2 h-2 bg-red-500 rounded-full"></div>
-          <div className="absolute -left-16 top-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
+          <div className="h-1 bg-red-500 w-full shadow-lg shadow-red-500/50"></div>
+          <div className="absolute -left-2 -top-2 w-4 h-4 bg-red-500 rounded-full shadow-lg shadow-red-500/50 border-2 border-white"></div>
+          <div className="absolute -left-20 top-0 bg-red-500 text-white text-sm font-bold px-3 py-2 rounded-lg shadow-lg border border-red-600">
             Current Time
           </div>
         </div>
@@ -74,12 +74,12 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
       className="absolute left-0 right-0 z-20 pointer-events-none"
       style={{ top: `${finalTopPosition}px` }}
     >
-      {/* Red line */}
-      <div className="h-0.5 bg-red-500 w-full"></div>
-      {/* Red dot */}
-      <div className="absolute -left-1 -top-1 w-2 h-2 bg-red-500 rounded-full"></div>
-      {/* Time label */}
-      <div className="absolute -left-16 top-0 bg-red-500 text-white text-xs px-2 py-1 rounded">
+      {/* Enhanced red line with glow effect */}
+      <div className="h-1 bg-red-500 w-full shadow-lg shadow-red-500/50"></div>
+      {/* Enhanced red dot */}
+      <div className="absolute -left-2 -top-2 w-4 h-4 bg-red-500 rounded-full shadow-lg shadow-red-500/50 border-2 border-white"></div>
+      {/* Enhanced time label */}
+      <div className="absolute -left-20 top-0 bg-red-500 text-white text-sm font-bold px-3 py-2 rounded-lg shadow-lg border border-red-600">
         {formatTime(currentTime)}
       </div>
     </div>
