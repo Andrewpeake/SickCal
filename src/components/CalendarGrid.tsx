@@ -1086,19 +1086,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          height: `${height}px`,
                          zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                          borderRadius: '6px',
-                         backgroundColor: `${event.color}`,
-                         opacity: '0.85',
-                         boxShadow: `0 2px 8px rgba(0,0,0,0.15)`
+                         backgroundColor: event.color,
+                         opacity: 0.8,
+                         boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
                        }}
                                              onMouseEnter={(e) => {
-                         e.currentTarget.style.opacity = '0.95';
-                         e.currentTarget.style.boxShadow = `0 4px 16px rgba(0,0,0,0.25)`;
-                         e.currentTarget.style.transform = 'scale(1.005)';
+                         e.currentTarget.style.opacity = '1';
+                         e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.3)';
+                         e.currentTarget.style.transform = 'scale(1.01)';
                          e.currentTarget.style.zIndex = '10';
                        }}
                        onMouseLeave={(e) => {
-                         e.currentTarget.style.opacity = '0.85';
-                         e.currentTarget.style.boxShadow = `0 2px 8px rgba(0,0,0,0.15)`;
+                         e.currentTarget.style.opacity = '0.8';
+                         e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
                          e.currentTarget.style.transform = 'scale(1)';
                          e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
                        }}
