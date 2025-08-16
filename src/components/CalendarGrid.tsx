@@ -88,6 +88,16 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
   // Adjust position within the hour based on minutes
   const minuteOffset = (currentMinute / 60) * hourHeight;
   const finalTopPosition = topPosition + minuteOffset;
+  
+  // DEBUG: Verify the calculation
+  console.log('🔍 Position Calculation:', {
+    timeSlotIndex,
+    topPosition: `${topPosition}px`,
+    minuteOffset: `${minuteOffset}px`,
+    finalTopPosition: `${finalTopPosition}px`,
+    expectedMinutes: `${currentMinute} minutes`,
+    expectedPosition: `${(currentMinute / 60) * 100}% of hour`
+  });
 
   // DEBUG: Log position calculations
   console.log('🔍 Position Debug:', {
@@ -841,6 +851,14 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       time.setHours(hour, 0, 0, 0);
       timeSlots.push(time);
     }
+    
+    // DEBUG: Log the first few time slots to see what we're working with
+    console.log('🔍 Time Slots Debug:', {
+      firstSlot: timeSlots[0]?.toISOString(),
+      currentTime: new Date().toISOString(),
+      timeSlotsLength: timeSlots.length,
+      firstFewSlots: timeSlots.slice(0, 3).map(t => t.toISOString())
+    });
     
     return (
               <div ref={calendarRef} className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
