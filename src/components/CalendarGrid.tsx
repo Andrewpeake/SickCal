@@ -35,50 +35,38 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();
   
-  // DEBUG: Log current time info
-  console.log('🔍 LiveTimeIndicator Debug:', {
-    currentTime: currentTime.toLocaleTimeString(),
-    currentHour,
-    currentMinute,
-    timeSlots: timeSlots.map(t => t.getHours()),
-    hourHeight,
-    timeSlotsLength: timeSlots.length
-  });
-  
   // Find the time slot that matches the current hour
   const currentTimeSlot = timeSlots.find(time => time.getHours() === currentHour);
   
-  // DEBUG: Log time slot info
-  console.log('🔍 Time Slot Debug:', {
-    currentTimeSlot: currentTimeSlot?.getHours(),
-    found: !!currentTimeSlot
-  });
-  
-  // If current time is not in visible range, show it at 6:00 AM for visibility
+  // If current time is not in visible range, show it at the actual current time position
   if (!currentTimeSlot) {
-    console.log('⚠️ Current time not in visible range, showing at 6:00 AM');
-    const testTimeSlot = timeSlots.find(time => time.getHours() === 6);
-    if (testTimeSlot) {
-      const timeSlotIndex = timeSlots.findIndex(time => time.getHours() === 6);
-      const topPosition = timeSlotIndex * hourHeight;
-      
-      console.log('🔍 Fallback Debug:', { timeSlotIndex, topPosition, hourHeight });
-      
-      return (
-        <div 
-          className="absolute left-0 right-0 z-20 pointer-events-none border-2 border-yellow-400 bg-yellow-100"
-          style={{ top: `${topPosition}px` }}
-        >
-          <div className="h-1 bg-red-500 w-full shadow-lg shadow-red-500/50"></div>
-          <div className="absolute -left-2 -top-2 w-4 h-4 bg-red-500 rounded-full shadow-lg shadow-red-500/50 border-2 border-white"></div>
-          <div className="absolute -left-20 top-0 bg-red-500 text-white text-sm font-bold px-3 py-2 rounded-lg shadow-lg border border-red-600">
-            Current Time (Fallback - Outside Visible Range)
-          </div>
+    // Calculate the actual position for the current time
+    const actualTimeSlotIndex = currentHour; // Since we now have 00:00-23:00
+    const actualTopPosition = actualTimeSlotIndex * hourHeight;
+    const actualMinuteOffset = (currentMinute / 60) * hourHeight;
+    const actualFinalPosition = actualTopPosition + actualMinuteOffset;
+    
+    return (
+      <div 
+        className="absolute left-0 right-0 z-20 pointer-events-none"
+        style={{ top: `${actualFinalPosition}px` }}
+      >
+        {/* Sleek gradient line with subtle glow */}
+        <div className="h-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 w-full shadow-lg shadow-orange-500/30"></div>
+        
+        {/* Elegant time indicator dot with pulse animation */}
+        <div className="absolute -left-3 -top-1.5">
+          <div className="w-6 h-6 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full shadow-lg shadow-orange-500/50 border-2 border-white animate-pulse"></div>
+          {/* Inner highlight */}
+          <div className="absolute inset-1 w-4 h-4 bg-gradient-to-br from-orange-300 to-orange-500 rounded-full"></div>
         </div>
-      );
-    }
-    console.log('❌ No fallback time slot found');
-    return null;
+        
+        {/* Sleek time label with glassmorphism effect */}
+        <div className="absolute -left-32 top-0 bg-white/90 backdrop-blur-sm text-orange-600 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-orange-200">
+          {formatTime(currentTime)} (Outside Default View)
+        </div>
+      </div>
+    );
   }
 
   // Calculate position based on current time within the hour
@@ -89,35 +77,25 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
   const minuteOffset = (currentMinute / 60) * hourHeight;
   const finalTopPosition = topPosition + minuteOffset;
   
-  // DEBUG: Verify the calculation
-  console.log('🔍 Position Calculation:', {
-    timeSlotIndex,
-    topPosition: `${topPosition}px`,
-    minuteOffset: `${minuteOffset}px`,
-    finalTopPosition: `${finalTopPosition}px`,
-    expectedMinutes: `${currentMinute} minutes`,
-    expectedPosition: `${(currentMinute / 60) * 100}% of hour`
-  });
-
-  // DEBUG: Log position calculations
-  console.log('🔍 Position Debug:', {
-    timeSlotIndex,
-    topPosition,
-    minuteOffset,
-    finalTopPosition
-  });
+  
 
   return (
     <div 
-      className="absolute left-0 right-0 z-20 pointer-events-none border-2 border-green-400 bg-green-100"
+      className="absolute left-0 right-0 z-20 pointer-events-none"
       style={{ top: `${finalTopPosition}px` }}
     >
-      {/* Enhanced red line with glow effect */}
-      <div className="h-1 bg-red-500 w-full shadow-lg shadow-red-500/50"></div>
-      {/* Enhanced red dot */}
-      <div className="absolute -left-2 -top-2 w-4 h-4 bg-red-500 rounded-full shadow-lg shadow-red-500/50 border-2 border-white"></div>
-      {/* Enhanced time label */}
-      <div className="absolute -left-20 top-0 bg-red-500 text-white text-sm font-bold px-3 py-2 rounded-lg shadow-lg border border-red-600">
+      {/* Sleek gradient line with subtle glow */}
+      <div className="h-0.5 bg-gradient-to-r from-red-400 via-red-500 to-red-600 w-full shadow-lg shadow-red-500/30"></div>
+      
+      {/* Elegant time indicator dot with pulse animation */}
+      <div className="absolute -left-3 -top-1.5">
+        <div className="w-6 h-6 bg-gradient-to-br from-red-400 to-red-600 rounded-full shadow-lg shadow-red-500/50 border-2 border-white animate-pulse"></div>
+        {/* Inner highlight */}
+        <div className="absolute inset-1 w-4 h-4 bg-gradient-to-br from-red-300 to-red-500 rounded-full"></div>
+      </div>
+      
+      {/* Sleek time label with glassmorphism effect */}
+      <div className="absolute -left-24 top-0 bg-white/90 backdrop-blur-sm text-red-600 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-red-200">
         {formatTime(currentTime)}
       </div>
     </div>
@@ -845,20 +823,14 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const weekDays = getWeekDays(currentDate);
     const timeSlots: Date[] = [];
     
-    // Generate time slots from 06:00 to 05:59 (24 hours, starting from 6 AM)
-    for (let hour = 6; hour < 30; hour++) {
+    // Generate time slots from 00:00 to 23:00 (full 24 hours)
+    for (let hour = 0; hour < 24; hour++) {
       const time = new Date();
-      time.setHours(hour % 24, 0, 0, 0);
+      time.setHours(hour, 0, 0, 0);
       timeSlots.push(time);
     }
     
-    // DEBUG: Log the first few time slots to see what we're working with
-    console.log('🔍 Time Slots Debug:', {
-      firstSlot: timeSlots[0]?.toISOString(),
-      currentTime: new Date().toISOString(),
-      timeSlotsLength: timeSlots.length,
-      firstFewSlots: timeSlots.slice(0, 3).map(t => t.toISOString())
-    });
+
     
     return (
               <div ref={calendarRef} className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
