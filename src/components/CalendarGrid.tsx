@@ -411,13 +411,15 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     originalStartDate: Date | null;
     originalEndDate: Date | null;
     startY: number;
+    lastResizeTime: number | null;
   }>({
     isActive: false,
     event: null,
     resizeType: null,
     originalStartDate: null,
     originalEndDate: null,
-    startY: 0
+    startY: 0,
+    lastResizeTime: null
   });
 
   // Event dragging handlers
@@ -496,7 +498,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       resizeType,
       originalStartDate: new Date(event.startDate),
       originalEndDate: new Date(event.endDate),
-      startY: e.clientY
+      startY: e.clientY,
+      lastResizeTime: null
     });
   }, []);
 
@@ -559,7 +562,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       resizeType: null,
       originalStartDate: null,
       originalEndDate: null,
-      startY: 0
+      startY: 0,
+      lastResizeTime: Date.now()
     });
   }, [eventResize.isActive, eventResize.event, onEventEdit]);
 
@@ -1117,6 +1121,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
                        }}
                       onClick={(e) => {
+                        // Prevent opening event if we just finished resizing
+                        if (eventResize.isActive && eventResize.event?.id === event.id) {
+                          e.stopPropagation();
+                          return;
+                        }
+                        
+                        // Check if we just finished resizing this event (within last 100ms)
+                        const now = Date.now();
+                        if (eventResize.lastResizeTime && eventResize.event?.id === event.id && (now - eventResize.lastResizeTime) < 100) {
+                          e.stopPropagation();
+                          return;
+                        }
+                        
                         e.stopPropagation();
                         if (onEventOpen) {
                           onEventOpen(event);
