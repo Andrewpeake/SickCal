@@ -54,12 +54,12 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
     found: !!currentTimeSlot
   });
   
-  // If current time is not in visible range, show it at 12:00 for visibility
+  // If current time is not in visible range, show it at 6:00 AM for visibility
   if (!currentTimeSlot) {
-    console.log('⚠️ Current time not in visible range, showing at 12:00');
-    const testTimeSlot = timeSlots.find(time => time.getHours() === 12);
+    console.log('⚠️ Current time not in visible range, showing at 6:00 AM');
+    const testTimeSlot = timeSlots.find(time => time.getHours() === 6);
     if (testTimeSlot) {
-      const timeSlotIndex = timeSlots.findIndex(time => time.getHours() === 12);
+      const timeSlotIndex = timeSlots.findIndex(time => time.getHours() === 6);
       const topPosition = timeSlotIndex * hourHeight;
       
       console.log('🔍 Fallback Debug:', { timeSlotIndex, topPosition, hourHeight });
@@ -72,7 +72,7 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
           <div className="h-1 bg-red-500 w-full shadow-lg shadow-red-500/50"></div>
           <div className="absolute -left-2 -top-2 w-4 h-4 bg-red-500 rounded-full shadow-lg shadow-red-500/50 border-2 border-white"></div>
           <div className="absolute -left-20 top-0 bg-red-500 text-white text-sm font-bold px-3 py-2 rounded-lg shadow-lg border border-red-600">
-            Current Time (Fallback)
+            Current Time (Fallback - Outside Visible Range)
           </div>
         </div>
       );
@@ -845,10 +845,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     const weekDays = getWeekDays(currentDate);
     const timeSlots: Date[] = [];
     
-    // Generate time slots from 00:00 to 23:00 (hour-level only)
-    for (let hour = 0; hour < 24; hour++) {
+    // Generate time slots from 06:00 to 05:59 (24 hours, starting from 6 AM)
+    for (let hour = 6; hour < 30; hour++) {
       const time = new Date();
-      time.setHours(hour, 0, 0, 0);
+      time.setHours(hour % 24, 0, 0, 0);
       timeSlots.push(time);
     }
     
