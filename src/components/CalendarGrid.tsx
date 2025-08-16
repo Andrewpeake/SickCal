@@ -1086,27 +1086,33 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          height: `${height}px`,
                          zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                          borderRadius: '8px',
-                         backgroundColor: `${event.color}50`,
+                         backgroundColor: settings?.theme === 'dark' ? `${event.color}50` : `${event.color}60`,
                          backdropFilter: 'blur(16px)',
-                         borderTop: `1px solid ${event.color}60`,
-                         borderLeft: `1px solid ${event.color}60`,
-                         boxShadow: `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20`
+                         borderTop: `1px solid ${event.color}70`,
+                         borderLeft: `1px solid ${event.color}70`,
+                         boxShadow: settings?.theme === 'dark' ? `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20` : `0 6px 24px ${event.color}40, inset 0 1px 0 ${event.color}30`
                        }}
                                              onMouseEnter={(e) => {
-                         e.currentTarget.style.backgroundColor = `${event.color}70`;
+                         const hoverOpacity = settings?.theme === 'dark' ? '70' : '80';
+                         const hoverShadow = settings?.theme === 'dark' ? `0 8px 32px ${event.color}40, inset 0 1px 0 ${event.color}30` : `0 10px 36px ${event.color}50, inset 0 1px 0 ${event.color}40`;
+                         
+                         e.currentTarget.style.backgroundColor = `${event.color}${hoverOpacity}`;
                          e.currentTarget.style.backdropFilter = 'blur(20px)';
-                         e.currentTarget.style.borderTop = `1px solid ${event.color}80`;
-                         e.currentTarget.style.borderLeft = `1px solid ${event.color}80`;
-                         e.currentTarget.style.boxShadow = `0 8px 32px ${event.color}40, inset 0 1px 0 ${event.color}30`;
+                         e.currentTarget.style.borderTop = `1px solid ${event.color}90`;
+                         e.currentTarget.style.borderLeft = `1px solid ${event.color}90`;
+                         e.currentTarget.style.boxShadow = hoverShadow;
                          e.currentTarget.style.transform = 'scale(1.02)';
                          e.currentTarget.style.zIndex = '10';
                        }}
                        onMouseLeave={(e) => {
-                         e.currentTarget.style.backgroundColor = `${event.color}50`;
+                         const normalOpacity = settings?.theme === 'dark' ? '50' : '60';
+                         const normalShadow = settings?.theme === 'dark' ? `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20` : `0 6px 24px ${event.color}40, inset 0 1px 0 ${event.color}30`;
+                         
+                         e.currentTarget.style.backgroundColor = `${event.color}${normalOpacity}`;
                          e.currentTarget.style.backdropFilter = 'blur(16px)';
-                         e.currentTarget.style.borderTop = `1px solid ${event.color}60`;
-                         e.currentTarget.style.borderLeft = `1px solid ${event.color}60`;
-                         e.currentTarget.style.boxShadow = `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20`;
+                         e.currentTarget.style.borderTop = `1px solid ${event.color}70`;
+                         e.currentTarget.style.borderLeft = `1px solid ${event.color}70`;
+                         e.currentTarget.style.boxShadow = normalShadow;
                          e.currentTarget.style.transform = 'scale(1)';
                          e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
                        }}
@@ -1123,10 +1129,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         handleContextMenu(e, 'event', event);
                       }}
                     >
-                                             <div className="font-semibold truncate text-white" style={{ fontSize: '12px', textShadow: `0 2px 4px ${event.color}80, 0 1px 2px rgba(0,0,0,0.8)` }}>
+                                             <div className={`font-semibold truncate ${settings?.theme === 'dark' ? 'text-white' : 'text-white'}`} style={{ fontSize: '12px', textShadow: settings?.theme === 'dark' ? `0 2px 4px ${event.color}80, 0 1px 2px rgba(0,0,0,0.8)` : `0 2px 4px ${event.color}80, 0 1px 2px rgba(0,0,0,0.9)` }}>
                          {event.title}
                        </div>
-                       <div className="text-xs truncate mt-1 text-white" style={{ fontSize: '11px', textShadow: `0 1px 3px ${event.color}80, 0 1px 2px rgba(0,0,0,0.8)` }}>
+                       <div className={`text-xs truncate mt-1 ${settings?.theme === 'dark' ? 'text-white' : 'text-white'}`} style={{ fontSize: '11px', textShadow: settings?.theme === 'dark' ? `0 1px 3px ${event.color}80, 0 1px 2px rgba(0,0,0,0.8)` : `0 1px 3px ${event.color}80, 0 1px 2px rgba(0,0,0,0.9)` }}>
                          {formatTime(eventStart)} - {formatTime(eventEnd)}
                        </div>
                       {totalOverlapping > 1 && index === 0 && (
