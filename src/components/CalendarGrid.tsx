@@ -1073,35 +1073,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   const eventWidth = totalOverlapping > 1 ? `calc(100% / ${totalOverlapping} - 2px)` : 'calc(100% - 2px)';
                   const leftOffset = totalOverlapping > 1 ? `calc(${index % totalOverlapping} * (100% / ${totalOverlapping}))` : '0px';
 
-                  // Debug: Log event color
-                  console.log('Event color debug:', { eventId: event.id, title: event.title, color: event.color });
-                  
-                  // Debug: Log the style object being applied
-                  const eventStyle = {
-                    top: `${top}px`,
-                    left: leftOffset,
-                    width: eventWidth,
-                    height: `${height}px`,
-                    zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                    borderRadius: '6px',
-                    backgroundColor: event.color,
-                    opacity: 0.9,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                  };
-                  console.log('Event style object:', eventStyle);
-                  
                   return (
                     <div
                       key={event.id}
-                      ref={(el) => {
-                        if (el) {
-                          // Debug: Log computed styles after render
-                          setTimeout(() => {
-                            const computedStyle = window.getComputedStyle(el);
-                            console.log('Computed background color for event:', event.title, computedStyle.backgroundColor);
-                          }, 100);
-                        }
-                      }}
                       className={`absolute text-xs p-2 overflow-hidden cursor-move transition-all duration-200 group ${
                         eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
                       }`}
@@ -1111,20 +1085,25 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          width: eventWidth,
                          height: `${height}px`,
                          zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
-                         borderRadius: '6px',
-                         backgroundColor: event.color,
-                         opacity: 0.9,
-                         boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                         borderRadius: '8px',
+                         backgroundColor: `${event.color}40`,
+                         backdropFilter: 'blur(16px)',
+                         border: `1px solid ${event.color}60`,
+                         boxShadow: `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20`
                        }}
                                              onMouseEnter={(e) => {
-                         e.currentTarget.style.opacity = '1';
-                         e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.3)';
-                         e.currentTarget.style.transform = 'scale(1.01)';
+                         e.currentTarget.style.backgroundColor = `${event.color}60`;
+                         e.currentTarget.style.backdropFilter = 'blur(20px)';
+                         e.currentTarget.style.border = `1px solid ${event.color}80`;
+                         e.currentTarget.style.boxShadow = `0 8px 32px ${event.color}40, inset 0 1px 0 ${event.color}30`;
+                         e.currentTarget.style.transform = 'scale(1.02)';
                          e.currentTarget.style.zIndex = '10';
                        }}
                        onMouseLeave={(e) => {
-                         e.currentTarget.style.opacity = '0.8';
-                         e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                         e.currentTarget.style.backgroundColor = `${event.color}40`;
+                         e.currentTarget.style.backdropFilter = 'blur(16px)';
+                         e.currentTarget.style.border = `1px solid ${event.color}60`;
+                         e.currentTarget.style.boxShadow = `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20`;
                          e.currentTarget.style.transform = 'scale(1)';
                          e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
                        }}
@@ -1141,10 +1120,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         handleContextMenu(e, 'event', event);
                       }}
                     >
-                                             <div className="font-semibold truncate text-white" style={{ fontSize: '12px', textShadow: '0 1px 2px rgba(0,0,0,0.7)' }}>
+                                             <div className="font-semibold truncate text-white" style={{ fontSize: '12px', textShadow: `0 2px 4px ${event.color}80, 0 1px 2px rgba(0,0,0,0.8)` }}>
                          {event.title}
                        </div>
-                       <div className="text-xs truncate mt-1 text-white" style={{ fontSize: '11px', textShadow: '0 1px 2px rgba(0,0,0,0.7)' }}>
+                       <div className="text-xs truncate mt-1 text-white" style={{ fontSize: '11px', textShadow: `0 1px 3px ${event.color}80, 0 1px 2px rgba(0,0,0,0.8)` }}>
                          {formatTime(eventStart)} - {formatTime(eventEnd)}
                        </div>
                       {totalOverlapping > 1 && index === 0 && (
