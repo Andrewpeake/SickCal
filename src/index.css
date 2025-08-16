@@ -157,8 +157,12 @@
     @apply bg-[#0d1117] !important;
   }
   
-  /* Force immediate background application */
-  .calendar-container * {
+  /* Force immediate background application for calendar grid elements */
+  .calendar-container .calendar-week-grid,
+  .calendar-container .calendar-day,
+  .calendar-container .time-slot,
+  .calendar-container .hour-marker,
+  .calendar-container .quarter-marker {
     background-color: inherit !important;
   }
   
