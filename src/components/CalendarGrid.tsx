@@ -35,29 +35,49 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
   const currentHour = currentTime.getHours();
   const currentMinute = currentTime.getMinutes();
   
+  // DEBUG: Log current time info
+  console.log('🔍 LiveTimeIndicator Debug:', {
+    currentTime: currentTime.toLocaleTimeString(),
+    currentHour,
+    currentMinute,
+    timeSlots: timeSlots.map(t => t.getHours()),
+    hourHeight,
+    timeSlotsLength: timeSlots.length
+  });
+  
   // Find the time slot that matches the current hour
   const currentTimeSlot = timeSlots.find(time => time.getHours() === currentHour);
   
+  // DEBUG: Log time slot info
+  console.log('🔍 Time Slot Debug:', {
+    currentTimeSlot: currentTimeSlot?.getHours(),
+    found: !!currentTimeSlot
+  });
+  
   // If current time is not in visible range, show it at 12:00 for visibility
   if (!currentTimeSlot) {
+    console.log('⚠️ Current time not in visible range, showing at 12:00');
     const testTimeSlot = timeSlots.find(time => time.getHours() === 12);
     if (testTimeSlot) {
       const timeSlotIndex = timeSlots.findIndex(time => time.getHours() === 12);
       const topPosition = timeSlotIndex * hourHeight;
       
+      console.log('🔍 Fallback Debug:', { timeSlotIndex, topPosition, hourHeight });
+      
       return (
         <div 
-          className="absolute left-0 right-0 z-20 pointer-events-none"
+          className="absolute left-0 right-0 z-20 pointer-events-none border-2 border-yellow-400 bg-yellow-100"
           style={{ top: `${topPosition}px` }}
         >
           <div className="h-1 bg-red-500 w-full shadow-lg shadow-red-500/50"></div>
           <div className="absolute -left-2 -top-2 w-4 h-4 bg-red-500 rounded-full shadow-lg shadow-red-500/50 border-2 border-white"></div>
           <div className="absolute -left-20 top-0 bg-red-500 text-white text-sm font-bold px-3 py-2 rounded-lg shadow-lg border border-red-600">
-            Current Time
+            Current Time (Fallback)
           </div>
         </div>
       );
     }
+    console.log('❌ No fallback time slot found');
     return null;
   }
 
@@ -69,9 +89,17 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
   const minuteOffset = (currentMinute / 60) * hourHeight;
   const finalTopPosition = topPosition + minuteOffset;
 
+  // DEBUG: Log position calculations
+  console.log('🔍 Position Debug:', {
+    timeSlotIndex,
+    topPosition,
+    minuteOffset,
+    finalTopPosition
+  });
+
   return (
     <div 
-      className="absolute left-0 right-0 z-20 pointer-events-none"
+      className="absolute left-0 right-0 z-20 pointer-events-none border-2 border-green-400 bg-green-100"
       style={{ top: `${finalTopPosition}px` }}
     >
       {/* Enhanced red line with glow effect */}
