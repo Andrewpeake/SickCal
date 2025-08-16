@@ -1073,6 +1073,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   const eventWidth = totalOverlapping > 1 ? `calc(100% / ${totalOverlapping} - 2px)` : 'calc(100% - 2px)';
                   const leftOffset = totalOverlapping > 1 ? `calc(${index % totalOverlapping} * (100% / ${totalOverlapping}))` : '0px';
 
+                  // Debug: Log event color
+                  console.log('Event color debug:', { eventId: event.id, title: event.title, color: event.color });
+                  
                   return (
                     <div
                       key={event.id}
@@ -1086,8 +1089,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          height: `${height}px`,
                          zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                          borderRadius: '6px',
-                         backgroundColor: event.color,
-                         opacity: 0.8,
+                         backgroundColor: event.color || '#3b82f6',
+                         opacity: 0.9,
                          boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
                        }}
                                              onMouseEnter={(e) => {
