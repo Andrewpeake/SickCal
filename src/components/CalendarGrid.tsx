@@ -45,10 +45,23 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
       const timeSlotIndex = timeSlots.findIndex(time => time.getHours() === 12);
       const topPosition = timeSlotIndex * hourHeight;
       
+      // Calculate which day column to show the indicator in
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      const adjustedDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to Monday = 0
+      
+      // Calculate left position for the current day column
+      const dayWidth = 800 / 7; // Approximate day width
+      const leftPosition = 80 + (adjustedDayOfWeek * dayWidth); // 80px for time column
+      
       return (
         <div 
-          className="absolute left-0 right-0 z-20 pointer-events-none"
-          style={{ top: `${topPosition}px` }}
+          className="absolute z-20 pointer-events-none"
+          style={{ 
+            top: `${topPosition}px`,
+            left: `${leftPosition}px`,
+            width: `${dayWidth}px`
+          }}
         >
           <div className="h-1 bg-red-500 w-full shadow-lg shadow-red-500/50"></div>
           <div className="absolute -left-2 -top-2 w-4 h-4 bg-red-500 rounded-full shadow-lg shadow-red-500/50 border-2 border-white"></div>
@@ -69,10 +82,23 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
   const minuteOffset = (currentMinute / 60) * hourHeight; // Use dynamic hour height
   const finalTopPosition = topPosition + minuteOffset;
 
+  // Calculate which day column to show the indicator in
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  const adjustedDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to Monday = 0
+  
+  // Calculate left position for the current day column
+  const dayWidth = 800 / 7; // Approximate day width
+  const leftPosition = 80 + (adjustedDayOfWeek * dayWidth); // 80px for time column
+  
   return (
     <div 
-      className="absolute left-0 right-0 z-20 pointer-events-none"
-      style={{ top: `${finalTopPosition}px` }}
+      className="absolute z-20 pointer-events-none"
+      style={{ 
+        top: `${finalTopPosition}px`,
+        left: `${leftPosition}px`,
+        width: `${dayWidth}px`
+      }}
     >
       {/* Enhanced red line with glow effect */}
       <div className="h-1 bg-red-500 w-full shadow-lg shadow-red-500/50"></div>
