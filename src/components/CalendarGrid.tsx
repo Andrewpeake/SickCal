@@ -1090,32 +1090,32 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          height: `${height}px`,
                          zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                          borderRadius: '8px',
-                         backgroundColor: settings?.theme === 'dark' ? `${event.color}50` : `${event.color}60`,
-                         backdropFilter: 'blur(16px)',
-                         borderTop: `1px solid ${event.color}70`,
-                         borderLeft: `1px solid ${event.color}70`,
-                         boxShadow: settings?.theme === 'dark' ? `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20` : `0 6px 24px ${event.color}40, inset 0 1px 0 ${event.color}30`
+                         backgroundColor: settings?.theme === 'dark' ? `${event.color}70` : `${event.color}75`,
+                         backdropFilter: 'blur(8px)',
+                         borderTop: `1px solid ${event.color}80`,
+                         borderLeft: `1px solid ${event.color}80`,
+                         boxShadow: settings?.theme === 'dark' ? `0 4px 20px ${event.color}40, inset 0 1px 0 ${event.color}30` : `0 6px 24px ${event.color}50, inset 0 1px 0 ${event.color}40`
                        }}
                                              onMouseEnter={(e) => {
-                         const hoverOpacity = settings?.theme === 'dark' ? '70' : '80';
-                         const hoverShadow = settings?.theme === 'dark' ? `0 8px 32px ${event.color}40, inset 0 1px 0 ${event.color}30` : `0 10px 36px ${event.color}50, inset 0 1px 0 ${event.color}40`;
+                         const hoverOpacity = settings?.theme === 'dark' ? '85' : '90';
+                         const hoverShadow = settings?.theme === 'dark' ? `0 8px 32px ${event.color}50, inset 0 1px 0 ${event.color}40` : `0 10px 36px ${event.color}60, inset 0 1px 0 ${event.color}50`;
                          
                          e.currentTarget.style.backgroundColor = `${event.color}${hoverOpacity}`;
-                         e.currentTarget.style.backdropFilter = 'blur(20px)';
-                         e.currentTarget.style.borderTop = `1px solid ${event.color}90`;
-                         e.currentTarget.style.borderLeft = `1px solid ${event.color}90`;
+                         e.currentTarget.style.backdropFilter = 'blur(12px)';
+                         e.currentTarget.style.borderTop = `1px solid ${event.color}95`;
+                         e.currentTarget.style.borderLeft = `1px solid ${event.color}95`;
                          e.currentTarget.style.boxShadow = hoverShadow;
                          e.currentTarget.style.transform = 'scale(1.02)';
                          e.currentTarget.style.zIndex = '10';
                        }}
                        onMouseLeave={(e) => {
-                         const normalOpacity = settings?.theme === 'dark' ? '50' : '60';
-                         const normalShadow = settings?.theme === 'dark' ? `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20` : `0 6px 24px ${event.color}40, inset 0 1px 0 ${event.color}30`;
+                         const normalOpacity = settings?.theme === 'dark' ? '70' : '75';
+                         const normalShadow = settings?.theme === 'dark' ? `0 4px 20px ${event.color}40, inset 0 1px 0 ${event.color}30` : `0 6px 24px ${event.color}50, inset 0 1px 0 ${event.color}40`;
                          
                          e.currentTarget.style.backgroundColor = `${event.color}${normalOpacity}`;
-                         e.currentTarget.style.backdropFilter = 'blur(16px)';
-                         e.currentTarget.style.borderTop = `1px solid ${event.color}70`;
-                         e.currentTarget.style.borderLeft = `1px solid ${event.color}70`;
+                         e.currentTarget.style.backdropFilter = 'blur(8px)';
+                         e.currentTarget.style.borderTop = `1px solid ${event.color}80`;
+                         e.currentTarget.style.borderLeft = `1px solid ${event.color}80`;
                          e.currentTarget.style.boxShadow = normalShadow;
                          e.currentTarget.style.transform = 'scale(1)';
                          e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
