@@ -1076,9 +1076,32 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   // Debug: Log event color
                   console.log('Event color debug:', { eventId: event.id, title: event.title, color: event.color });
                   
+                  // Debug: Log the style object being applied
+                  const eventStyle = {
+                    top: `${top}px`,
+                    left: leftOffset,
+                    width: eventWidth,
+                    height: `${height}px`,
+                    zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
+                    borderRadius: '6px',
+                    backgroundColor: event.color,
+                    opacity: 0.9,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                  };
+                  console.log('Event style object:', eventStyle);
+                  
                   return (
                     <div
                       key={event.id}
+                      ref={(el) => {
+                        if (el) {
+                          // Debug: Log computed styles after render
+                          setTimeout(() => {
+                            const computedStyle = window.getComputedStyle(el);
+                            console.log('Computed background color for event:', event.title, computedStyle.backgroundColor);
+                          }, 100);
+                        }
+                      }}
                       className={`absolute text-xs p-2 overflow-hidden cursor-move transition-all duration-200 group ${
                         eventDrag.isActive && eventDrag.event?.id === event.id ? 'opacity-50' : ''
                       }`}
@@ -1089,7 +1112,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          height: `${height}px`,
                          zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                          borderRadius: '6px',
-                         backgroundColor: event.color || '#3b82f6',
+                         backgroundColor: event.color,
                          opacity: 0.9,
                          boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
                        }}
