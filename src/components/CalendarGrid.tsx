@@ -1067,23 +1067,23 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          height: `${height}px`,
                          zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                          borderRadius: '6px',
-                         backgroundColor: `${event.color}25`,
-                         backdropFilter: 'blur(8px)',
-                         borderTop: `1px solid ${event.color}80`,
-                         borderBottom: `1px solid ${event.color}80`,
-                         borderLeft: `1px solid ${event.color}80`,
-                         borderRight: `1px solid ${event.color}80`,
-                         boxShadow: `0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)`
+                         backgroundColor: `${event.color}70`,
+                         backdropFilter: 'blur(4px)',
+                         borderTop: `2px solid ${event.color}`,
+                         borderBottom: `2px solid ${event.color}`,
+                         borderLeft: `2px solid ${event.color}`,
+                         borderRight: `2px solid ${event.color}`,
+                         boxShadow: `0 6px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4)`
                        }}
                                              onMouseEnter={(e) => {
-                         e.currentTarget.style.backgroundColor = `${event.color}40`;
-                         e.currentTarget.style.boxShadow = `0 8px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.3)`;
+                         e.currentTarget.style.backgroundColor = `${event.color}90`;
+                         e.currentTarget.style.boxShadow = `0 10px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.6)`;
                          e.currentTarget.style.transform = 'scale(1.02)';
                          e.currentTarget.style.zIndex = '10';
                        }}
                        onMouseLeave={(e) => {
-                         e.currentTarget.style.backgroundColor = `${event.color}25`;
-                         e.currentTarget.style.boxShadow = `0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)`;
+                         e.currentTarget.style.backgroundColor = `${event.color}70`;
+                         e.currentTarget.style.boxShadow = `0 6px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4)`;
                          e.currentTarget.style.transform = 'scale(1)';
                          e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
                        }}
@@ -1100,10 +1100,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         handleContextMenu(e, 'event', event);
                       }}
                     >
-                                             <div className={`font-semibold truncate ${settings?.theme === 'dark' ? 'text-white' : 'text-gray-800'}`} style={{ fontSize: '11px', textShadow: settings?.theme === 'dark' ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 2px rgba(255,255,255,0.8)' }}>
+                                             <div className={`font-bold truncate ${settings?.theme === 'dark' ? 'text-white' : 'text-gray-900'}`} style={{ fontSize: '12px', textShadow: settings?.theme === 'dark' ? '0 2px 4px rgba(0,0,0,1)' : '0 2px 4px rgba(255,255,255,1)' }}>
                          {event.title}
                        </div>
-                       <div className={`text-xs truncate mt-1 ${settings?.theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`} style={{ fontSize: '10px', textShadow: settings?.theme === 'dark' ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 2px rgba(255,255,255,0.8)' }}>
+                       <div className={`text-xs truncate mt-1 ${settings?.theme === 'dark' ? 'text-white' : 'text-gray-800'}`} style={{ fontSize: '11px', textShadow: settings?.theme === 'dark' ? '0 1px 3px rgba(0,0,0,1)' : '0 1px 3px rgba(255,255,255,1)' }}>
                          {formatTime(eventStart)} - {formatTime(eventEnd)}
                        </div>
                       {totalOverlapping > 1 && index === 0 && (
