@@ -52,17 +52,17 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
         style={{ top: `${actualFinalPosition}px` }}
       >
         {/* Sleek gradient line with subtle glow */}
-        <div className="h-0.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 w-full shadow-lg shadow-orange-500/30"></div>
+        <div className="h-0.5 bg-gradient-to-r from-blue-300/70 via-blue-400/80 to-blue-500/70 w-full shadow-lg shadow-blue-400/30"></div>
         
         {/* Elegant time indicator dot with pulse animation */}
         <div className="absolute -left-3 -top-1.5">
-          <div className="w-6 h-6 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full shadow-lg shadow-orange-500/50 border-2 border-white animate-pulse"></div>
+          <div className="w-6 h-6 bg-gradient-to-br from-blue-300/80 to-blue-500/80 rounded-full shadow-lg shadow-blue-400/50 border-2 border-white/80 animate-pulse"></div>
           {/* Inner highlight */}
-          <div className="absolute inset-1 w-4 h-4 bg-gradient-to-br from-orange-300 to-orange-500 rounded-full"></div>
+          <div className="absolute inset-1 w-4 h-4 bg-gradient-to-br from-blue-200/70 to-blue-400/70 rounded-full"></div>
         </div>
         
         {/* Sleek time label with glassmorphism effect */}
-        <div className="absolute -left-32 top-0 bg-white/90 backdrop-blur-sm text-orange-600 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-orange-200">
+        <div className="absolute -left-32 top-0 bg-white/90 backdrop-blur-sm text-blue-500 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-blue-200">
           {formatTime(currentTime)} (Outside Default View)
         </div>
       </div>
@@ -85,17 +85,17 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
       style={{ top: `${finalTopPosition}px` }}
     >
       {/* Sleek gradient line with subtle glow */}
-      <div className="h-0.5 bg-gradient-to-r from-red-400 via-red-500 to-red-600 w-full shadow-lg shadow-red-500/30"></div>
+      <div className="h-0.5 bg-gradient-to-r from-blue-400/80 via-blue-500/90 to-blue-600/80 w-full shadow-lg shadow-blue-500/40"></div>
       
       {/* Elegant time indicator dot with pulse animation */}
       <div className="absolute -left-3 -top-1.5">
-        <div className="w-6 h-6 bg-gradient-to-br from-red-400 to-red-600 rounded-full shadow-lg shadow-red-500/50 border-2 border-white animate-pulse"></div>
+        <div className="w-6 h-6 bg-gradient-to-br from-blue-400/90 to-blue-600/90 rounded-full shadow-lg shadow-blue-500/50 border-2 border-white/80 animate-pulse"></div>
         {/* Inner highlight */}
-        <div className="absolute inset-1 w-4 h-4 bg-gradient-to-br from-red-300 to-red-500 rounded-full"></div>
+        <div className="absolute inset-1 w-4 h-4 bg-gradient-to-br from-blue-300/80 to-blue-500/80 rounded-full"></div>
       </div>
       
       {/* Sleek time label with glassmorphism effect */}
-      <div className="absolute -left-24 top-0 bg-white/90 backdrop-blur-sm text-red-600 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-red-200">
+      <div className="absolute -left-24 top-0 bg-white/90 backdrop-blur-sm text-blue-600 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-blue-200">
         {formatTime(currentTime)}
       </div>
     </div>
