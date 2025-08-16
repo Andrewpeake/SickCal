@@ -902,9 +902,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         {/* Time grid - scrollable */}
         <div 
           ref={timeGridRef}
-          className={`calendar-week-grid relative overflow-y-auto calendar-scroll transition-all duration-300 ${
+          className={`calendar-week-grid relative overflow-y-auto overflow-x-hidden calendar-scroll transition-all duration-300 ${
             isFull24Hours ? 'max-h-[2304px]' : isExpanded ? 'max-h-[1056px]' : 'max-h-[600px]'
           }`}
+          style={{ overflow: 'hidden' }}
         >
           {/* Live time indicator */}
           {showLiveTimeIndicator && <LiveTimeIndicator timeSlots={timeSlots} hourHeight={hourHeight} />}
@@ -962,7 +963,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           {weekDays.map((date) => (
             <div 
               key={date.toISOString()} 
-              className={`relative border-l ${
+              className={`relative border-l overflow-hidden ${
                 settings.theme === 'dark' ? 'bg-[#0d1117] border-[#30363d]' : 'bg-white border-gray-300'
               }`}
               style={{ 

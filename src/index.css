@@ -81,13 +81,26 @@
     @apply bg-black bg-opacity-70;
   }
   
-  /* Dark theme input fields */
+    /* Dark theme input fields */
   .dark .input-field {
     @apply bg-[#0d1117] border-[#30363d] text-[#c9d1d9] placeholder-[#484f58];
   }
-  
+
   .dark .input-field:focus {
     @apply border-[#1f6feb] ring-[#1f6feb] ring-opacity-20;
+  }
+
+  /* Calendar overflow clipping */
+  .calendar-week-grid {
+    overflow: hidden !important;
+  }
+
+  .calendar-week-grid > div {
+    overflow: hidden !important;
+  }
+
+  .calendar-week-grid .relative.border-l {
+    overflow: hidden !important;
   }
   
   /* Settings modal specific dark theme styles */
