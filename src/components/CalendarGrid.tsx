@@ -920,9 +920,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               className="absolute z-25 pointer-events-none bg-blue-600 bg-opacity-30 border-2 border-blue-600 rounded"
               style={{
                 left: `${80 + weekDays.findIndex(day => day.toDateString() === eventDrag.dragStartDate!.toDateString()) * ((timeGridRef.current?.getBoundingClientRect().width || 800) - 80) / 7}px`,
-                top: `${eventDrag.dragStartHour! * 96}px`,
+                top: `${eventDrag.dragStartHour! * hourHeight}px`,
                 width: `${((timeGridRef.current?.getBoundingClientRect().width || 800) - 80) / 7}px`,
-                height: `${Math.ceil((new Date(eventDrag.originalEndDate!).getTime() - new Date(eventDrag.originalStartDate!).getTime()) / (60 * 60 * 1000)) * 96}px`
+                height: `${Math.ceil((new Date(eventDrag.originalEndDate!).getTime() - new Date(eventDrag.originalStartDate!).getTime()) / (60 * 60 * 1000)) * hourHeight}px`
               }}
             >
               <div className="absolute top-1 left-1 text-xs text-blue-800 font-medium bg-white bg-opacity-80 px-1 rounded">
