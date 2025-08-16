@@ -1086,23 +1086,26 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          height: `${height}px`,
                          zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                          borderRadius: '8px',
-                         backgroundColor: `${event.color}40`,
+                         backgroundColor: `${event.color}50`,
                          backdropFilter: 'blur(16px)',
-                         border: `1px solid ${event.color}60`,
+                         borderTop: `1px solid ${event.color}60`,
+                         borderLeft: `1px solid ${event.color}60`,
                          boxShadow: `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20`
                        }}
                                              onMouseEnter={(e) => {
-                         e.currentTarget.style.backgroundColor = `${event.color}60`;
+                         e.currentTarget.style.backgroundColor = `${event.color}70`;
                          e.currentTarget.style.backdropFilter = 'blur(20px)';
-                         e.currentTarget.style.border = `1px solid ${event.color}80`;
+                         e.currentTarget.style.borderTop = `1px solid ${event.color}80`;
+                         e.currentTarget.style.borderLeft = `1px solid ${event.color}80`;
                          e.currentTarget.style.boxShadow = `0 8px 32px ${event.color}40, inset 0 1px 0 ${event.color}30`;
                          e.currentTarget.style.transform = 'scale(1.02)';
                          e.currentTarget.style.zIndex = '10';
                        }}
                        onMouseLeave={(e) => {
-                         e.currentTarget.style.backgroundColor = `${event.color}40`;
+                         e.currentTarget.style.backgroundColor = `${event.color}50`;
                          e.currentTarget.style.backdropFilter = 'blur(16px)';
-                         e.currentTarget.style.border = `1px solid ${event.color}60`;
+                         e.currentTarget.style.borderTop = `1px solid ${event.color}60`;
+                         e.currentTarget.style.borderLeft = `1px solid ${event.color}60`;
                          e.currentTarget.style.boxShadow = `0 4px 20px ${event.color}30, inset 0 1px 0 ${event.color}20`;
                          e.currentTarget.style.transform = 'scale(1)';
                          e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
