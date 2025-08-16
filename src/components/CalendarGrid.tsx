@@ -1086,19 +1086,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                          height: `${height}px`,
                          zIndex: eventDrag.isActive && eventDrag.event?.id === event.id ? 30 : 5,
                          borderRadius: '6px',
-                         backgroundColor: `${event.color}30`,
-                         backdropFilter: 'blur(12px)',
-                         boxShadow: `0 2px 8px ${event.color}20`
+                         backgroundColor: `${event.color}`,
+                         opacity: '0.85',
+                         boxShadow: `0 2px 8px rgba(0,0,0,0.15)`
                        }}
                                              onMouseEnter={(e) => {
-                         e.currentTarget.style.backgroundColor = `${event.color}45`;
-                         e.currentTarget.style.boxShadow = `0 3px 12px ${event.color}30`;
+                         e.currentTarget.style.opacity = '0.95';
+                         e.currentTarget.style.boxShadow = `0 4px 16px rgba(0,0,0,0.25)`;
                          e.currentTarget.style.transform = 'scale(1.005)';
                          e.currentTarget.style.zIndex = '10';
                        }}
                        onMouseLeave={(e) => {
-                         e.currentTarget.style.backgroundColor = `${event.color}30`;
-                         e.currentTarget.style.boxShadow = `0 2px 8px ${event.color}20`;
+                         e.currentTarget.style.opacity = '0.85';
+                         e.currentTarget.style.boxShadow = `0 2px 8px rgba(0,0,0,0.15)`;
                          e.currentTarget.style.transform = 'scale(1)';
                          e.currentTarget.style.zIndex = eventDrag.isActive && eventDrag.event?.id === event.id ? '30' : '5';
                        }}
@@ -1115,10 +1115,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                         handleContextMenu(e, 'event', event);
                       }}
                     >
-                                             <div className="font-semibold truncate text-white" style={{ fontSize: '12px', textShadow: `0 1px 2px ${event.color}80` }}>
+                                             <div className="font-semibold truncate text-white" style={{ fontSize: '12px', textShadow: '0 1px 2px rgba(0,0,0,0.7)' }}>
                          {event.title}
                        </div>
-                       <div className="text-xs truncate mt-1 text-white" style={{ fontSize: '11px', textShadow: `0 1px 2px ${event.color}80` }}>
+                       <div className="text-xs truncate mt-1 text-white" style={{ fontSize: '11px', textShadow: '0 1px 2px rgba(0,0,0,0.7)' }}>
                          {formatTime(eventStart)} - {formatTime(eventEnd)}
                        </div>
                       {totalOverlapping > 1 && index === 0 && (
