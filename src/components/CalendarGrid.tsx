@@ -52,7 +52,7 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
         style={{ top: `${actualFinalPosition}px` }}
       >
         {/* Sleek gradient line with subtle glow */}
-        <div className="h-0.5 bg-gradient-to-r from-blue-300/70 via-blue-400/80 to-blue-500/70 w-full shadow-lg shadow-blue-400/30"></div>
+        <div className="h-0.5 bg-gradient-to-r from-blue-300/50 via-blue-400/50 to-blue-500/50 w-full shadow-lg shadow-blue-400/30"></div>
         
         {/* Elegant time indicator dot with pulse animation */}
         <div className="absolute -left-3 -top-1.5">
@@ -85,7 +85,7 @@ const LiveTimeIndicator: React.FC<{ timeSlots: Date[]; hourHeight: number }> = (
       style={{ top: `${finalTopPosition}px` }}
     >
       {/* Sleek gradient line with subtle glow */}
-      <div className="h-0.5 bg-gradient-to-r from-blue-400/80 via-blue-500/90 to-blue-600/80 w-full shadow-lg shadow-blue-500/40"></div>
+      <div className="h-0.5 bg-gradient-to-r from-blue-400/50 via-blue-500/50 to-blue-600/50 w-full shadow-lg shadow-blue-500/40"></div>
       
       {/* Elegant time indicator dot with pulse animation */}
       <div className="absolute -left-3 -top-1.5">
