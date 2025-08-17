@@ -1758,7 +1758,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
         {/* Calendar grid - EXACTLY like week view time column */}
         <div 
-          className="calendar-grid"
+          className={`calendar-grid ${settings.theme === 'dark' ? 'dark' : ''}`}
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(7, 1fr)',
@@ -1770,21 +1770,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
             border: '1px solid rgba(107, 114, 128, 0.75)'
           }}
         >
-          <div className={settings.theme === 'dark' ? 'dark' : ''}>
-            {(() => {
-              console.log('🔍 Month Days Debug:', { monthDaysLength: monthDays.length, firstFewDays: monthDays.slice(0, 3) });
-              return null;
-            })()}
-            {monthDays.map((date, index) => {
-              console.log(`🔍 Rendering day ${index}:`, date.toDateString());
-              return (
-                <div key={date.toISOString()} className="calendar-day relative p-2 border border-gray-300 bg-gray-50">
-                  <div className="text-lg font-bold text-gray-900">{date.getDate()}</div>
-                  <div className="text-xs text-gray-500">TEST CELL {index}</div>
-                </div>
-              );
-            })}
-          </div>
+          {(() => {
+            console.log('🔍 Month Days Debug:', { monthDaysLength: monthDays.length, firstFewDays: monthDays.slice(0, 3) });
+            return null;
+          })()}
+          {monthDays.map((date, index) => {
+            console.log(`🔍 Rendering day ${index}:`, date.toDateString());
+            return (
+              <div key={date.toISOString()} className="calendar-day relative p-2 border border-gray-300 bg-gray-50">
+                <div className="text-lg font-bold text-gray-900">{date.getDate()}</div>
+                <div className="text-xs text-gray-500">TEST CELL {index}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
