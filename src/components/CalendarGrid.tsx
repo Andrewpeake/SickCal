@@ -757,12 +757,17 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                   className="event-dot"
                   style={{ 
                     backgroundColor: event.color,
-                    boxShadow: `0 1px 3px ${event.color}60`
+                    boxShadow: settings?.theme === 'dark' 
+                      ? `0 1px 3px ${event.color}80`
+                      : `0 1px 3px ${event.color}60`
                   }}
                 />
               ))}
               {dayEvents.length > 3 && (
-                <span className="text-xs text-gray-500">+{dayEvents.length - 3}</span>
+                <span className={clsx(
+                  'text-xs',
+                  settings?.theme === 'dark' ? 'text-[#484f58]' : 'text-gray-500'
+                )}>+{dayEvents.length - 3}</span>
               )}
             </div>
           )}
@@ -775,11 +780,17 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               key={event.id}
               className="text-xs p-1 rounded truncate cursor-pointer"
               style={{ 
-                background: `linear-gradient(135deg, ${event.color}30 0%, ${event.color}20 50%, ${event.color}15 100%)`,
-                color: event.color,
+                background: settings?.theme === 'dark' 
+                  ? `linear-gradient(135deg, ${event.color}40 0%, ${event.color}30 50%, ${event.color}20 100%)`
+                  : `linear-gradient(135deg, ${event.color}30 0%, ${event.color}20 50%, ${event.color}15 100%)`,
+                color: settings?.theme === 'dark' ? 'white' : event.color,
                 borderLeft: `3px solid ${event.color}`,
-                boxShadow: `0 1px 3px ${event.color}20`,
-                textShadow: `0 1px 1px ${event.color}20`
+                boxShadow: settings?.theme === 'dark' 
+                  ? `0 1px 3px ${event.color}40`
+                  : `0 1px 3px ${event.color}20`,
+                textShadow: settings?.theme === 'dark' 
+                  ? `0 1px 2px rgba(0,0,0,0.8)`
+                  : `0 1px 1px ${event.color}20`
               }}
               onContextMenu={(e) => {
                 e.stopPropagation();
@@ -798,7 +809,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               key={task.id}
               className={clsx(
                 'flex items-center space-x-1 text-xs cursor-pointer',
-                task.completed ? 'text-gray-400' : 'text-gray-700'
+                settings?.theme === 'dark' 
+                  ? (task.completed ? 'text-[#484f58]' : 'text-[#c9d1d9]')
+                  : (task.completed ? 'text-gray-400' : 'text-gray-700')
               )}
               onContextMenu={(e) => {
                 e.stopPropagation();
@@ -808,7 +821,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               {task.completed ? (
                 <CheckCircle className="w-3 h-3 text-green-500" />
               ) : (
-                <Circle className="w-3 h-3 text-gray-400" />
+                <Circle className={clsx(
+                  'w-3 h-3',
+                  settings?.theme === 'dark' ? 'text-[#484f58]' : 'text-gray-400'
+                )} />
               )}
               <span className={clsx(
                 'truncate',
@@ -1732,7 +1748,9 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         </div>
 
         {/* Calendar grid */}
-        <div className="calendar-grid">
+        <div className={`calendar-grid ${
+          settings.theme === 'dark' ? 'dark' : ''
+        }`}>
           {monthDays.map((date) => renderDayCell(date))}
         </div>
       </div>
