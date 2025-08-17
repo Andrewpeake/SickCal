@@ -21,7 +21,8 @@ const EventModal: React.FC<EventModalProps> = ({
     isAllDay: false,
     isAllWeek: false,
     location: '',
-    attendees: []
+    attendees: [],
+    repeat: { type: 'none', interval: 1 }
   });
 
   const [attendeeInput, setAttendeeInput] = useState('');
@@ -56,6 +57,7 @@ const EventModal: React.FC<EventModalProps> = ({
       setFormData({
         ...event,
         isAllWeek: event.isAllWeek || false,
+        repeat: event.repeat || { type: 'none', interval: 1 },
         startDate: isNaN(eventStartDate.getTime()) ? new Date() : eventStartDate,
         endDate: isNaN(eventEndDate.getTime()) ? new Date() : eventEndDate
       });
@@ -95,7 +97,8 @@ const EventModal: React.FC<EventModalProps> = ({
         color: '#0ea5e9',
         isAllDay: false,
         location: '',
-        attendees: []
+        attendees: [],
+        repeat: { type: 'none', interval: 1 }
       });
     }
   }, [event, selectedDate]);
@@ -117,11 +120,86 @@ const EventModal: React.FC<EventModalProps> = ({
       isAllDay: formData.isAllDay,
       isAllWeek: formData.isAllWeek,
       location: formData.location,
-      attendees: formData.attendees
+      attendees: formData.attendees,
+      repeat: formData.repeat
     };
 
-    onSave(eventData);
+    // Generate recurring events if repeat is enabled
+    if (formData.repeat && formData.repeat.type !== 'none') {
+      const recurringEvents = generateRecurringEvents(eventData);
+      recurringEvents.forEach(event => onSave(event));
+    } else {
+      onSave(eventData);
+    }
+
     onClose();
+  };
+
+  const generateRecurringEvents = (baseEvent: Event): Event[] => {
+    if (!baseEvent.repeat || baseEvent.repeat.type === 'none') {
+      return [baseEvent];
+    }
+
+    const events: Event[] = [baseEvent];
+    const { repeat } = baseEvent;
+    let currentDate = new Date(baseEvent.startDate);
+    let currentEndDate = new Date(baseEvent.endDate);
+    let occurrenceCount = 1;
+
+    // Calculate duration of the event
+    const eventDuration = currentEndDate.getTime() - currentDate.getTime();
+
+    while (occurrenceCount < (repeat.endAfter || 999)) {
+      // Check if we've reached the end date
+      if (repeat.endDate && currentDate >= repeat.endDate) {
+        break;
+      }
+
+      // Calculate next occurrence date
+      let nextDate: Date;
+      switch (repeat.type) {
+        case 'daily':
+          nextDate = new Date(currentDate);
+          nextDate.setDate(currentDate.getDate() + repeat.interval);
+          break;
+        
+        case 'weekly':
+          nextDate = new Date(currentDate);
+          nextDate.setDate(currentDate.getDate() + (7 * repeat.interval));
+          break;
+        
+        case 'monthly':
+          nextDate = new Date(currentDate);
+          nextDate.setMonth(currentDate.getMonth() + repeat.interval);
+          if (repeat.dayOfMonth) {
+            nextDate.setDate(repeat.dayOfMonth);
+          }
+          break;
+        
+        case 'yearly':
+          nextDate = new Date(currentDate);
+          nextDate.setFullYear(currentDate.getFullYear() + repeat.interval);
+          break;
+        
+        default:
+          return events;
+      }
+
+      // Create next occurrence
+      const nextEvent: Event = {
+        ...baseEvent,
+        id: generateId(),
+        startDate: new Date(nextDate),
+        endDate: new Date(nextDate.getTime() + eventDuration)
+      };
+
+      events.push(nextEvent);
+      currentDate = nextDate;
+      currentEndDate = nextEvent.endDate;
+      occurrenceCount++;
+    }
+
+    return events;
   };
 
   const handleAddAttendee = () => {
@@ -272,6 +350,244 @@ const EventModal: React.FC<EventModalProps> = ({
                   >
                     All Week
                   </button>
+                </div>
+              </div>
+
+              {/* Repeat Options */}
+              <div className="space-y-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Repeat
+                </label>
+                <div className="space-y-3">
+                  {/* Repeat Type Selection */}
+                  <div className="flex space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ 
+                        ...prev, 
+                        repeat: { type: 'none', interval: 1 }
+                      }))}
+                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                        !formData.repeat || formData.repeat.type === 'none'
+                          ? 'bg-primary-600 text-white border-primary-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      Never
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ 
+                        ...prev, 
+                        repeat: { type: 'daily', interval: 1, endAfter: 10 }
+                      }))}
+                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                        formData.repeat?.type === 'daily'
+                          ? 'bg-primary-600 text-white border-primary-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      Daily
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ 
+                        ...prev, 
+                        repeat: { type: 'weekly', interval: 1, daysOfWeek: [formData.startDate?.getDay() || 0], endAfter: 10 }
+                      }))}
+                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                        formData.repeat?.type === 'weekly'
+                          ? 'bg-primary-600 text-white border-primary-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      Weekly
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ 
+                        ...prev, 
+                        repeat: { type: 'monthly', interval: 1, dayOfMonth: formData.startDate?.getDate() || 1, endAfter: 10 }
+                      }))}
+                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                        formData.repeat?.type === 'monthly'
+                          ? 'bg-primary-600 text-white border-primary-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      Monthly
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ 
+                        ...prev, 
+                        repeat: { type: 'yearly', interval: 1, endAfter: 10 }
+                      }))}
+                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                        formData.repeat?.type === 'yearly'
+                          ? 'bg-primary-600 text-white border-primary-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      Yearly
+                    </button>
+                  </div>
+
+                  {/* Repeat Configuration */}
+                  {formData.repeat && formData.repeat.type !== 'none' && (
+                    <div className="bg-gray-50 p-3 rounded-lg space-y-3">
+                      {/* Interval */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Every
+                        </label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="number"
+                            min="1"
+                            max="99"
+                            value={formData.repeat.interval}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              repeat: prev.repeat ? { ...prev.repeat, interval: parseInt(e.target.value) || 1 } : prev.repeat
+                            }))}
+                            className="input-field w-16 text-center"
+                          />
+                          <span className="text-sm text-gray-600">
+                            {formData.repeat.type === 'daily' && 'day(s)'}
+                            {formData.repeat.type === 'weekly' && 'week(s)'}
+                            {formData.repeat.type === 'monthly' && 'month(s)'}
+                            {formData.repeat.type === 'yearly' && 'year(s)'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Weekly: Days of Week */}
+                      {formData.repeat.type === 'weekly' && (
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                            Repeat on
+                          </label>
+                          <div className="flex space-x-1">
+                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                              <button
+                                key={day}
+                                type="button"
+                                onClick={() => {
+                                  const currentDays = formData.repeat?.daysOfWeek || [];
+                                  const newDays = currentDays.includes(index)
+                                    ? currentDays.filter(d => d !== index)
+                                    : [...currentDays, index];
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    repeat: prev.repeat ? { ...prev.repeat, daysOfWeek: newDays } : prev.repeat
+                                  }));
+                                }}
+                                className={`px-2 py-1 text-xs rounded border transition-colors duration-200 ${
+                                  formData.repeat?.daysOfWeek?.includes(index)
+                                    ? 'bg-primary-600 text-white border-primary-600'
+                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                }`}
+                              >
+                                {day}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Monthly: Day of Month */}
+                      {formData.repeat.type === 'monthly' && (
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-2">
+                            Day of month
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="31"
+                            value={formData.repeat.dayOfMonth || formData.startDate?.getDate() || 1}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              repeat: prev.repeat ? { ...prev.repeat, dayOfMonth: parseInt(e.target.value) || 1 } : prev.repeat
+                            }))}
+                            className="input-field w-20"
+                          />
+                        </div>
+                      )}
+
+                      {/* End Conditions */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-2">
+                          End after
+                        </label>
+                        <div className="flex space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({
+                              ...prev,
+                              repeat: prev.repeat ? { ...prev.repeat, endAfter: 10, endDate: undefined } : prev.repeat
+                            }))}
+                            className={`px-3 py-1 text-xs rounded border transition-colors duration-200 ${
+                              formData.repeat?.endAfter && !formData.repeat?.endDate
+                                ? 'bg-primary-600 text-white border-primary-600'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            Occurrences
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({
+                              ...prev,
+                              repeat: prev.repeat ? { ...prev.repeat, endDate: new Date(), endAfter: undefined } : prev.repeat
+                            }))}
+                            className={`px-3 py-1 text-xs rounded border transition-colors duration-200 ${
+                              formData.repeat?.endDate && !formData.repeat?.endAfter
+                                ? 'bg-primary-600 text-white border-primary-600'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            Until date
+                          </button>
+                        </div>
+
+                        {/* Occurrences Input */}
+                        {formData.repeat?.endAfter && (
+                          <div className="mt-2">
+                            <input
+                              type="number"
+                              min="1"
+                              max="999"
+                              value={formData.repeat.endAfter}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                repeat: prev.repeat ? { ...prev.repeat, endAfter: parseInt(e.target.value) || 1 } : prev.repeat
+                              }))}
+                              className="input-field w-20"
+                              placeholder="10"
+                            />
+                            <span className="text-xs text-gray-500 ml-2">occurrences</span>
+                          </div>
+                        )}
+
+                        {/* End Date Input */}
+                        {formData.repeat?.endDate && (
+                          <div className="mt-2">
+                            <input
+                              type="date"
+                              value={formData.repeat.endDate ? formatDateTime(formData.repeat.endDate).split('T')[0] : ''}
+                              onChange={(e) => setFormData(prev => ({
+                                ...prev,
+                                repeat: prev.repeat ? { ...prev.repeat, endDate: new Date(e.target.value) } : prev.repeat
+                              }))}
+                              className="input-field w-40"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

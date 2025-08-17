@@ -12,6 +12,18 @@ export interface Event {
   location?: string;
   attendees?: string[];
   category?: string;
+  repeat?: RepeatPattern;
+}
+
+export interface RepeatPattern {
+  type: 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
+  interval: number; // Every X days/weeks/months/years
+  endDate?: Date; // When to stop repeating
+  endAfter?: number; // Or stop after X occurrences
+  daysOfWeek?: number[]; // For weekly: [0,1,2,3,4,5,6] (Sunday = 0)
+  dayOfMonth?: number; // For monthly: specific day of month
+  weekOfMonth?: number; // For monthly: which week (1-5, -1 for last)
+  dayOfWeek?: number; // For monthly: which day of week (0-6)
 }
 
 export interface Task {
