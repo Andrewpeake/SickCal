@@ -1730,11 +1730,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     
     return (
       <div className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
-        settings?.theme === 'dark' ? 'bg-[#161b22]' : 'bg-white'
+        settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
       }`}>
         {/* Month header */}
         <div className={`grid grid-cols-7 gap-px ${
-          settings.theme === 'dark' ? 'bg-[#21262d]' : 'bg-gray-200'
+          settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-200'
         }`}>
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
             <div key={day} className={`p-3 text-center ${
