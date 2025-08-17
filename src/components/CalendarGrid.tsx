@@ -1765,7 +1765,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
             })()}
             {monthDays.map((date, index) => {
               console.log(`🔍 Rendering day ${index}:`, date.toDateString());
-              return renderDayCell(date);
+              return (
+                <div key={date.toISOString()} className="calendar-day relative p-2 border border-gray-300 bg-gray-50">
+                  <div className="text-lg font-bold text-gray-900">{date.getDate()}</div>
+                  <div className="text-xs text-gray-500">TEST CELL {index}</div>
+                </div>
+              );
             })}
           </div>
         </div>
