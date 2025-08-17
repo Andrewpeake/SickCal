@@ -1734,7 +1734,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       isDark: settings?.theme === 'dark',
       containerBg: settings?.theme === 'dark' ? '#0d1117' : 'white',
       headerBg: settings?.theme === 'dark' ? '#161b22' : 'gray-50',
-      dayBg: settings?.theme === 'dark' ? '#0d1117' : 'white'
+      dayBg: settings?.theme === 'dark' ? '#0d1117' : 'gray-50'
     });
     
     return (
@@ -1747,7 +1747,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         }`}>
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
             <div key={day} className={`p-3 text-center ${
-              settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
+              settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
             }`}>
               <span className={`text-sm font-medium ${
                 settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-600'
