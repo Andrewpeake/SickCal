@@ -51,27 +51,30 @@
     border: 1px solid rgba(139, 148, 158, var(--grid-line-opacity, 0.75));
   }
   
-  /* Dark theme calendar days */
+  /* Dark theme calendar days - EXACTLY like week view */
   .dark .calendar-day {
-    background-color: #0d1117 !important;
-    color: #c9d1d9 !important;
+    background-color: #0d1117 !important; /* EXACTLY like week view container */
+    color: #c9d1d9 !important; /* EXACTLY like week view text */
     border: 1px solid rgba(139, 148, 158, var(--grid-line-opacity, 0.75)) !important;
   }
   
   .dark .calendar-day:hover {
-    background-color: #161b22 !important;
+    background-color: #161b22 !important; /* EXACTLY like week view header hover */
   }
   
   .dark .calendar-day.today {
-    @apply bg-[#1f6feb] bg-opacity-10 border-2 border-[#1f6feb];
+    background-color: rgba(30, 102, 235, 0.1) !important; /* EXACTLY like week view today */
+    border: 2px solid #1f6feb !important;
   }
   
   .dark .calendar-day.other-month {
-    @apply bg-[#0d1117] text-[#484f58];
+    background-color: #0d1117 !important; /* EXACTLY like week view container */
+    color: #484f58 !important;
   }
   
   .dark .calendar-day.selected {
-    @apply bg-[#1f6feb] bg-opacity-20 border-2 border-[#1f6feb];
+    background-color: rgba(30, 102, 235, 0.2) !important; /* EXACTLY like week view selected */
+    border: 2px solid #1f6feb !important;
   }
   
   /* Dark theme modals */
@@ -229,6 +232,7 @@
 }
 
   @layer components {
+    /* Month view calendar grid - EXACTLY like week view */
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -240,17 +244,18 @@
       border: 1px solid rgba(107, 114, 128, var(--grid-line-opacity, 0.75));
     }
     
+    /* Month view calendar days - EXACTLY like week view time column */
     .calendar-day {
       min-height: 120px;
       padding: 0.5rem;
       transition: all 0.2s ease-in-out;
       cursor: pointer;
       border: 1px solid rgba(107, 114, 128, var(--grid-line-opacity, 0.75));
-      background-color: rgb(249 250 251); /* gray-50 */
+      background-color: rgb(249 250 251); /* gray-50 - EXACTLY like week view time column */
     }
     
     .calendar-day:hover {
-      background-color: rgb(243 244 246); /* gray-100 */
+      background-color: rgb(243 244 246); /* gray-100 - EXACTLY like week view hover */
     }
   
   .calendar-day.today {

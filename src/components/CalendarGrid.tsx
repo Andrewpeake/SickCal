@@ -1741,7 +1741,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       <div className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
         settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
       }`}>
-        {/* Month header */}
+        {/* Month header - EXACTLY like week view */}
         <div className={`grid grid-cols-7 gap-px ${
           settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
         }`}>
@@ -1750,17 +1750,17 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
             }`}>
               <span className={`text-sm font-medium ${
-                settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-600'
+                settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
               }`}>{day}</span>
             </div>
           ))}
         </div>
 
-        {/* Calendar grid */}
-        <div className={`calendar-grid ${
-          settings.theme === 'dark' ? 'dark' : ''
-        }`}>
-          {monthDays.map((date) => renderDayCell(date))}
+        {/* Calendar grid - EXACTLY like week view time column */}
+        <div className="calendar-grid">
+          <div className={settings.theme === 'dark' ? 'dark' : ''}>
+            {monthDays.map((date) => renderDayCell(date))}
+          </div>
         </div>
       </div>
     );
