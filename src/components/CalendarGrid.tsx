@@ -1728,6 +1728,15 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   const renderMonthView = () => {
     const monthDays = getMonthDays(currentDate);
     
+    // Debug logging
+    console.log('🔍 Month View Debug:', {
+      theme: settings?.theme,
+      isDark: settings?.theme === 'dark',
+      containerBg: settings?.theme === 'dark' ? '#0d1117' : 'white',
+      headerBg: settings?.theme === 'dark' ? '#161b22' : 'gray-200',
+      dayBg: settings?.theme === 'dark' ? '#0d1117' : 'gray-50'
+    });
+    
     return (
       <div className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
         settings?.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
