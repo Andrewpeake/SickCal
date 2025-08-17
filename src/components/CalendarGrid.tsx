@@ -1759,7 +1759,14 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         {/* Calendar grid - EXACTLY like week view time column */}
         <div className="calendar-grid">
           <div className={settings.theme === 'dark' ? 'dark' : ''}>
-            {monthDays.map((date) => renderDayCell(date))}
+            {(() => {
+              console.log('🔍 Month Days Debug:', { monthDaysLength: monthDays.length, firstFewDays: monthDays.slice(0, 3) });
+              return null;
+            })()}
+            {monthDays.map((date, index) => {
+              console.log(`🔍 Rendering day ${index}:`, date.toDateString());
+              return renderDayCell(date);
+            })}
           </div>
         </div>
       </div>
