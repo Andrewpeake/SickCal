@@ -47,13 +47,14 @@
   
   /* Dark theme calendar grid */
   .dark .calendar-grid {
-    background-color: rgba(48, 54, 61, var(--grid-line-opacity, 0.75));
+    background-color: rgba(139, 148, 158, var(--grid-line-opacity, 0.75));
+    border: 1px solid rgba(139, 148, 158, var(--grid-line-opacity, 0.75));
   }
   
   /* Dark theme calendar days */
   .dark .calendar-day {
     @apply bg-[#0d1117] text-[#c9d1d9];
-    border: 1px solid rgba(48, 54, 61, var(--grid-line-opacity, 0.75));
+    border: 1px solid rgba(139, 148, 158, var(--grid-line-opacity, 0.75));
   }
   
   .dark .calendar-day:hover {
@@ -235,6 +236,7 @@
       border-radius: 0.5rem;
       overflow: hidden;
       padding: 1px;
+      border: 1px solid rgba(107, 114, 128, var(--grid-line-opacity, 0.75));
     }
     
     .calendar-day {
