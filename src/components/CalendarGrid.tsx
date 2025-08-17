@@ -1757,7 +1757,19 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         </div>
 
         {/* Calendar grid - EXACTLY like week view time column */}
-        <div className="calendar-grid">
+        <div 
+          className="calendar-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(7, 1fr)',
+            gap: '1px',
+            backgroundColor: 'rgba(107, 114, 128, 0.75)',
+            borderRadius: '0.5rem',
+            overflow: 'hidden',
+            padding: '1px',
+            border: '1px solid rgba(107, 114, 128, 0.75)'
+          }}
+        >
           <div className={settings.theme === 'dark' ? 'dark' : ''}>
             {(() => {
               console.log('🔍 Month Days Debug:', { monthDaysLength: monthDays.length, firstFewDays: monthDays.slice(0, 3) });
