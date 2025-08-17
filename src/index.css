@@ -241,7 +241,10 @@
     }
     
     .calendar-day {
-      @apply min-h-[120px] p-2 transition-colors duration-200 cursor-pointer;
+      min-height: 120px;
+      padding: 0.5rem;
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
       border: 1px solid rgba(107, 114, 128, var(--grid-line-opacity, 0.75));
       background-color: white;
     }
@@ -251,15 +254,18 @@
     }
   
   .calendar-day.today {
-    @apply bg-yellow-50 border-2 border-yellow-500;
+    background-color: rgb(254 249 195); /* yellow-50 */
+    border: 2px solid rgb(234 179 8); /* yellow-500 */
   }
   
   .calendar-day.other-month {
-    @apply bg-gray-100 text-gray-400;
+    background-color: rgb(243 244 246); /* gray-100 */
+    color: rgb(156 163 175); /* gray-400 */
   }
   
   .calendar-day.selected {
-    @apply bg-primary-100 border-2 border-primary-600;
+    background-color: rgb(219 234 254); /* primary-100 */
+    border: 2px solid rgb(37 99 235); /* primary-600 */
   }
   
   .event-dot {
