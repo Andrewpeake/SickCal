@@ -1733,8 +1733,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       theme: settings?.theme,
       isDark: settings?.theme === 'dark',
       containerBg: settings?.theme === 'dark' ? '#0d1117' : 'white',
-      headerBg: settings?.theme === 'dark' ? '#161b22' : 'gray-200',
-      dayBg: settings?.theme === 'dark' ? '#0d1117' : 'gray-50'
+      headerBg: settings?.theme === 'dark' ? '#161b22' : 'gray-50',
+      dayBg: settings?.theme === 'dark' ? '#0d1117' : 'white'
     });
     
     return (
@@ -1743,11 +1743,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       }`}>
         {/* Month header */}
         <div className={`grid grid-cols-7 gap-px ${
-          settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-200'
+          settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
         }`}>
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
             <div key={day} className={`p-3 text-center ${
-              settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-gray-50'
+              settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-white'
             }`}>
               <span className={`text-sm font-medium ${
                 settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-600'
