@@ -270,6 +270,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       if (onEventDelete) {
         onEventDelete(event.id);
       }
+      // Close the context menu if it's open
+      closeContextMenu();
       // Reset the double right-click state
       setDoubleRightClick({ eventId: null, timestamp: 0 });
     } else {
