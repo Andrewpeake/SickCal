@@ -1047,7 +1047,66 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                     clickedTime.setHours(time.getHours(), 0, 0, 0);
                     handleContextMenu(e, 'empty', clickedTime);
                   }}
-                />
+                >
+                  {/* Task indicators for this time slot */}
+                  {(() => {
+                    const slotStart = new Date(date);
+                    slotStart.setHours(time.getHours(), 0, 0, 0);
+                    const slotEnd = new Date(date);
+                    slotEnd.setHours(time.getHours() + 1, 0, 0, 0);
+                    
+                    // Find tasks scheduled for this time slot
+                    const tasksInSlot = tasks.filter(task => {
+                      if (!task.startTime) return false;
+                      const taskStart = new Date(task.startTime);
+                      return taskStart >= slotStart && taskStart < slotEnd;
+                    });
+                    
+                    // Find tasks with soft deadlines in this time slot
+                    const softDeadlineTasks = tasks.filter(task => {
+                      if (!task.softDeadline) return false;
+                      const softDeadline = new Date(task.softDeadline);
+                      return softDeadline >= slotStart && softDeadline < slotEnd;
+                    });
+                    
+                    // Find tasks with hard deadlines in this time slot
+                    const hardDeadlineTasks = tasks.filter(task => {
+                      const hardDeadline = new Date(task.dueDate);
+                      return hardDeadline >= slotStart && hardDeadline < slotEnd;
+                    });
+                    
+                    return (
+                      <div className="absolute inset-0 pointer-events-none">
+                        {/* Scheduled task indicator */}
+                        {tasksInSlot.map((task, idx) => (
+                          <div
+                            key={`scheduled-${task.id}`}
+                            className="absolute left-1 top-1 w-2 h-2 bg-blue-500 rounded-full opacity-80"
+                            title={`Scheduled: ${task.title}`}
+                          />
+                        ))}
+                        
+                        {/* Soft deadline indicator */}
+                        {softDeadlineTasks.map((task, idx) => (
+                          <div
+                            key={`soft-${task.id}`}
+                            className="absolute right-1 top-1 w-2 h-2 bg-yellow-500 rounded-full opacity-80"
+                            title={`Soft deadline: ${task.title}`}
+                          />
+                        ))}
+                        
+                        {/* Hard deadline indicator */}
+                        {hardDeadlineTasks.map((task, idx) => (
+                          <div
+                            key={`hard-${task.id}`}
+                            className="absolute right-1 bottom-1 w-2 h-2 bg-red-500 rounded-full opacity-80"
+                            title={`Hard deadline: ${task.title}`}
+                          />
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
               ))}
               
               {/* Events for this day - rendered at day level */}

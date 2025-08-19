@@ -16,6 +16,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     title: '',
     description: '',
     dueDate: selectedDate || new Date(),
+    softDeadline: undefined,
     startTime: selectedDate || new Date(),
     endTime: selectedDate ? new Date(selectedDate.getTime() + 60 * 60 * 1000) : new Date(),
     completed: false,
@@ -49,6 +50,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
         title: '',
         description: '',
         dueDate: startTime,
+        softDeadline: undefined,
         startTime: startTime,
         endTime: endTime,
         completed: false,
@@ -70,6 +72,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
       title: formData.title!,
       description: formData.description,
       dueDate: formData.dueDate!,
+      softDeadline: formData.softDeadline,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
       completed: formData.completed || false,
       priority: formData.priority!,
       category: formData.category
@@ -138,6 +143,23 @@ const TaskModal: React.FC<TaskModalProps> = ({
               className="input-field"
               required
             />
+          </div>
+
+          {/* Soft Deadline */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Soft Deadline (Warning)
+            </label>
+            <input
+              type="datetime-local"
+              value={formData.softDeadline ? new Date(formData.softDeadline.getTime() - formData.softDeadline.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, softDeadline: new Date(e.target.value) }))}
+              className="input-field"
+              placeholder="Optional warning deadline"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Set a soft deadline to get an early warning before the hard deadline
+            </p>
           </div>
 
           {/* Start and End Times */}

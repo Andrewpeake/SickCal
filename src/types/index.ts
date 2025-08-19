@@ -31,6 +31,7 @@ export interface Task {
   title: string;
   description?: string;
   dueDate: Date;
+  softDeadline?: Date; // Soft deadline (warning)
   startTime?: Date;
   endTime?: Date;
   completed: boolean;
