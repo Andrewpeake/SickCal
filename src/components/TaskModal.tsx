@@ -136,6 +136,58 @@ const TaskModal: React.FC<TaskModalProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Due Date *
             </label>
+            
+            {/* Quick Due Date Selection */}
+            <div className="mb-3">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const now = new Date();
+                    setFormData(prev => ({ ...prev, dueDate: now }));
+                  }}
+                  className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                >
+                  Now
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const today = new Date();
+                    today.setHours(17, 0, 0, 0); // 5 PM
+                    setFormData(prev => ({ ...prev, dueDate: today }));
+                  }}
+                  className="px-3 py-1 text-xs bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+                >
+                  Today 5PM
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(17, 0, 0, 0); // 5 PM
+                    setFormData(prev => ({ ...prev, dueDate: tomorrow }));
+                  }}
+                  className="px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors"
+                >
+                  Tomorrow 5PM
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextWeek = new Date();
+                    nextWeek.setDate(nextWeek.getDate() + 7);
+                    nextWeek.setHours(17, 0, 0, 0); // 5 PM
+                    setFormData(prev => ({ ...prev, dueDate: nextWeek }));
+                  }}
+                  className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                >
+                  Next Week
+                </button>
+              </div>
+            </div>
+            
             <input
               type="datetime-local"
               value={formData.dueDate ? new Date(formData.dueDate.getTime() - formData.dueDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
@@ -185,6 +237,63 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 onChange={(e) => setFormData(prev => ({ ...prev, endTime: new Date(e.target.value) }))}
                 className="input-field"
               />
+            </div>
+          </div>
+
+          {/* Quick Duration for Tasks */}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-2">
+              Quick Duration
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const startTime = formData.startTime || new Date();
+                  const endTime = new Date(startTime);
+                  endTime.setHours(endTime.getHours() + 1);
+                  setFormData(prev => ({ ...prev, endTime }));
+                }}
+                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                1 Hour
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const startTime = formData.startTime || new Date();
+                  const endTime = new Date(startTime);
+                  endTime.setHours(endTime.getHours() + 2);
+                  setFormData(prev => ({ ...prev, endTime }));
+                }}
+                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                2 Hours
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const startTime = formData.startTime || new Date();
+                  const endTime = new Date(startTime);
+                  endTime.setHours(endTime.getHours() + 4);
+                  setFormData(prev => ({ ...prev, endTime }));
+                }}
+                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                4 Hours
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const startTime = formData.startTime || new Date();
+                  const endTime = new Date(startTime);
+                  endTime.setHours(endTime.getHours() + 8);
+                  setFormData(prev => ({ ...prev, endTime }));
+                }}
+                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Full Day
+              </button>
             </div>
           </div>
 

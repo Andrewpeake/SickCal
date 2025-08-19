@@ -629,6 +629,68 @@ const EventModal: React.FC<EventModalProps> = ({
                   Date & Time
                 </h3>
                 
+                {/* Quick Date Selection */}
+                <div className="mb-4">
+                  <label className="block text-xs font-medium text-gray-600 mb-2">
+                    Quick Date
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const now = new Date();
+                        const endTime = new Date(now);
+                        endTime.setHours(endTime.getHours() + 1);
+                        setFormData(prev => ({ ...prev, startDate: now, endDate: endTime }));
+                      }}
+                      className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                    >
+                      Now
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const today = new Date();
+                        today.setHours(9, 0, 0, 0);
+                        const endTime = new Date(today);
+                        endTime.setHours(10, 0, 0, 0);
+                        setFormData(prev => ({ ...prev, startDate: today, endDate: endTime }));
+                      }}
+                      className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                    >
+                      Today 9AM
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        tomorrow.setHours(9, 0, 0, 0);
+                        const endTime = new Date(tomorrow);
+                        endTime.setHours(10, 0, 0, 0);
+                        setFormData(prev => ({ ...prev, startDate: tomorrow, endDate: endTime }));
+                      }}
+                      className="px-3 py-1 text-xs bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
+                    >
+                      Tomorrow 9AM
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextWeek = new Date();
+                        nextWeek.setDate(nextWeek.getDate() + 7);
+                        nextWeek.setHours(9, 0, 0, 0);
+                        const endTime = new Date(nextWeek);
+                        endTime.setHours(10, 0, 0, 0);
+                        setFormData(prev => ({ ...prev, startDate: nextWeek, endDate: endTime }));
+                      }}
+                      className="px-3 py-1 text-xs bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+                    >
+                      Next Week
+                    </button>
+                  </div>
+                </div>
+
                 {/* Start Date/Time */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -661,7 +723,7 @@ const EventModal: React.FC<EventModalProps> = ({
                 </div>
 
                 {/* End Date/Time */}
-                <div>
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     End Date & Time *
                   </label>
@@ -669,10 +731,10 @@ const EventModal: React.FC<EventModalProps> = ({
                     <input
                       type="date"
                       value={formData.endDate ? formatDateTime(formData.endDate).split('T')[0] : ''}
-                      onChange={(e) => {
-                        const currentTime = formData.endDate ? formatDateTime(formData.endDate).split('T')[1] : '00:00';
-                        handleDateChange('endDate', `${e.target.value}T${currentTime}`);
-                      }}
+                                              onChange={(e) => {
+                          const currentTime = formData.endDate ? formatDateTime(formData.endDate).split('T')[1] : '00:00';
+                          handleDateChange('endDate', `${e.target.value}T${currentTime}`);
+                        }}
                       className="input-field flex-1"
                       required
                     />
@@ -690,6 +752,61 @@ const EventModal: React.FC<EventModalProps> = ({
                     )}
                   </div>
                 </div>
+
+                {/* Quick Duration */}
+                {!formData.isAllDay && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-2">
+                      Quick Duration
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const endTime = new Date(formData.startDate || new Date());
+                          endTime.setHours(endTime.getHours() + 1);
+                          setFormData(prev => ({ ...prev, endDate: endTime }));
+                        }}
+                        className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        1 Hour
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const endTime = new Date(formData.startDate || new Date());
+                          endTime.setHours(endTime.getHours() + 2);
+                          setFormData(prev => ({ ...prev, endDate: endTime }));
+                        }}
+                        className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        2 Hours
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const endTime = new Date(formData.startDate || new Date());
+                          endTime.setHours(endTime.getHours() + 4);
+                          setFormData(prev => ({ ...prev, endDate: endTime }));
+                        }}
+                        className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        4 Hours
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const endTime = new Date(formData.startDate || new Date());
+                          endTime.setHours(endTime.getHours() + 8);
+                          setFormData(prev => ({ ...prev, endDate: endTime }));
+                        }}
+                        className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        Full Day
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Color */}
