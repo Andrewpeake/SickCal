@@ -255,8 +255,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   };
 
   // Handle double right-click for quick delete
-  const handleDoubleRightClick = (e: React.MouseEvent, event: CalendarEvent) => {
-    if (!enableDoubleRightClickDelete) return;
+  const handleDoubleRightClick = (e: React.MouseEvent, event: CalendarEvent): boolean => {
+    if (!enableDoubleRightClickDelete) return false;
     
     e.preventDefault();
     e.stopPropagation();
@@ -270,13 +270,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       if (onEventDelete) {
         onEventDelete(event.id);
       }
-      // Close the context menu if it's open
-      closeContextMenu();
       // Reset the double right-click state
       setDoubleRightClick({ eventId: null, timestamp: 0 });
+      return true; // Event was handled, don't show context menu
     } else {
       // First right-click - set the state
       setDoubleRightClick({ eventId: event.id, timestamp: now });
+      return false; // Event not handled, show context menu
     }
   };
 
@@ -1160,8 +1160,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                       onMouseDown={(e) => handleEventMouseDown(e, event)}
                       onContextMenu={(e) => {
                         e.stopPropagation();
-                        handleDoubleRightClick(e, event);
-                        handleContextMenu(e, 'event', event);
+                        const wasHandled = handleDoubleRightClick(e, event);
+                        if (!wasHandled) {
+                          handleContextMenu(e, 'event', event);
+                        }
                       }}
                     >
                                              <div className={`font-semibold truncate ${settings?.theme === 'dark' ? 'text-white' : 'text-white'}`} style={{ fontSize: '12px', textShadow: settings?.theme === 'dark' ? `0 2px 4px ${event.color}80, 0 1px 2px rgba(0,0,0,0.8)` : `0 2px 4px ${event.color}80, 0 1px 2px rgba(0,0,0,0.9)` }}>
