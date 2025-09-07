@@ -79,6 +79,10 @@ export const generateId = (): string => {
   return Math.random().toString(36).substr(2, 9);
 }; 
 
+export const formatDateTime = (date: Date): string => {
+  return format(date, "yyyy-MM-dd'T'HH:mm");
+};
+
 export const getYearMonths = (date: Date): Date[] => {
   const months: Date[] = [];
   const currentYear = getYear(date);

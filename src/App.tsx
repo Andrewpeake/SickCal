@@ -544,6 +544,7 @@ function App() {
           selectedDate={selectedDate}
           onSave={handleSaveEvent}
           onDelete={handleDeleteEvent}
+          settings={settings}
         />
 
         <TaskModal
@@ -556,6 +557,7 @@ function App() {
           selectedDate={selectedDate}
           onSave={handleSaveTask}
           onDelete={handleDeleteTask}
+          settings={settings}
         />
 
         {/* Project Modals */}

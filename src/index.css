@@ -86,13 +86,46 @@
     @apply bg-black bg-opacity-70;
   }
   
-    /* Dark theme input fields */
+  /* Dark theme input fields */
   .dark .input-field {
     @apply bg-[#0d1117] border-[#30363d] text-[#c9d1d9] placeholder-[#484f58];
   }
 
   .dark .input-field:focus {
     @apply border-[#1f6feb] ring-[#1f6feb] ring-opacity-20;
+  }
+  
+  /* Custom dark theme classes for modals */
+  .dark-theme-bg {
+    @apply bg-[#0d1117];
+  }
+  
+  .dark-theme-bg-secondary {
+    @apply bg-[#161b22];
+  }
+  
+  .dark-theme-text {
+    @apply text-[#c9d1d9];
+  }
+  
+  .dark-theme-text-secondary {
+    @apply text-[#8b949e];
+  }
+  
+  .dark-theme-border {
+    @apply border-[#30363d];
+  }
+  
+  .dark-theme-input {
+    @apply bg-[#0d1117] border-[#30363d] text-[#c9d1d9];
+  }
+  
+  .dark-theme-button {
+    @apply bg-[#0d1117] text-[#c9d1d9] border-[#30363d] hover:bg-[#161b22];
+  }
+  
+  .dark-theme-button-primary {
+    @apply bg-[#1f6feb] text-white border-[#1f6feb] hover:bg-[#1f6feb] hover:bg-opacity-90;
   }
 
   /* Calendar overflow clipping */

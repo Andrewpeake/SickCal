@@ -10,7 +10,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
   task,
   selectedDate,
   onSave,
-  onDelete
+  onDelete,
+  settings
 }) => {
   const [formData, setFormData] = useState<Partial<Task>>({
     title: '',
@@ -90,28 +91,32 @@ const TaskModal: React.FC<TaskModalProps> = ({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className={`text-xl font-semibold ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
             {task ? 'Edit Task' : 'New Task'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className={`p-2 rounded-lg transition-colors duration-200 ${
+              settings.theme === 'dark' 
+                ? 'hover:bg-[#21262d] text-[#8b949e]' 
+                : 'hover:bg-gray-100 text-gray-500'
+            }`}
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Task Title *
             </label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              className="input-field"
+              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
               placeholder="Enter task title"
               required
             />
@@ -119,13 +124,13 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              className="input-field resize-none"
+              className={`input-field resize-none ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
               rows={3}
               placeholder="Enter task description"
             />
@@ -133,7 +138,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Due Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Due Date *
             </label>
             
@@ -192,24 +197,24 @@ const TaskModal: React.FC<TaskModalProps> = ({
               type="datetime-local"
               value={formData.dueDate ? new Date(formData.dueDate.getTime() - formData.dueDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
               onChange={(e) => setFormData(prev => ({ ...prev, dueDate: new Date(e.target.value) }))}
-              className="input-field"
+              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
               required
             />
           </div>
 
           {/* Soft Deadline */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Soft Deadline (Warning)
             </label>
             <input
               type="datetime-local"
               value={formData.softDeadline ? new Date(formData.softDeadline.getTime() - formData.softDeadline.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
               onChange={(e) => setFormData(prev => ({ ...prev, softDeadline: new Date(e.target.value) }))}
-              className="input-field"
+              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
               placeholder="Optional warning deadline"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className={`text-xs mt-1 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-500'}`}>
               Set a soft deadline to get an early warning before the hard deadline
             </p>
           </div>
@@ -217,32 +222,32 @@ const TaskModal: React.FC<TaskModalProps> = ({
           {/* Start and End Times */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                 Start Time
               </label>
               <input
                 type="datetime-local"
                 value={formData.startTime ? new Date(formData.startTime.getTime() - formData.startTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, startTime: new Date(e.target.value) }))}
-                className="input-field"
+                className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                 End Time
               </label>
               <input
                 type="datetime-local"
                 value={formData.endTime ? new Date(formData.endTime.getTime() - formData.endTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, endTime: new Date(e.target.value) }))}
-                className="input-field"
+                className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
               />
             </div>
           </div>
 
           {/* Quick Duration for Tasks */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-2">
+            <label className={`block text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
               Quick Duration
             </label>
             <div className="flex flex-wrap gap-2">
@@ -299,7 +304,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Priority */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Priority
             </label>
             <div className="flex space-x-2">
@@ -312,7 +317,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
                     'px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
                     formData.priority === priority.value
                       ? priority.color
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : settings.theme === 'dark'
+                        ? 'bg-[#0d1117] text-[#c9d1d9] border border-[#30363d] hover:bg-[#161b22]'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   )}
                 >
                   <Flag className="w-4 h-4 inline mr-1" />
@@ -324,13 +331,13 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Category
             </label>
             <select
               value={formData.category}
               onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-              className="input-field"
+              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
             >
               <option value="">Select a category</option>
               {categoryOptions.map((category) => (
@@ -350,13 +357,13 @@ const TaskModal: React.FC<TaskModalProps> = ({
               onChange={(e) => setFormData(prev => ({ ...prev, completed: e.target.checked }))}
               className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
             />
-            <label htmlFor="completed" className="ml-2 text-sm text-gray-700">
+            <label htmlFor="completed" className={`ml-2 text-sm ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Mark as completed
             </label>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          <div className={`flex items-center justify-between pt-4 border-t ${settings.theme === 'dark' ? 'dark-theme-border' : 'border-gray-200'}`}>
             <div className="flex space-x-3">
               <button
                 type="submit"

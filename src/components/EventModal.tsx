@@ -1,8 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { EventModalProps, Event } from '../types';
-import { X, Calendar, Clock } from 'lucide-react';
-import { generateId } from '../utils/dateUtils';
+import { X, Calendar } from 'lucide-react';
 import clsx from 'clsx';
+import { Event } from '../types';
+import { generateId } from '../utils/dateUtils';
+
+interface EventModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (event: Event) => void;
+  event?: Event | null;
+  selectedDate?: Date;
+  onDelete?: (eventId: string) => void;
+  settings: any;
+}
+
+// Default quick event titles (fallback if not in settings)
+const defaultQuickEventTitles = [
+  { category: 'School', titles: ['Class', 'Study Session', 'Homework', 'Exam', 'Group Project', 'Office Hours'] },
+  { category: 'Work', titles: ['Meeting', 'Standup', 'Client Call', 'Team Sync', 'Review', 'Planning'] },
+  { category: 'Social', titles: ['Hangout', 'Dinner', 'Coffee', 'Movie Night', 'Game Night', 'Party'] },
+  { category: 'Health', titles: ['Doctor Appointment', 'Dentist', 'Gym', 'Yoga', 'Therapy', 'Checkup'] },
+  { category: 'General', titles: ['Appointment', 'Call', 'Reminder', 'Task', 'Event', 'Meeting'] }
+];
+
+const subjectOptions = [
+  { value: 'work', label: 'Work' },
+  { value: 'personal', label: 'Personal' },
+  { value: 'health', label: 'Health' },
+  { value: 'education', label: 'Education' },
+  { value: 'social', label: 'Social' },
+  { value: 'other', label: 'Other' }
+];
 
 const EventModal: React.FC<EventModalProps> = ({
   isOpen,
@@ -10,7 +38,8 @@ const EventModal: React.FC<EventModalProps> = ({
   event,
   selectedDate,
   onSave,
-  onDelete
+  onDelete,
+  settings
 }) => {
   const [formData, setFormData] = useState<Partial<Event>>({
     title: '',
@@ -36,17 +65,6 @@ const EventModal: React.FC<EventModalProps> = ({
     { name: 'Pink', value: '#ec4899' },
     { name: 'Yellow', value: '#eab308' },
     { name: 'Gray', value: '#6b7280' }
-  ];
-
-  const subjectOptions = [
-    { value: 'meeting', label: 'Meeting' },
-    { value: 'appointment', label: 'Appointment' },
-    { value: 'deadline', label: 'Deadline' },
-    { value: 'reminder', label: 'Reminder' },
-    { value: 'social', label: 'Social Event' },
-    { value: 'work', label: 'Work' },
-    { value: 'personal', label: 'Personal' },
-    { value: 'other', label: 'Other' }
   ];
 
   useEffect(() => {
@@ -241,14 +259,18 @@ const EventModal: React.FC<EventModalProps> = ({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content max-w-4xl w-full mx-4" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className={`text-xl font-semibold ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
             {event ? 'Edit Event' : 'New Event'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className={`p-2 rounded-lg transition-colors duration-200 ${
+              settings.theme === 'dark' 
+                ? 'hover:bg-[#21262d] text-[#8b949e]' 
+                : 'hover:bg-gray-100 text-gray-500'
+            }`}
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -258,28 +280,101 @@ const EventModal: React.FC<EventModalProps> = ({
             <div className="space-y-6">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                   Event Title *
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  className="input-field"
+                  className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
                   placeholder="Enter event title"
                   required
                 />
+                
+                {/* Quick Title Selection */}
+                <div className="mt-3">
+                  <label className={`block text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
+                    Quick Title Selection
+                  </label>
+                  
+                  {/* Main Categories */}
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {settings.quickEventTitles && settings.quickEventTitles.length > 0 ? (
+                      settings.quickEventTitles.map((category: any) => (
+                        <button
+                          key={category.category}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, title: category.category }))}
+                          className={`px-3 py-1 text-xs rounded border transition-colors duration-200 ${
+                            formData.title === category.category
+                              ? 'bg-primary-600 text-white border-primary-600'
+                              : settings.theme === 'dark'
+                                ? 'dark-theme-button'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {category.category}
+                        </button>
+                      ))
+                    ) : (
+                      defaultQuickEventTitles.map((category) => (
+                        <button
+                          key={category.category}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, title: category.category }))}
+                          className={`px-3 py-1 text-xs rounded border transition-colors duration-200 ${
+                            formData.title === category.category
+                              ? 'bg-primary-600 text-white border-primary-600'
+                              : settings.theme === 'dark'
+                                ? 'dark-theme-button'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {category.category}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                  
+                  {/* Specific Titles - Show when a category is selected */}
+                  {formData.title && (settings.quickEventTitles || defaultQuickEventTitles).find((cat: any) => cat.category === formData.title) && (
+                    <div className="mt-2 p-2 rounded-lg border border-gray-200 bg-gray-50">
+                      <div className={`text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
+                        {formData.title} Events:
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {(settings.quickEventTitles || defaultQuickEventTitles).find((cat: any) => cat.category === formData.title)?.titles.map((title: string) => (
+                          <button
+                            key={title}
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, title }))}
+                            className={`px-2 py-1 text-xs rounded border transition-colors duration-200 ${
+                              formData.title === title
+                                ? 'bg-primary-600 text-white border-primary-600'
+                                : settings.theme === 'dark'
+                                  ? 'dark-theme-button'
+                                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            {title}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Subject/Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                   Subject/Category
                 </label>
                 <select
                   value={formData.category || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                  className="input-field"
+                  className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
                 >
                   <option value="">Select a category</option>
                   {subjectOptions.map((option) => (
@@ -292,7 +387,7 @@ const EventModal: React.FC<EventModalProps> = ({
 
               {/* Event Type Options */}
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className={`block text-sm font-medium ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                   Event Type
                 </label>
                 <div className="flex space-x-3">
@@ -306,7 +401,9 @@ const EventModal: React.FC<EventModalProps> = ({
                     className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
                       !formData.isAllDay && !formData.isAllWeek
                         ? 'bg-primary-600 text-white border-primary-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        : settings.theme === 'dark'
+                          ? 'dark-theme-button'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     Timed Event
@@ -321,31 +418,26 @@ const EventModal: React.FC<EventModalProps> = ({
                     className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
                       formData.isAllDay && !formData.isAllWeek
                         ? 'bg-primary-600 text-white border-primary-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        : settings.theme === 'dark'
+                          ? 'dark-theme-button'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     All Day
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      const startDate = new Date(formData.startDate || new Date());
-                      const endDate = new Date(startDate);
-                      endDate.setDate(endDate.getDate() + 6); // End of week (7 days)
-                      endDate.setHours(23, 59, 59, 999);
-                      
-                      setFormData(prev => ({ 
-                        ...prev, 
-                        isAllDay: true,
-                        isAllWeek: true,
-                        startDate,
-                        endDate
-                      }));
-                    }}
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      isAllDay: false,
+                      isAllWeek: true 
+                    }))}
                     className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
                       formData.isAllWeek
                         ? 'bg-primary-600 text-white border-primary-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        : settings.theme === 'dark'
+                          ? 'dark-theme-button'
+                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     All Week
@@ -355,251 +447,267 @@ const EventModal: React.FC<EventModalProps> = ({
 
               {/* Repeat Options */}
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className={`block text-sm font-medium ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                   Repeat
                 </label>
-                <div className="space-y-3">
-                  {/* Repeat Type Selection */}
-                  <div className="flex space-x-2">
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ 
-                        ...prev, 
-                        repeat: { type: 'none', interval: 1 }
-                      }))}
-                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
-                        !formData.repeat || formData.repeat.type === 'none'
-                          ? 'bg-primary-600 text-white border-primary-600'
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      repeat: { type: 'none', interval: 1 }
+                    }))}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                      formData.repeat?.type === 'none'
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : settings.theme === 'dark'
+                          ? 'dark-theme-button'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      Never
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ 
-                        ...prev, 
-                        repeat: { type: 'daily', interval: 1, endAfter: 10 }
-                      }))}
-                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
-                        formData.repeat?.type === 'daily'
-                          ? 'bg-primary-600 text-white border-primary-600'
+                    }`}
+                  >
+                    Never
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      repeat: { type: 'daily', interval: 1 }
+                    }))}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                      formData.repeat?.type === 'daily'
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : settings.theme === 'dark'
+                          ? 'dark-theme-button'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      Daily
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ 
-                        ...prev, 
-                        repeat: { type: 'weekly', interval: 1, daysOfWeek: [formData.startDate?.getDay() || 0], endAfter: 10 }
-                      }))}
-                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
-                        formData.repeat?.type === 'weekly'
-                          ? 'bg-primary-600 text-white border-primary-600'
+                    }`}
+                  >
+                    Daily
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      repeat: { type: 'weekly', interval: 1 }
+                    }))}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                      formData.repeat?.type === 'weekly'
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : settings.theme === 'dark'
+                          ? 'dark-theme-button'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      Weekly
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ 
-                        ...prev, 
-                        repeat: { type: 'monthly', interval: 1, dayOfMonth: formData.startDate?.getDate() || 1, endAfter: 10 }
-                      }))}
-                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
-                        formData.repeat?.type === 'monthly'
-                          ? 'bg-primary-600 text-white border-primary-600'
+                    }`}
+                  >
+                    Weekly
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      repeat: { type: 'monthly', interval: 1 }
+                    }))}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                      formData.repeat?.type === 'monthly'
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : settings.theme === 'dark'
+                          ? 'dark-theme-button'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      Monthly
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ 
-                        ...prev, 
-                        repeat: { type: 'yearly', interval: 1, endAfter: 10 }
-                      }))}
-                      className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
-                        formData.repeat?.type === 'yearly'
-                          ? 'bg-primary-600 text-white border-primary-600'
+                    }`}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ 
+                      ...prev, 
+                      repeat: { type: 'yearly', interval: 1 }
+                    }))}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors duration-200 ${
+                      formData.repeat?.type === 'yearly'
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : settings.theme === 'dark'
+                          ? 'dark-theme-button'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      Yearly
-                    </button>
-                  </div>
-
-                  {/* Repeat Configuration */}
-                  {formData.repeat && formData.repeat.type !== 'none' && (
-                    <div className="bg-gray-50 p-3 rounded-lg space-y-3">
-                      {/* Interval */}
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Every
-                        </label>
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="number"
-                            min="1"
-                            max="99"
-                            value={formData.repeat.interval}
-                            onChange={(e) => setFormData(prev => ({
-                              ...prev,
-                              repeat: prev.repeat ? { ...prev.repeat, interval: parseInt(e.target.value) || 1 } : prev.repeat
-                            }))}
-                            className="input-field w-16 text-center"
-                          />
-                          <span className="text-sm text-gray-600">
-                            {formData.repeat.type === 'daily' && 'day(s)'}
-                            {formData.repeat.type === 'weekly' && 'week(s)'}
-                            {formData.repeat.type === 'monthly' && 'month(s)'}
-                            {formData.repeat.type === 'yearly' && 'year(s)'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Weekly: Days of Week */}
-                      {formData.repeat.type === 'weekly' && (
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-2">
-                            Repeat on
-                          </label>
-                          <div className="flex space-x-1">
-                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
-                              <button
-                                key={day}
-                                type="button"
-                                onClick={() => {
-                                  const currentDays = formData.repeat?.daysOfWeek || [];
-                                  const newDays = currentDays.includes(index)
-                                    ? currentDays.filter(d => d !== index)
-                                    : [...currentDays, index];
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    repeat: prev.repeat ? { ...prev.repeat, daysOfWeek: newDays } : prev.repeat
-                                  }));
-                                }}
-                                className={`px-2 py-1 text-xs rounded border transition-colors duration-200 ${
-                                  formData.repeat?.daysOfWeek?.includes(index)
-                                    ? 'bg-primary-600 text-white border-primary-600'
-                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                                }`}
-                              >
-                                {day}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Monthly: Day of Month */}
-                      {formData.repeat.type === 'monthly' && (
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-2">
-                            Day of month
-                          </label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="31"
-                            value={formData.repeat.dayOfMonth || formData.startDate?.getDate() || 1}
-                            onChange={(e) => setFormData(prev => ({
-                              ...prev,
-                              repeat: prev.repeat ? { ...prev.repeat, dayOfMonth: parseInt(e.target.value) || 1 } : prev.repeat
-                            }))}
-                            className="input-field w-20"
-                          />
-                        </div>
-                      )}
-
-                      {/* End Conditions */}
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-2">
-                          End after
-                        </label>
-                        <div className="flex space-x-2">
-                          <button
-                            type="button"
-                            onClick={() => setFormData(prev => ({
-                              ...prev,
-                              repeat: prev.repeat ? { ...prev.repeat, endAfter: 10, endDate: undefined } : prev.repeat
-                            }))}
-                            className={`px-3 py-1 text-xs rounded border transition-colors duration-200 ${
-                              formData.repeat?.endAfter && !formData.repeat?.endDate
-                                ? 'bg-primary-600 text-white border-primary-600'
-                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                            }`}
-                          >
-                            Occurrences
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setFormData(prev => ({
-                              ...prev,
-                              repeat: prev.repeat ? { ...prev.repeat, endDate: new Date(), endAfter: undefined } : prev.repeat
-                            }))}
-                            className={`px-3 py-1 text-xs rounded border transition-colors duration-200 ${
-                              formData.repeat?.endDate && !formData.repeat?.endAfter
-                                ? 'bg-primary-600 text-white border-primary-600'
-                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                            }`}
-                          >
-                            Until date
-                          </button>
-                        </div>
-
-                        {/* Occurrences Input */}
-                        {formData.repeat?.endAfter && (
-                          <div className="mt-2">
-                            <input
-                              type="number"
-                              min="1"
-                              max="999"
-                              value={formData.repeat.endAfter}
-                              onChange={(e) => setFormData(prev => ({
-                                ...prev,
-                                repeat: prev.repeat ? { ...prev.repeat, endAfter: parseInt(e.target.value) || 1 } : prev.repeat
-                              }))}
-                              className="input-field w-20"
-                              placeholder="10"
-                            />
-                            <span className="text-xs text-gray-500 ml-2">occurrences</span>
-                          </div>
-                        )}
-
-                        {/* End Date Input */}
-                        {formData.repeat?.endDate && (
-                          <div className="mt-2">
-                            <input
-                              type="date"
-                              value={formData.repeat.endDate ? formatDateTime(formData.repeat.endDate).split('T')[0] : ''}
-                              onChange={(e) => setFormData(prev => ({
-                                ...prev,
-                                repeat: prev.repeat ? { ...prev.repeat, endDate: new Date(e.target.value) } : prev.repeat
-                              }))}
-                              className="input-field w-40"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                    }`}
+                  >
+                    Yearly
+                  </button>
                 </div>
               </div>
 
+              {/* Repeat Configuration */}
+              {formData.repeat && formData.repeat.type !== 'none' && (
+                <div className={`p-3 rounded-lg space-y-3 ${settings.theme === 'dark' ? 'dark-theme-bg-secondary' : 'bg-gray-50'}`}>
+                  {/* Interval */}
+                  <div>
+                    <label className={`block text-xs font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
+                      Every
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        min="1"
+                        max="99"
+                        value={formData.repeat.interval}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          repeat: prev.repeat ? { ...prev.repeat, interval: parseInt(e.target.value) || 1 } : prev.repeat
+                        }))}
+                        className={`input-field w-16 text-center ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
+                      />
+                      <span className={`text-sm ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
+                        {formData.repeat.type === 'daily' && 'day(s)'}
+                        {formData.repeat.type === 'weekly' && 'week(s)'}
+                        {formData.repeat.type === 'monthly' && 'month(s)'}
+                        {formData.repeat.type === 'yearly' && 'year(s)'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Weekly: Days of Week */}
+                  {formData.repeat.type === 'weekly' && (
+                    <div>
+                      <label className={`block text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
+                        Repeat on
+                      </label>
+                      <div className="flex space-x-1">
+                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                          <button
+                            key={day}
+                            type="button"
+                            onClick={() => {
+                              const currentDays = formData.repeat?.daysOfWeek || [];
+                              const newDays = currentDays.includes(index)
+                                ? currentDays.filter(d => d !== index)
+                                : [...currentDays, index];
+                              setFormData(prev => ({
+                                ...prev,
+                                repeat: prev.repeat ? { ...prev.repeat, daysOfWeek: newDays } : prev.repeat
+                              }));
+                            }}
+                            className={`px-2 py-1 text-xs rounded border transition-colors duration-200 ${
+                              formData.repeat?.daysOfWeek?.includes(index)
+                                ? 'bg-primary-600 text-white border-primary-600'
+                                : settings.theme === 'dark'
+                                  ? 'dark-theme-button'
+                                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            {day}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Monthly: Day of Month */}
+                  {formData.repeat.type === 'monthly' && (
+                    <div>
+                      <label className={`block text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
+                        Day of month
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="31"
+                        value={formData.repeat.dayOfMonth || formData.startDate?.getDate() || 1}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          repeat: prev.repeat ? { ...prev.repeat, dayOfMonth: parseInt(e.target.value) || 1 } : prev.repeat
+                        }))}
+                        className={`input-field w-20 ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
+                      />
+                    </div>
+                  )}
+
+                  {/* End Conditions */}
+                  <div>
+                    <label className={`block text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
+                      End after
+                    </label>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({
+                          ...prev,
+                          repeat: prev.repeat ? { ...prev.repeat, endAfter: 10, endDate: undefined } : prev.repeat
+                        }))}
+                        className={`px-3 py-1 text-xs rounded border transition-colors duration-200 ${
+                          formData.repeat?.endAfter && !formData.repeat?.endDate
+                            ? 'bg-primary-600 text-white border-primary-600'
+                            : settings.theme === 'dark'
+                              ? 'dark-theme-button'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        Occurrences
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({
+                          ...prev,
+                          repeat: prev.repeat ? { ...prev.repeat, endDate: new Date(), endAfter: undefined } : prev.repeat
+                        }))}
+                        className={`px-3 py-1 text-xs rounded border transition-colors duration-200 ${
+                          formData.repeat?.endDate && !formData.repeat?.endAfter
+                            ? 'bg-primary-600 text-white border-primary-600'
+                            : settings.theme === 'dark'
+                              ? 'dark-theme-button'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        Until date
+                      </button>
+                    </div>
+
+                    {/* Occurrences Input */}
+                    {formData.repeat?.endAfter && (
+                      <div className="mt-2">
+                        <input
+                          type="number"
+                          min="1"
+                          max="999"
+                          value={formData.repeat.endAfter}
+                          onChange={(e) => setFormData(prev => ({
+                            ...prev,
+                            repeat: prev.repeat ? { ...prev.repeat, endAfter: parseInt(e.target.value) || 1 } : prev.repeat
+                          }))}
+                          className={`input-field w-20 ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
+                          placeholder="10"
+                        />
+                        <span className={`text-xs ml-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-500'}`}>occurrences</span>
+                      </div>
+                    )}
+
+                    {/* End Date Input */}
+                    {formData.repeat?.endDate && (
+                      <div className="mt-2">
+                        <input
+                          type="date"
+                          value={formData.repeat.endDate ? formatDateTime(formData.repeat.endDate).split('T')[0] : ''}
+                          onChange={(e) => setFormData(prev => ({
+                            ...prev,
+                            repeat: prev.repeat ? { ...prev.repeat, endDate: new Date(e.target.value) } : prev.repeat
+                          }))}
+                          className={`input-field w-40 ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Description and Location */}
+            <div className="space-y-6">
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                   Description
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="input-field resize-none"
+                  className={`input-field resize-none ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
                   rows={4}
                   placeholder="Enter event description"
                 />
@@ -607,14 +715,14 @@ const EventModal: React.FC<EventModalProps> = ({
 
               {/* Location */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                   Location
                 </label>
                 <input
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                  className="input-field"
+                  className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
                   placeholder="Enter location"
                 />
               </div>
@@ -623,15 +731,15 @@ const EventModal: React.FC<EventModalProps> = ({
             {/* Right Column */}
             <div className="space-y-6">
               {/* Date and Time Section */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-sm font-medium text-gray-700 mb-4 flex items-center">
+              <div className={`p-4 rounded-lg ${settings.theme === 'dark' ? 'dark-theme-bg-secondary' : 'bg-gray-50'}`}>
+                <h3 className={`text-sm font-medium mb-4 flex items-center ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                   <Calendar className="w-4 h-4 mr-2" />
                   Date & Time
                 </h3>
                 
                 {/* Quick Date Selection */}
                 <div className="mb-4">
-                  <label className="block text-xs font-medium text-gray-600 mb-2">
+                  <label className={`block text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
                     Quick Date
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -693,7 +801,7 @@ const EventModal: React.FC<EventModalProps> = ({
 
                 {/* Start Date/Time */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                     Start Date & Time *
                   </label>
                   <div className="flex space-x-2">
@@ -704,7 +812,7 @@ const EventModal: React.FC<EventModalProps> = ({
                         const currentTime = formData.startDate ? formatDateTime(formData.startDate).split('T')[1] : '00:00';
                         handleDateChange('startDate', `${e.target.value}T${currentTime}`);
                       }}
-                      className="input-field flex-1"
+                      className={`input-field flex-1 ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
                       required
                     />
                     {!formData.isAllDay && (
@@ -715,7 +823,7 @@ const EventModal: React.FC<EventModalProps> = ({
                           const currentDate = formData.startDate ? formatDateTime(formData.startDate).split('T')[0] : '';
                           handleDateChange('startDate', `${currentDate}T${e.target.value}`);
                         }}
-                        className="input-field w-32"
+                        className={`input-field w-32 ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
                         required
                       />
                     )}
@@ -724,18 +832,18 @@ const EventModal: React.FC<EventModalProps> = ({
 
                 {/* End Date/Time */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                     End Date & Time *
                   </label>
                   <div className="flex space-x-2">
                     <input
                       type="date"
                       value={formData.endDate ? formatDateTime(formData.endDate).split('T')[0] : ''}
-                                              onChange={(e) => {
-                          const currentTime = formData.endDate ? formatDateTime(formData.endDate).split('T')[1] : '00:00';
-                          handleDateChange('endDate', `${e.target.value}T${currentTime}`);
-                        }}
-                      className="input-field flex-1"
+                      onChange={(e) => {
+                        const currentTime = formData.endDate ? formatDateTime(formData.endDate).split('T')[1] : '00:00';
+                        handleDateChange('endDate', `${e.target.value}T${currentTime}`);
+                      }}
+                      className={`input-field flex-1 ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
                       required
                     />
                     {!formData.isAllDay && (
@@ -746,7 +854,7 @@ const EventModal: React.FC<EventModalProps> = ({
                           const currentDate = formData.endDate ? formatDateTime(formData.endDate).split('T')[0] : '';
                           handleDateChange('endDate', `${currentDate}T${e.target.value}`);
                         }}
-                        className="input-field w-32"
+                        className={`input-field w-32 ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
                         required
                       />
                     )}
@@ -756,7 +864,7 @@ const EventModal: React.FC<EventModalProps> = ({
                 {/* Quick Duration */}
                 {!formData.isAllDay && (
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-2">
+                    <label className={`block text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
                       Quick Duration
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -811,7 +919,7 @@ const EventModal: React.FC<EventModalProps> = ({
 
               {/* Color */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                   Color
                 </label>
                 <div className="flex space-x-2">
@@ -833,7 +941,7 @@ const EventModal: React.FC<EventModalProps> = ({
 
               {/* Attendees */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                   Attendees
                 </label>
                 <div className="flex space-x-2 mb-2">
@@ -841,7 +949,7 @@ const EventModal: React.FC<EventModalProps> = ({
                     type="email"
                     value={attendeeInput}
                     onChange={(e) => setAttendeeInput(e.target.value)}
-                    className="input-field flex-1"
+                    className={`input-field flex-1 ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
                     placeholder="Enter email address"
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAttendee())}
                   />
@@ -856,8 +964,8 @@ const EventModal: React.FC<EventModalProps> = ({
                 {formData.attendees && formData.attendees.length > 0 && (
                   <div className="space-y-1 max-h-32 overflow-y-auto">
                     {formData.attendees.map((attendee, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg">
-                        <span className="text-sm text-gray-700">{attendee}</span>
+                      <div key={index} className={`flex items-center justify-between px-3 py-2 rounded-lg ${settings.theme === 'dark' ? 'dark-theme-bg-secondary' : 'bg-gray-50'}`}>
+                        <span className={`text-sm ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>{attendee}</span>
                         <button
                           type="button"
                           onClick={() => handleRemoveAttendee(index)}
@@ -874,7 +982,7 @@ const EventModal: React.FC<EventModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          <div className={`flex items-center justify-between pt-4 border-t ${settings.theme === 'dark' ? 'dark-theme-border' : 'border-gray-200'}`}>
             <div className="flex space-x-3">
               <button
                 type="submit"

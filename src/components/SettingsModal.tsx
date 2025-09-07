@@ -61,6 +61,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       showEventCount: true,
       eventColorScheme: 'category' as const,
       
+      // Quick Event Titles
+      quickEventTitles: [
+        { category: 'School', titles: ['Class', 'Study Session', 'Homework', 'Exam', 'Group Project', 'Office Hours'] },
+        { category: 'Work', titles: ['Meeting', 'Standup', 'Client Call', 'Team Sync', 'Review', 'Planning'] },
+        { category: 'Social', titles: ['Hangout', 'Dinner', 'Coffee', 'Movie Night', 'Game Night', 'Party'] },
+        { category: 'Health', titles: ['Doctor Appointment', 'Dentist', 'Gym', 'Yoga', 'Therapy', 'Checkup'] },
+        { category: 'General', titles: ['Appointment', 'Call', 'Reminder', 'Task', 'Event', 'Meeting'] }
+      ],
+      
       // Interaction
       enableDragAndDrop: true,
       enableDoubleRightClickDelete: true,
@@ -438,6 +447,98 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                       />
                       <span className="text-sm text-gray-700">Show event count badges</span>
                     </label>
+                  </div>
+                </div>
+
+                {/* Quick Event Titles Customization */}
+                <div>
+                  <h3 className={`text-lg font-medium mb-4 ${localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>Quick Event Titles</h3>
+                  <p className={`text-sm mb-4 ${localSettings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'}`}>
+                    Customize the quick title selection options for creating events. These will appear in the event modal for easy selection.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    {localSettings.quickEventTitles?.map((category, categoryIndex) => (
+                      <div key={categoryIndex} className={`border rounded-lg p-4 ${localSettings.theme === 'dark' ? 'border-[#30363d] bg-[#161b22]' : 'border-gray-200'}`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <input
+                            type="text"
+                            value={category.category}
+                            onChange={(e) => {
+                              const newTitles = [...(localSettings.quickEventTitles || [])];
+                              newTitles[categoryIndex] = { ...category, category: e.target.value };
+                              setLocalSettings(prev => ({ ...prev, quickEventTitles: newTitles }));
+                            }}
+                            className={`input-field flex-1 mr-2 ${localSettings.theme === 'dark' ? 'dark-theme-input' : ''}`}
+                            placeholder="Category name"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newTitles = localSettings.quickEventTitles?.filter((_, index) => index !== categoryIndex) || [];
+                              setLocalSettings(prev => ({ ...prev, quickEventTitles: newTitles }));
+                            }}
+                            className="text-red-600 hover:text-red-700 px-2 py-1 text-sm"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <label className={`block text-sm font-medium ${localSettings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'}`}>Event Titles:</label>
+                          <div className="space-y-2">
+                            {category.titles.map((title, titleIndex) => (
+                              <div key={titleIndex} className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={title}
+                                  onChange={(e) => {
+                                    const newTitles = [...(localSettings.quickEventTitles || [])];
+                                    newTitles[categoryIndex].titles[titleIndex] = e.target.value;
+                                    setLocalSettings(prev => ({ ...prev, quickEventTitles: newTitles }));
+                                  }}
+                                  className={`input-field flex-1 ${localSettings.theme === 'dark' ? 'dark-theme-input' : ''}`}
+                                  placeholder="Event title"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newTitles = [...(localSettings.quickEventTitles || [])];
+                                    newTitles[categoryIndex].titles = newTitles[categoryIndex].titles.filter((_, index) => index !== titleIndex);
+                                    setLocalSettings(prev => ({ ...prev, quickEventTitles: newTitles }));
+                                  }}
+                                  className="text-red-500 hover:text-red-600 px-2 py-1 text-sm"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newTitles = [...(localSettings.quickEventTitles || [])];
+                                newTitles[categoryIndex].titles.push('');
+                                setLocalSettings(prev => ({ ...prev, quickEventTitles: newTitles }));
+                              }}
+                              className="text-blue-600 hover:text-blue-700 text-sm"
+                            >
+                              + Add Title
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newTitles = [...(localSettings.quickEventTitles || []), { category: '', titles: [''] }];
+                        setLocalSettings(prev => ({ ...prev, quickEventTitles: newTitles }));
+                      }}
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    >
+                      + Add Category
+                    </button>
                   </div>
                 </div>
               </div>

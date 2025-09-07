@@ -23,6 +23,15 @@ export const defaultSettings: Settings = {
   showEventCount: true,
   eventColorScheme: 'category',
   
+  // Quick Event Titles
+  quickEventTitles: [
+    { category: 'School', titles: ['Class', 'Study Session', 'Homework', 'Exam', 'Group Project', 'Office Hours'] },
+    { category: 'Work', titles: ['Meeting', 'Standup', 'Client Call', 'Team Sync', 'Review', 'Planning'] },
+    { category: 'Social', titles: ['Hangout', 'Dinner', 'Coffee', 'Movie Night', 'Game Night', 'Party'] },
+    { category: 'Health', titles: ['Doctor Appointment', 'Dentist', 'Gym', 'Yoga', 'Therapy', 'Checkup'] },
+    { category: 'General', titles: ['Appointment', 'Call', 'Reminder', 'Task', 'Event', 'Meeting'] }
+  ],
+  
   // Interaction
   enableDragAndDrop: true,
   enableDoubleRightClickDelete: true,

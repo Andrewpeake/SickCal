@@ -83,6 +83,7 @@ export interface EventModalProps {
   selectedDate?: Date;
   onSave: (event: Event) => void;
   onDelete?: (eventId: string) => void;
+  settings: Settings;
 }
 
 export interface TaskModalProps {
@@ -91,7 +92,8 @@ export interface TaskModalProps {
   task?: Task;
   selectedDate?: Date;
   onSave: (task: Task) => void;
-  onDelete?: (taskId: string) => void;
+  onDelete?: (eventId: string) => void;
+  settings: Settings;
 }
 
 export interface Settings {
@@ -116,6 +118,12 @@ export interface Settings {
   allowEventOverlap: boolean;
   showEventCount: boolean;
   eventColorScheme: 'category' | 'random' | 'custom';
+  
+  // Quick Event Titles
+  quickEventTitles: {
+    category: string;
+    titles: string[];
+  }[];
   
   // Interaction
   enableDragAndDrop: boolean;
