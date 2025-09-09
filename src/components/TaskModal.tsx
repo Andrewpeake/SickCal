@@ -106,7 +106,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-2">
           {/* Title */}
           <div>
             <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
@@ -122,19 +122,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
             />
           </div>
 
-          {/* Description */}
-          <div>
-            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              className={`input-field resize-none ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              rows={2}
-              placeholder="Enter task description"
-            />
-          </div>
 
           {/* Due Date */}
           <div>
@@ -202,22 +189,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
             />
           </div>
 
-          {/* Soft Deadline */}
-          <div>
-            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
-              Soft Deadline (Warning)
-            </label>
-            <input
-              type="datetime-local"
-              value={formData.softDeadline ? new Date(formData.softDeadline.getTime() - formData.softDeadline.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, softDeadline: new Date(e.target.value) }))}
-              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              placeholder="Optional warning deadline"
-            />
-            <p className={`text-xs mt-0.5 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-500'}`}>
-              Set a soft deadline to get an early warning before the hard deadline
-            </p>
-          </div>
 
           {/* Start and End Times */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -245,62 +216,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
             </div>
           </div>
 
-          {/* Quick Duration for Tasks */}
-          <div>
-            <label className={`block text-xs font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
-              Quick Duration
-            </label>
-            <div className="flex flex-wrap gap-1 sm:gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const startTime = formData.startTime || new Date();
-                  const endTime = new Date(startTime);
-                  endTime.setHours(endTime.getHours() + 1);
-                  setFormData(prev => ({ ...prev, endTime }));
-                }}
-                className="px-2 sm:px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                1 Hour
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const startTime = formData.startTime || new Date();
-                  const endTime = new Date(startTime);
-                  endTime.setHours(endTime.getHours() + 2);
-                  setFormData(prev => ({ ...prev, endTime }));
-                }}
-                className="px-2 sm:px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                2 Hours
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const startTime = formData.startTime || new Date();
-                  const endTime = new Date(startTime);
-                  endTime.setHours(endTime.getHours() + 4);
-                  setFormData(prev => ({ ...prev, endTime }));
-                }}
-                className="px-2 sm:px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                4 Hours
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const startTime = formData.startTime || new Date();
-                  const endTime = new Date(startTime);
-                  endTime.setHours(endTime.getHours() + 8);
-                  setFormData(prev => ({ ...prev, endTime }));
-                }}
-                className="px-2 sm:px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Full Day
-              </button>
-            </div>
-          </div>
 
           {/* Priority */}
           <div>
@@ -329,24 +244,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
             </div>
           </div>
 
-          {/* Category */}
-          <div>
-            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
-              Category
-            </label>
-            <select
-              value={formData.category}
-              onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-            >
-              <option value="">Select a category</option>
-              {categoryOptions.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
 
           {/* Completed Status */}
           <div className="flex items-center">
