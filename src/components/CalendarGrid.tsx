@@ -1,21 +1,21 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { CalendarGridProps, Event as CalendarEvent } from '../types';
 import { 
-  getMonthDays, 
   getWeekDays, 
+  getMonthDays,
+  getYearMonths,
   isToday, 
-  isSelected, 
-  isCurrentMonth, 
+  isSelected,
+  isCurrentMonth,
   getDayName, 
   getEventsForDate, 
   getTasksForDate,
-  getYearMonths,
   getMonthEvents,
   getMonthTasks,
   formatDate,
   formatTime
 } from '../utils/dateUtils';
-import { Circle, CheckCircle, Clock, Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Copy, Clipboard, Circle, CheckCircle, Clock } from 'lucide-react';
 import clsx from 'clsx';
 import ContextMenu, { ContextMenuItem } from './ContextMenu';
 
@@ -116,7 +116,11 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   onTaskEdit,
   onTaskDelete,
   onEventCreate,
-  onTaskCreate
+  onTaskCreate,
+  clipboard,
+  onCopyEvent,
+  onCopyTask,
+  onPaste
 }) => {
   // const [localCurrentDate, setLocalCurrentDate] = useState(currentDate); // Unused - using currentDate directly
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -131,6 +135,12 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   
   // Theme loading state to prevent white flash
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
+  
+  // Horizontal scroll state for week view
+  const horizontalScrollRef = useRef<HTMLDivElement>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [weekRange, setWeekRange] = useState<Date[][]>([]);
+  const [currentWeekIndex, setCurrentWeekIndex] = useState(2); // Center week
   
   // Use settings for various features
   const hourHeight = localZoomHeight; // Use local zoom height instead of settings
@@ -226,6 +236,63 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     };
   }, []);
 
+  // Generate multiple weeks for horizontal scroll
+  const generateWeekRange = useCallback((centerDate: Date, range: number = 2) => {
+    const weeks = [];
+    for (let i = -range; i <= range; i++) {
+      const weekStart = new Date(centerDate);
+      weekStart.setDate(centerDate.getDate() + (i * 7) - centerDate.getDay());
+      weeks.push(getWeekDays(weekStart));
+    }
+    return weeks;
+  }, []);
+
+  // Horizontal scroll handlers
+  const handleHorizontalScroll = useCallback((e: React.UIEvent) => {
+    const container = e.currentTarget;
+    const scrollLeft = container.scrollLeft;
+    const containerWidth = container.clientWidth;
+    const weekWidth = containerWidth;
+    
+    const targetWeek = Math.round(scrollLeft / weekWidth);
+    setCurrentWeekIndex(targetWeek);
+  }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX);
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStart) return;
+    
+    const touchEnd = e.changedTouches[0].clientX;
+    const diff = touchStart - touchEnd;
+    
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        navigateWeek(1);
+      } else {
+        navigateWeek(-1);
+      }
+    }
+    setTouchStart(null);
+  }, [touchStart]);
+
+  const navigateWeek = useCallback((direction: number) => {
+    if (!horizontalScrollRef.current) return;
+    
+    const container = horizontalScrollRef.current;
+    const containerWidth = container.clientWidth;
+    const newIndex = currentWeekIndex + direction;
+    
+    if (newIndex >= 0 && newIndex < weekRange.length) {
+      container.scrollTo({
+        left: newIndex * containerWidth,
+        behavior: 'smooth'
+      });
+    }
+  }, [currentWeekIndex, weekRange.length]);
+
   // Scroll to 6 AM on mount (or 00:00 for full 24-hour view)
   useEffect(() => {
     if (view === 'week' && timeGridRef.current) {
@@ -236,7 +303,10 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
   }, [view, isFull24Hours, hourHeight]);
 
-
+  // Initialize week range for horizontal scroll
+  useEffect(() => {
+    setWeekRange(generateWeekRange(currentDate));
+  }, [currentDate, generateWeekRange]);
 
   // Context menu handlers
   const handleContextMenu = (e: React.MouseEvent, type: 'empty' | 'event' | 'task', data?: any) => {
@@ -288,7 +358,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     // Handle regular context menu
     switch (contextMenu.type) {
       case 'empty':
-        return [
+        const items = [
           {
             id: 'create-event',
             label: 'Create Event',
@@ -345,9 +415,26 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
             }
           }
         ];
+
+        // Add paste option if clipboard has data and we're in week/month view
+        if (clipboard && clipboard.data && clipboard.type && (view === 'week' || view === 'month') && onPaste) {
+          const payload = contextMenu.data;
+          const targetDate = payload instanceof Date ? payload : (payload && payload.date ? new Date(payload.date) : new Date());
+          
+          items.push({
+            id: 'paste',
+            label: `Paste ${clipboard.type === 'event' ? 'Event' : 'Task'}`,
+            icon: <Clipboard className="w-4 h-4" />,
+            onClick: () => {
+              onPaste(targetDate);
+            }
+          });
+        }
+
+        return items;
       
       case 'event':
-        return [
+        const eventItems = [
           {
             id: 'edit-event',
             label: 'Edit Event',
@@ -357,21 +444,36 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 onEventOpen(contextMenu.data);
               }
             }
-          },
-          {
-            id: 'delete-event',
-            label: 'Delete Event',
-            icon: <Trash2 className="w-4 h-4" />,
-            onClick: () => {
-              if (onEventDelete && contextMenu.data) {
-                onEventDelete(contextMenu.data.id);
-              }
-            }
           }
         ];
+
+        // Add copy option if we're in week/month view
+        if ((view === 'week' || view === 'month') && onCopyEvent && contextMenu.data) {
+          eventItems.push({
+            id: 'copy-event',
+            label: 'Copy Event',
+            icon: <Copy className="w-4 h-4" />,
+            onClick: () => {
+              onCopyEvent(contextMenu.data);
+            }
+          });
+        }
+
+        eventItems.push({
+          id: 'delete-event',
+          label: 'Delete Event',
+          icon: <Trash2 className="w-4 h-4" />,
+          onClick: () => {
+            if (onEventDelete && contextMenu.data) {
+              onEventDelete(contextMenu.data.id);
+            }
+          }
+        });
+
+        return eventItems;
       
       case 'task':
-        return [
+        const taskItems = [
           {
             id: 'edit-task',
             label: 'Edit Task',
@@ -381,18 +483,33 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
                 onTaskEdit(contextMenu.data);
               }
             }
-          },
-          {
-            id: 'delete-task',
-            label: 'Delete Task',
-            icon: <Trash2 className="w-4 h-4" />,
-            onClick: () => {
-              if (onTaskDelete && contextMenu.data) {
-                onTaskDelete(contextMenu.data.id);
-              }
-            }
           }
         ];
+
+        // Add copy option if we're in week/month view
+        if ((view === 'week' || view === 'month') && onCopyTask && contextMenu.data) {
+          taskItems.push({
+            id: 'copy-task',
+            label: 'Copy Task',
+            icon: <Copy className="w-4 h-4" />,
+            onClick: () => {
+              onCopyTask(contextMenu.data);
+            }
+          });
+        }
+
+        taskItems.push({
+          id: 'delete-task',
+          label: 'Delete Task',
+          icon: <Trash2 className="w-4 h-4" />,
+          onClick: () => {
+            if (onTaskDelete && contextMenu.data) {
+              onTaskDelete(contextMenu.data.id);
+            }
+          }
+        });
+
+        return taskItems;
       
       default:
         return [];
@@ -509,7 +626,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
     if (!eventResize.isActive || !eventResize.event || !timeGridRef.current) return;
 
     const rect = timeGridRef.current.getBoundingClientRect();
-    const y = e.clientY - rect.top + timeGridRef.current.scrollTop;
+    // const y = e.clientY - rect.top + timeGridRef.current.scrollTop;
     const hourHeight = settings.hourHeight;
     
     // Calculate hour change
@@ -842,7 +959,6 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
   };
 
   const renderWeekView = () => {
-    const weekDays = getWeekDays(currentDate);
     const timeSlots: Date[] = [];
     
     // Generate time slots from 00:00 to 23:00 (full 24 hours)
@@ -852,7 +968,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       timeSlots.push(time);
     }
     
-
+    if (weekRange.length === 0) return null;
     
     return (
               <div ref={calendarRef} className={`calendar-container shadow-soft rounded-xl overflow-hidden transition-colors duration-200 ${
@@ -909,25 +1025,25 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           
           {/* Day headers - now properly aligned */}
                             <div className="flex">
-                    <div className={`w-20 p-3 ${
+                    <div className={`w-16 sm:w-20 p-2 sm:p-3 ${
                       settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
                     }`}></div>
-            {weekDays.map((date) => (
+            {weekRange[currentWeekIndex]?.map((date) => (
               <div
                 key={date.toISOString()}
                 className={clsx(
-                  'flex-1 p-3 text-center',
+                  'flex-1 p-2 sm:p-3 text-center',
                   settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50',
                   isToday(date) && (settings.theme === 'dark' ? 'bg-[#1f6feb] bg-opacity-10' : 'bg-primary-50')
                 )}
               >
-                <div className={`text-sm font-medium ${
+                <div className={`text-xs sm:text-sm font-medium ${
                   settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'
                 }`}>
                   {getDayName(date)}
                 </div>
                 <div className={clsx(
-                  'text-lg font-bold',
+                  'text-sm sm:text-lg font-bold',
                   isToday(date) 
                     ? (settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600')
                     : (settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900')
@@ -943,7 +1059,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
         <div 
           ref={timeGridRef}
           className={`calendar-week-grid relative overflow-y-auto overflow-x-hidden calendar-scroll transition-all duration-300 ${
-            isFull24Hours ? 'max-h-[2304px]' : isExpanded ? 'max-h-[1056px]' : 'max-h-[600px]'
+            isFull24Hours ? 'max-h-[2304px]' : isExpanded ? 'max-h-[1056px]' : 'max-h-[400px] sm:max-h-[600px]'
           }`}
           style={{ overflow: 'hidden' }}
         >
@@ -959,7 +1075,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
             <div
               className="absolute z-25 pointer-events-none bg-blue-600 bg-opacity-30 border-2 border-blue-600 rounded"
               style={{
-                left: `${80 + weekDays.findIndex(day => day.toDateString() === eventDrag.dragStartDate!.toDateString()) * ((timeGridRef.current?.getBoundingClientRect().width || 800) - 80) / 7}px`,
+                left: `${80 + weekRange[currentWeekIndex]?.findIndex(day => day.toDateString() === eventDrag.dragStartDate!.toDateString()) * ((timeGridRef.current?.getBoundingClientRect().width || 800) - 80) / 7}px`,
                 top: `${eventDrag.dragStartHour! * hourHeight}px`,
                 width: `${((timeGridRef.current?.getBoundingClientRect().width || 800) - 80) / 7}px`,
                 height: `${Math.ceil((new Date(eventDrag.originalEndDate!).getTime() - new Date(eventDrag.originalStartDate!).getTime()) / (60 * 60 * 1000)) * hourHeight}px`
@@ -973,7 +1089,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
 
           {/* Time column - sticky */}
           <div 
-            className={`w-20 sticky-time-column border-r ${
+            className={`w-16 sm:w-20 sticky-time-column border-r ${
               settings.theme === 'dark' ? 'bg-[#161b22] border-[#30363d]' : 'bg-gray-50 border-gray-300'
             }`}
             style={{ 
@@ -985,7 +1101,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
             {timeSlots.map((time, index) => (
                               <div
                   key={index}
-                  className={`flex items-center justify-end pr-2 ${
+                  className={`flex items-center justify-end pr-1 sm:pr-2 ${
                     settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-gray-50'
                   }`}
                   style={{ height: `${hourHeight}px` }}
@@ -1000,7 +1116,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
           </div>
           
           {/* Day columns */}
-          {weekDays.map((date) => (
+          {weekRange[currentWeekIndex]?.map((date) => (
             <div 
               key={date.toISOString()} 
               className={`relative border-l overflow-hidden ${

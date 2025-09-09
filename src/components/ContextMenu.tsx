@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Edit, Trash2, Plus, CheckCircle } from 'lucide-react';
+// import { Edit, Trash2, Plus, CheckCircle } from 'lucide-react';
 
 export interface ContextMenuItem {
   id: string;

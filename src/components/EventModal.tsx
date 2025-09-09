@@ -257,7 +257,7 @@ const EventModal: React.FC<EventModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content max-w-4xl w-full mx-4" onClick={e => e.stopPropagation()}>
+      <div className="modal-content max-w-7xl w-full mx-2 sm:mx-4 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
           <h2 className={`text-xl font-semibold ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
             {event ? 'Edit Event' : 'New Event'}
@@ -275,7 +275,7 @@ const EventModal: React.FC<EventModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
             {/* Left Column */}
             <div className="space-y-6">
               {/* Title */}

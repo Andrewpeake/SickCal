@@ -21,6 +21,19 @@
     --calendar-bg-dark: #0d1117;
   }
   
+  /* Responsive breakpoints */
+  @media (max-width: 640px) {
+    :root {
+      --hour-height: 48px;
+    }
+  }
+  
+  @media (min-width: 641px) and (max-width: 1024px) {
+    :root {
+      --hour-height: 56px;
+    }
+  }
+  
   * {
     @apply border-gray-200;
   }
@@ -371,6 +384,31 @@
     background: #94a3b8;
   }
   
+  /* Responsive calendar adjustments */
+  @media (max-width: 640px) {
+    .calendar-container {
+      margin: 0 -0.5rem;
+    }
+    
+    .calendar-week-grid {
+      font-size: 0.75rem;
+    }
+    
+    .sticky-time-column {
+      min-width: 3rem;
+    }
+  }
+  
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .calendar-container {
+      margin: 0 -0.25rem;
+    }
+    
+    .sticky-time-column {
+      min-width: 4rem;
+    }
+  }
+  
   /* Ensure sticky positioning works correctly */
   .sticky-header {
     position: sticky;
@@ -392,4 +430,24 @@
     background-color: #e5e7eb;
   }
 
+}
+
+/* Horizontal scroll styles */
+.horizontal-scroll-container {
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.horizontal-scroll-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.week-column {
+  scroll-snap-align: start;
 } 

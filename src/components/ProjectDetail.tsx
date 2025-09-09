@@ -292,7 +292,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">Tasks</h3>
                 <button
-                  onClick={() => setShowAddTask(true)}
+                  onClick={() => {/* setShowAddTask(true) */}}
                   className="btn-primary flex items-center space-x-2"
                 >
                   <Plus className="w-4 h-4" />

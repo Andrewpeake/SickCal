@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { X, Settings, Palette, Clock, Calendar, Eye, MousePointer, Keyboard, Sun, Moon } from 'lucide-react';
+import { X, Settings, Palette, Clock, Calendar, Eye, MousePointer } from 'lucide-react';
 import { Settings as SettingsType } from '../types';
 
-export type Settings = SettingsType;
+// export type Settings = SettingsType;
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  settings: Settings;
-  onSave: (settings: Settings) => void;
+  settings: SettingsType;
+  onSave: (settings: SettingsType) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -17,7 +17,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   settings,
   onSave
 }) => {
-  const [localSettings, setLocalSettings] = useState<Settings>(settings);
+  const [localSettings, setLocalSettings] = useState<SettingsType>(settings);
   const [activeTab, setActiveTab] = useState('appearance');
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleReset = () => {
-    const defaultSettings: Settings = {
+    const defaultSettings: SettingsType = {
       // Appearance
       theme: 'light' as const,
       primaryColor: '#0ea5e9',

@@ -48,36 +48,38 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <div className={`w-80 shadow-soft rounded-xl p-6 h-fit ${
+      <div className={`w-full shadow-soft rounded-xl p-4 sm:p-6 h-fit ${
         settings.theme === 'dark' 
           ? 'bg-[#161b22]' 
           : 'bg-white'
       }`}>
       {/* Quick Actions */}
-      <div className="mb-8">
-        <h3 className={`text-lg font-semibold mb-4 ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>Quick Actions</h3>
-        <div className="space-y-3">
+      <div className="mb-6 sm:mb-8">
+        <h3 className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>Quick Actions</h3>
+        <div className="grid grid-cols-2 gap-2 sm:space-y-0 sm:space-y-3 sm:grid-cols-1">
           <button
             onClick={onAddEvent}
-            className="w-full btn-primary flex items-center justify-center space-x-2"
+            className="w-full btn-primary flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add Event</span>
+            <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Add Event</span>
+            <span className="sm:hidden">Event</span>
           </button>
           <button
             onClick={onAddTask}
-            className="w-full btn-secondary flex items-center justify-center space-x-2"
+            className="w-full btn-secondary flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base"
           >
-            <CheckSquare className="w-4 h-4" />
-            <span>Add Task</span>
+            <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Add Task</span>
+            <span className="sm:hidden">Task</span>
           </button>
         </div>
       </div>
 
       {/* Task Summary */}
-      <div className="mb-8">
-        <h3 className={`text-lg font-semibold mb-4 flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
-          <TrendingUp className={`w-5 h-5 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
+      <div className="mb-6 sm:mb-8">
+        <h3 className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
+          <TrendingUp className={`w-4 h-4 sm:w-5 sm:h-5 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
           Task Progress
         </h3>
         <div className={`rounded-lg p-4 ${settings.theme === 'dark' ? 'bg-[#0d1117]' : 'bg-gray-50'}`}>
@@ -99,9 +101,9 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Upcoming Events */}
-      <div className="mb-8">
-        <h3 className={`text-lg font-semibold mb-4 flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
-          <Calendar className={`w-5 h-5 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
+      <div className="mb-6 sm:mb-8">
+        <h3 className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
+          <Calendar className={`w-4 h-4 sm:w-5 sm:h-5 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
           Upcoming Events
         </h3>
         {upcomingEvents.length > 0 ? (
@@ -140,8 +142,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Pending Tasks */}
       <div>
-        <h3 className={`text-lg font-semibold mb-4 flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
-          <CheckSquare className={`w-5 h-5 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
+        <h3 className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
+          <CheckSquare className={`w-4 h-4 sm:w-5 sm:h-5 mr-2 ${settings.theme === 'dark' ? 'text-[#1f6feb]' : 'text-primary-600'}`} />
           Pending Tasks
         </h3>
         {pendingTasks.length > 0 ? (

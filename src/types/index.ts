@@ -74,6 +74,13 @@ export interface CalendarGridProps {
   onTaskDelete?: (taskId: string) => void;
   onEventCreate?: (event: Event) => void;
   onTaskCreate?: (date: Date) => void;
+  clipboard?: {
+    type: 'event' | 'task' | null;
+    data: Event | Task | null;
+  };
+  onCopyEvent?: (event: Event) => void;
+  onCopyTask?: (task: Task) => void;
+  onPaste?: (targetDate: Date) => void;
 }
 
 export interface EventModalProps {

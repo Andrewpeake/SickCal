@@ -1,4 +1,4 @@
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addDays, subDays, addMonths, subMonths, addYears, subYears, startOfDay, endOfDay, getMonth, getYear } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, addDays, subDays, addMonths, subMonths, addYears, subYears, startOfDay, endOfDay, getYear } from 'date-fns';
 
 export const formatDate = (date: Date, formatStr: string = 'MMM dd, yyyy'): string => {
   return format(date, formatStr);
