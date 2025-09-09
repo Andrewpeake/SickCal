@@ -339,7 +339,7 @@
   }
   
   .modal-content {
-    @apply bg-white rounded-xl shadow-medium p-6 w-full max-w-md mx-4 animate-scale-in;
+    @apply bg-white rounded-xl shadow-medium p-4 sm:p-6 w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl mx-2 sm:mx-4 animate-scale-in max-h-[90vh] overflow-y-auto;
   }
   
   .time-slot {

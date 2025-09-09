@@ -90,8 +90,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className={`text-xl font-semibold ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className={`text-lg sm:text-xl font-semibold ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
             {task ? 'Edit Task' : 'New Task'}
           </h2>
           <button
@@ -106,7 +106,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Title */}
           <div>
             <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
@@ -144,14 +144,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
             
             {/* Quick Due Date Selection */}
             <div className="mb-3">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1 sm:gap-2">
                 <button
                   type="button"
                   onClick={() => {
                     const now = new Date();
                     setFormData(prev => ({ ...prev, dueDate: now }));
                   }}
-                  className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                  className="px-2 sm:px-3 py-1 text-xs bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
                 >
                   Now
                 </button>
@@ -162,7 +162,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                     today.setHours(17, 0, 0, 0); // 5 PM
                     setFormData(prev => ({ ...prev, dueDate: today }));
                   }}
-                  className="px-3 py-1 text-xs bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+                  className="px-2 sm:px-3 py-1 text-xs bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
                 >
                   Today 5PM
                 </button>
@@ -174,7 +174,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                     tomorrow.setHours(17, 0, 0, 0); // 5 PM
                     setFormData(prev => ({ ...prev, dueDate: tomorrow }));
                   }}
-                  className="px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors"
+                  className="px-2 sm:px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors"
                 >
                   Tomorrow 5PM
                 </button>
@@ -186,7 +186,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                     nextWeek.setHours(17, 0, 0, 0); // 5 PM
                     setFormData(prev => ({ ...prev, dueDate: nextWeek }));
                   }}
-                  className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                  className="px-2 sm:px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
                 >
                   Next Week
                 </button>
@@ -220,7 +220,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           {/* Start and End Times */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                 Start Time
@@ -250,7 +250,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
             <label className={`block text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
               Quick Duration
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1 sm:gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -259,7 +259,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                   endTime.setHours(endTime.getHours() + 1);
                   setFormData(prev => ({ ...prev, endTime }));
                 }}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-2 sm:px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 1 Hour
               </button>
@@ -271,7 +271,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                   endTime.setHours(endTime.getHours() + 2);
                   setFormData(prev => ({ ...prev, endTime }));
                 }}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-2 sm:px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 2 Hours
               </button>
@@ -283,7 +283,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                   endTime.setHours(endTime.getHours() + 4);
                   setFormData(prev => ({ ...prev, endTime }));
                 }}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-2 sm:px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 4 Hours
               </button>
@@ -295,7 +295,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                   endTime.setHours(endTime.getHours() + 8);
                   setFormData(prev => ({ ...prev, endTime }));
                 }}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-2 sm:px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Full Day
               </button>
@@ -307,14 +307,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
             <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Priority
             </label>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               {priorityOptions.map((priority) => (
                 <button
                   key={priority.value}
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, priority: priority.value as any }))}
                   className={clsx(
-                    'px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200',
+                    'px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200',
                     formData.priority === priority.value
                       ? priority.color
                       : settings.theme === 'dark'
@@ -363,8 +363,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className={`flex items-center justify-between pt-4 border-t ${settings.theme === 'dark' ? 'dark-theme-border' : 'border-gray-200'}`}>
-            <div className="flex space-x-3">
+          <div className={`flex flex-col sm:flex-row items-center justify-between pt-4 border-t gap-3 ${settings.theme === 'dark' ? 'dark-theme-border' : 'border-gray-200'}`}>
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
               <button
                 type="submit"
                 className="btn-primary"
@@ -386,7 +386,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                   onDelete(task.id);
                   onClose();
                 }}
-                className="text-red-600 hover:text-red-700 font-medium"
+                className="text-red-600 hover:text-red-700 font-medium text-sm sm:text-base w-full sm:w-auto text-center sm:text-left"
               >
                 Delete Task
               </button>
