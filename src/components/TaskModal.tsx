@@ -18,8 +18,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
     description: '',
     dueDate: selectedDate || new Date(),
     softDeadline: undefined,
-    startTime: selectedDate || new Date(),
-    endTime: selectedDate ? new Date(selectedDate.getTime() + 60 * 60 * 1000) : new Date(),
+    startTime: undefined,
+    endTime: undefined,
     completed: false,
     priority: 'medium',
     category: ''
@@ -42,18 +42,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
         dueDate: new Date(task.dueDate)
       });
     } else if (selectedDate) {
-      // If selectedDate has a specific time (from week view), set start and end times
-      const startTime = new Date(selectedDate);
-      const endTime = new Date(selectedDate);
-      endTime.setHours(endTime.getHours() + 1); // Default to 1 hour later
-      
+      // If selectedDate has a specific time (from week view), set it as due date
       setFormData({
         title: '',
         description: '',
-        dueDate: startTime,
+        dueDate: new Date(selectedDate),
         softDeadline: undefined,
-        startTime: startTime,
-        endTime: endTime,
+        startTime: undefined,
+        endTime: undefined,
         completed: false,
         priority: 'medium',
         category: ''
@@ -190,30 +186,38 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
 
-          {/* Start and End Times */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
-                Start Time
-              </label>
-              <input
-                type="datetime-local"
-                value={formData.startTime ? new Date(formData.startTime.getTime() - formData.startTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, startTime: new Date(e.target.value) }))}
-                className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              />
-            </div>
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
-                End Time
-              </label>
-              <input
-                type="datetime-local"
-                value={formData.endTime ? new Date(formData.endTime.getTime() - formData.endTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, endTime: new Date(e.target.value) }))}
-                className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              />
-            </div>
+          {/* Soft Deadline */}
+          <div>
+            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+              Soft Deadline (Optional)
+            </label>
+            <input
+              type="datetime-local"
+              value={formData.softDeadline ? new Date(formData.softDeadline.getTime() - formData.softDeadline.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, softDeadline: new Date(e.target.value) }))}
+              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
+              placeholder="Optional warning deadline"
+            />
+            <p className={`text-xs mt-0.5 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-500'}`}>
+              Get an early warning before the hard deadline
+            </p>
+          </div>
+
+          {/* Optional Start Time */}
+          <div>
+            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+              Start Time (Optional)
+            </label>
+            <input
+              type="datetime-local"
+              value={formData.startTime ? new Date(formData.startTime.getTime() - formData.startTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, startTime: new Date(e.target.value) }))}
+              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
+              placeholder="Optional start time"
+            />
+            <p className={`text-xs mt-0.5 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-500'}`}>
+              Only if you want to schedule a specific start time
+            </p>
           </div>
 
 
