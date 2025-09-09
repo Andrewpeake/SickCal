@@ -90,7 +90,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <div className="flex items-center justify-between mb-3">
           <h2 className={`text-lg sm:text-xl font-semibold ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
             {task ? 'Edit Task' : 'New Task'}
           </h2>
@@ -106,10 +106,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-3">
           {/* Title */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Task Title *
             </label>
             <input
@@ -124,26 +124,26 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               className={`input-field resize-none ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              rows={3}
+              rows={2}
               placeholder="Enter task description"
             />
           </div>
 
           {/* Due Date */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Due Date *
             </label>
             
             {/* Quick Due Date Selection */}
-            <div className="mb-3">
+            <div className="mb-2">
               <div className="flex flex-wrap gap-1 sm:gap-2">
                 <button
                   type="button"
@@ -204,7 +204,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Soft Deadline */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Soft Deadline (Warning)
             </label>
             <input
@@ -214,7 +214,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
               className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
               placeholder="Optional warning deadline"
             />
-            <p className={`text-xs mt-1 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-500'}`}>
+            <p className={`text-xs mt-0.5 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-500'}`}>
               Set a soft deadline to get an early warning before the hard deadline
             </p>
           </div>
@@ -222,7 +222,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           {/* Start and End Times */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                 Start Time
               </label>
               <input
@@ -233,7 +233,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
               />
             </div>
             <div>
-              <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+              <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
                 End Time
               </label>
               <input
@@ -247,7 +247,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Quick Duration for Tasks */}
           <div>
-            <label className={`block text-xs font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
+            <label className={`block text-xs font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-600'}`}>
               Quick Duration
             </label>
             <div className="flex flex-wrap gap-1 sm:gap-2">
@@ -304,7 +304,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Priority */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Priority
             </label>
             <div className="flex flex-wrap gap-2">
@@ -331,7 +331,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Category */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
+            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
               Category
             </label>
             <select
@@ -363,8 +363,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className={`flex flex-col sm:flex-row items-center justify-between pt-4 border-t gap-3 ${settings.theme === 'dark' ? 'dark-theme-border' : 'border-gray-200'}`}>
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+          <div className={`flex flex-col sm:flex-row items-center justify-between pt-3 border-t gap-2 ${settings.theme === 'dark' ? 'dark-theme-border' : 'border-gray-200'}`}>
+            <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
               <button
                 type="submit"
                 className="btn-primary"
