@@ -158,4 +158,4 @@ This project is licensed under the MIT License.
 - [ ] Mobile app version
 - [ ] Cloud synchronization
 - [ ] Calendar import/export (ICS format)
-- [ ] Advanced search and filtering 
+- [ ] Advanced search and filtering # Trigger deployment
