@@ -40,6 +40,15 @@ const PanelWrapper: React.FC<PanelWrapperProps> = ({
     return {};
   };
 
+  // Prevent errors if config is undefined
+  if (!config) {
+    return (
+      <div className={`p-4 ${settings.theme === 'dark' ? 'bg-[#161b22]' : 'bg-white'} rounded-xl`}>
+        <div className="text-red-500">Panel configuration error</div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`${getSizeClasses()} ${
