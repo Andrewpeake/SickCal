@@ -56,13 +56,23 @@ export class OverdueManager {
     const softDeadline = new Date(task.softDeadline);
     const hardDeadline = new Date(task.hardDeadline);
 
+    // Check if past the hard deadline (due date + grace period)
     if (now > hardDeadline) {
       const days = Math.floor((now.getTime() - hardDeadline.getTime()) / (1000 * 60 * 60 * 24));
       return { status: 'hard-overdue', days };
-    } else if (now > softDeadline) {
+    } 
+    // Check if past the due date (but within grace period)
+    else if (now > dueDate) {
+      const days = Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+      return { status: 'soft-overdue', days };
+    } 
+    // Check if past the soft deadline (early warning)
+    else if (now > softDeadline) {
       const days = Math.floor((now.getTime() - softDeadline.getTime()) / (1000 * 60 * 60 * 24));
       return { status: 'soft-overdue', days };
-    } else {
+    } 
+    // On time
+    else {
       const days = Math.floor((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
       return { status: 'on-time', days: Math.max(0, days) };
     }

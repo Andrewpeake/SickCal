@@ -584,7 +584,7 @@ function App() {
           <OverdueTasks
             tasks={overdueManager.getOverdueTasks(tasks.map(task => ({
               ...task,
-              softDeadline: new Date(task.dueDate.getTime() - 3 * 24 * 60 * 60 * 1000),
+              softDeadline: task.softDeadline || new Date(task.dueDate.getTime() - 3 * 24 * 60 * 60 * 1000),
               hardDeadline: new Date(task.dueDate.getTime() + 7 * 24 * 60 * 60 * 1000)
             })))}
             settings={settings}

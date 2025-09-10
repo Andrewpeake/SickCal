@@ -3,6 +3,7 @@ import { TaskModalProps, Task } from '../types';
 import { X, Flag } from 'lucide-react';
 import { generateId } from '../utils/dateUtils';
 import clsx from 'clsx';
+import IntuitiveDatePicker from './IntuitiveDatePicker';
 
 const TaskModal: React.FC<TaskModalProps> = ({
   isOpen,
@@ -85,8 +86,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-3">
+      <div className="modal-content max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-3 flex-shrink-0">
           <h2 className={`text-lg sm:text-xl font-semibold ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
             {task ? 'Edit Task' : 'New Task'}
           </h2>
@@ -102,7 +103,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-2">
+        <div className="flex-1 overflow-y-auto pr-2">
+          <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title */}
           <div>
             <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
@@ -121,66 +123,12 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Due Date */}
           <div>
-            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
-              Due Date *
-            </label>
-            
-            {/* Quick Due Date Selection */}
-            <div className="mb-2">
-              <div className="flex flex-wrap gap-1 sm:gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const now = new Date();
-                    setFormData(prev => ({ ...prev, dueDate: now }));
-                  }}
-                  className="px-2 sm:px-3 py-1 text-xs bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                >
-                  Now
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const today = new Date();
-                    today.setHours(17, 0, 0, 0); // 5 PM
-                    setFormData(prev => ({ ...prev, dueDate: today }));
-                  }}
-                  className="px-2 sm:px-3 py-1 text-xs bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
-                >
-                  Today 5PM
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    tomorrow.setHours(17, 0, 0, 0); // 5 PM
-                    setFormData(prev => ({ ...prev, dueDate: tomorrow }));
-                  }}
-                  className="px-2 sm:px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors"
-                >
-                  Tomorrow 5PM
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const nextWeek = new Date();
-                    nextWeek.setDate(nextWeek.getDate() + 7);
-                    nextWeek.setHours(17, 0, 0, 0); // 5 PM
-                    setFormData(prev => ({ ...prev, dueDate: nextWeek }));
-                  }}
-                  className="px-2 sm:px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                >
-                  Next Week
-                </button>
-              </div>
-            </div>
-            
-            <input
-              type="datetime-local"
-              value={formData.dueDate ? new Date(formData.dueDate.getTime() - formData.dueDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, dueDate: new Date(e.target.value) }))}
-              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
+            <IntuitiveDatePicker
+              value={formData.dueDate}
+              onChange={(date) => setFormData(prev => ({ ...prev, dueDate: date }))}
+              placeholder="Select due date and time"
+              theme={settings.theme}
+              label="Due Date"
               required
             />
           </div>
@@ -188,15 +136,12 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Soft Deadline */}
           <div>
-            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
-              Soft Deadline (Optional)
-            </label>
-            <input
-              type="datetime-local"
-              value={formData.softDeadline ? new Date(formData.softDeadline.getTime() - formData.softDeadline.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, softDeadline: new Date(e.target.value) }))}
-              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              placeholder="Optional warning deadline"
+            <IntuitiveDatePicker
+              value={formData.softDeadline}
+              onChange={(date) => setFormData(prev => ({ ...prev, softDeadline: date }))}
+              placeholder="Select soft deadline (optional)"
+              theme={settings.theme}
+              label="Soft Deadline (Optional)"
             />
             <p className={`text-xs mt-0.5 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-500'}`}>
               Get an early warning before the hard deadline
@@ -205,15 +150,12 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
           {/* Optional Start Time */}
           <div>
-            <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'dark-theme-text' : 'text-gray-700'}`}>
-              Start Time (Optional)
-            </label>
-            <input
-              type="datetime-local"
-              value={formData.startTime ? new Date(formData.startTime.getTime() - formData.startTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, startTime: new Date(e.target.value) }))}
-              className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              placeholder="Optional start time"
+            <IntuitiveDatePicker
+              value={formData.startTime}
+              onChange={(date) => setFormData(prev => ({ ...prev, startTime: date }))}
+              placeholder="Select start time (optional)"
+              theme={settings.theme}
+              label="Start Time (Optional)"
             />
             <p className={`text-xs mt-0.5 ${settings.theme === 'dark' ? 'dark-theme-text-secondary' : 'text-gray-500'}`}>
               Only if you want to schedule a specific start time
@@ -263,37 +205,40 @@ const TaskModal: React.FC<TaskModalProps> = ({
             </label>
           </div>
 
-          {/* Action Buttons */}
-          <div className={`flex flex-col sm:flex-row items-center justify-between pt-3 border-t gap-2 ${settings.theme === 'dark' ? 'dark-theme-border' : 'border-gray-200'}`}>
-            <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-              <button
-                type="submit"
-                className="btn-primary"
-              >
-                {task ? 'Update Task' : 'Create Task'}
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className="btn-secondary"
-              >
-                Cancel
-              </button>
-            </div>
-            {task && onDelete && (
-              <button
-                type="button"
-                onClick={() => {
-                  onDelete(task.id);
-                  onClose();
-                }}
-                className="text-red-600 hover:text-red-700 font-medium text-sm sm:text-base w-full sm:w-auto text-center sm:text-left"
-              >
-                Delete Task
-              </button>
-            )}
+          </form>
+        </div>
+
+        {/* Action Buttons - Fixed at bottom */}
+        <div className={`flex flex-col sm:flex-row items-center justify-between pt-3 border-t gap-2 flex-shrink-0 mt-4 ${settings.theme === 'dark' ? 'dark-theme-border' : 'border-gray-200'}`}>
+          <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+            <button
+              type="submit"
+              className="btn-primary"
+              onClick={handleSubmit}
+            >
+              {task ? 'Update Task' : 'Create Task'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary"
+            >
+              Cancel
+            </button>
           </div>
-        </form>
+          {task && onDelete && (
+            <button
+              type="button"
+              onClick={() => {
+                onDelete(task.id);
+                onClose();
+              }}
+              className="text-red-600 hover:text-red-700 font-medium text-sm sm:text-base w-full sm:w-auto text-center sm:text-left"
+            >
+              Delete Task
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
