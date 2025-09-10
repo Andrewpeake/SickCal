@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CalendarView, Event, Task, Settings } from './types';
+import { CalendarView, Event, Task, Settings, LayoutConfig, PanelConfig } from './types';
 import { OverdueManager } from './types/overdue';
 import { ProjectManager as ProjectManagerClass, Project, ProjectTask, ProjectMilestone } from './types/project';
 import Navigation from './components/Navigation';
@@ -13,9 +13,12 @@ import ProjectModal from './components/ProjectModal';
 import ProjectDetail from './components/ProjectDetail';
 import SettingsModal from './components/SettingsModal';
 import AuthModal from './components/AuthModal';
+import ModularLayout from './components/ModularLayout';
+import PanelCustomizer from './components/PanelCustomizer';
 import { useAuth } from './contexts/AuthContext';
 import { eventsAPI, tasksAPI, settingsAPI, projectsAPI } from './services/api';
 import { loadSettings, saveSettings, applyAllSettings } from './utils/settingsUtils';
+import { getDefaultLayout, defaultLayouts } from './utils/layoutPresets';
 
 function App() {
   const { user, loading: authLoading } = useAuth();
@@ -50,6 +53,11 @@ function App() {
     type: 'event' | 'task' | null;
     data: Event | Task | null;
   }>({ type: null, data: null });
+
+  // Modular Layout state
+  const [currentLayout, setCurrentLayout] = useState<LayoutConfig>(() => getDefaultLayout());
+  const [showPanelCustomizer, setShowPanelCustomizer] = useState(false);
+  const [useModularLayout, setUseModularLayout] = useState(false);
 
   // Load data from API when user is authenticated
   useEffect(() => {
@@ -446,6 +454,29 @@ function App() {
     setShowSettingsModal(true);
   };
 
+  // Modular Layout handlers
+  const handleLayoutChange = (newLayout: LayoutConfig) => {
+    setCurrentLayout(newLayout);
+  };
+
+  const handlePanelUpdate = (panelId: string, updates: Partial<PanelConfig>) => {
+    setCurrentLayout(prev => ({
+      ...prev,
+      panels: prev.panels.map(panel =>
+        panel.id === panelId ? { ...panel, ...updates } : panel
+      )
+    }));
+  };
+
+  const handleLayoutSave = (newLayout: LayoutConfig) => {
+    setCurrentLayout(newLayout);
+    setShowPanelCustomizer(false);
+  };
+
+  const handleToggleModularLayout = () => {
+    setUseModularLayout(prev => !prev);
+  };
+
   if (authLoading || dataLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -499,6 +530,22 @@ function App() {
               </button>
             )}
             <button
+              onClick={handleToggleModularLayout}
+              className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-sm border rounded-lg transition-colors duration-200 ${
+                useModularLayout
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : settings.theme === 'dark' 
+                    ? 'bg-[#0d1117] hover:bg-[#161b22] border-[#30363d] text-[#c9d1d9]' 
+                    : 'bg-white hover:bg-gray-50 border-gray-300'
+              }`}
+              title="Toggle Modular Layout"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              <span className="hidden sm:inline">Modular</span>
+            </button>
+            <button
               onClick={handleOpenSettings}
               className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-sm border rounded-lg transition-colors duration-200 ${
                 settings.theme === 'dark' 
@@ -527,57 +574,106 @@ function App() {
         />
 
         {/* Main Content */}
-        <div className="flex flex-col xl:flex-row gap-4 xl:gap-8">
-          {/* Calendar Grid */}
-          <div className="flex-1 min-w-0">
-            <CalendarGrid
-              key={`calendar-${settings.hourHeight}-${settings.theme}-${settings.primaryColor}`}
-              currentDate={currentDate}
-              selectedDate={selectedDate}
-              onDateSelect={handleDateSelect}
-              events={events}
-              tasks={tasks}
-              view={view}
-              settings={settings}
-              onEventEdit={handleEventEdit}
-              onEventOpen={handleEventOpen}
-              onEventDelete={handleEventDelete}
-              onTaskEdit={handleTaskEdit}
-              onTaskDelete={handleTaskDelete}
-              onEventCreate={handleEventCreate}
-              onTaskCreate={handleTaskCreate}
-              clipboard={clipboard}
-              onCopyEvent={handleCopyEvent}
-              onCopyTask={handleCopyTask}
-              onPaste={handlePaste}
-            />
-          </div>
+        {useModularLayout ? (
+          <div className="space-y-6">
+            {/* Layout Controls */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <h3 className={`text-lg font-semibold ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
+                  {currentLayout.name}
+                </h3>
+                <div className="flex space-x-2">
+                  {defaultLayouts.map((layout) => (
+                    <button
+                      key={layout.id}
+                      onClick={() => setCurrentLayout(layout)}
+                      className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                        currentLayout.id === layout.id
+                          ? 'bg-blue-600 text-white'
+                          : settings.theme === 'dark'
+                            ? 'bg-[#30363d] text-[#c9d1d9] hover:bg-[#484f58]'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {layout.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPanelCustomizer(true)}
+                className="btn-primary flex items-center space-x-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                </svg>
+                <span>Customize</span>
+              </button>
+            </div>
 
-          {/* Sidebar */}
-          <div className="w-full xl:w-80 flex-shrink-0">
-            <Sidebar
+            {/* Modular Layout */}
+            <ModularLayout
+              layoutConfig={currentLayout}
               events={events}
               tasks={tasks}
               settings={settings}
-              onAddEvent={handleAddEvent}
-              onAddTask={handleAddTask}
-              onEventOpen={(event) => {
-                // Navigate to the event's date/time and open the modal
-                const date = new Date(event.startDate);
-                setSelectedDate(date);
-                setView('day');
-                setEditingEvent(event);
-                setShowEventModal(true);
-              }}
-              onEventEdit={(event) => {
-                setSelectedDate(new Date(event.startDate));
-                setEditingEvent(event);
-                setShowEventModal(true);
-              }}
-              onEventDelete={handleDeleteEvent}
+              onLayoutChange={handleLayoutChange}
+              onPanelUpdate={handlePanelUpdate}
             />
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col xl:flex-row gap-4 xl:gap-8">
+            {/* Calendar Grid */}
+            <div className="flex-1 min-w-0">
+              <CalendarGrid
+                key={`calendar-${settings.hourHeight}-${settings.theme}-${settings.primaryColor}`}
+                currentDate={currentDate}
+                selectedDate={selectedDate}
+                onDateSelect={handleDateSelect}
+                events={events}
+                tasks={tasks}
+                view={view}
+                settings={settings}
+                onEventEdit={handleEventEdit}
+                onEventOpen={handleEventOpen}
+                onEventDelete={handleEventDelete}
+                onTaskEdit={handleTaskEdit}
+                onTaskDelete={handleTaskDelete}
+                onEventCreate={handleEventCreate}
+                onTaskCreate={handleTaskCreate}
+                clipboard={clipboard}
+                onCopyEvent={handleCopyEvent}
+                onCopyTask={handleCopyTask}
+                onPaste={handlePaste}
+              />
+            </div>
+
+            {/* Sidebar */}
+            <div className="w-full xl:w-80 flex-shrink-0">
+              <Sidebar
+                events={events}
+                tasks={tasks}
+                settings={settings}
+                onAddEvent={handleAddEvent}
+                onAddTask={handleAddTask}
+                onEventOpen={(event) => {
+                  // Navigate to the event's date/time and open the modal
+                  const date = new Date(event.startDate);
+                  setSelectedDate(date);
+                  setView('day');
+                  setEditingEvent(event);
+                  setShowEventModal(true);
+                }}
+                onEventEdit={(event) => {
+                  setSelectedDate(new Date(event.startDate));
+                  setEditingEvent(event);
+                  setShowEventModal(true);
+                }}
+                onEventDelete={handleDeleteEvent}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Overdue Tasks Section */}
         <div className="mt-8">
@@ -685,6 +781,15 @@ function App() {
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
+        />
+
+        {/* Panel Customizer Modal */}
+        <PanelCustomizer
+          isOpen={showPanelCustomizer}
+          onClose={() => setShowPanelCustomizer(false)}
+          layoutConfig={currentLayout}
+          onLayoutSave={handleLayoutSave}
+          settings={settings}
         />
       </div>
     </div>

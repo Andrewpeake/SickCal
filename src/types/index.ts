@@ -153,4 +153,78 @@ export interface Settings {
   dateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD';
   language: string;
   timezone: string;
+}
+
+// Modular Panel System Types
+export type PanelType = 
+  | 'calendar' 
+  | 'sidebar' 
+  | 'overdue-tasks' 
+  | 'projects' 
+  | 'task-progress'
+  | 'upcoming-events'
+  | 'pending-tasks'
+  | 'quick-actions'
+  | 'custom';
+
+export type PanelSize = 
+  | 'small'     // 1/4 width
+  | 'medium'    // 1/3 width  
+  | 'large'     // 1/2 width
+  | 'xlarge'    // 2/3 width
+  | 'full'      // full width
+  | 'custom';   // user-defined
+
+export type PanelPosition = 
+  | 'top-left' | 'top-center' | 'top-right'
+  | 'center-left' | 'center' | 'center-right'
+  | 'bottom-left' | 'bottom-center' | 'bottom-right';
+
+export interface PanelConfig {
+  id: string;
+  type: PanelType;
+  title: string;
+  position: PanelPosition;
+  size: PanelSize;
+  customSize?: {
+    width: string;
+    height: string;
+  };
+  visible: boolean;
+  order: number;
+  settings: {
+    showHeader?: boolean;
+    collapsible?: boolean;
+    resizable?: boolean;
+    movable?: boolean;
+  };
+  content?: {
+    showQuickActions?: boolean;
+    showTaskProgress?: boolean;
+    showUpcomingEvents?: boolean;
+    showPendingTasks?: boolean;
+    maxItems?: number;
+    customContent?: string;
+  };
+}
+
+export interface LayoutConfig {
+  id: string;
+  name: string;
+  panels: PanelConfig[];
+  gridTemplate: {
+    columns: string;
+    rows: string;
+    gap: string;
+  };
+  isDefault: boolean;
+}
+
+export interface ModularLayoutProps {
+  layoutConfig: LayoutConfig;
+  events: Event[];
+  tasks: Task[];
+  settings: Settings;
+  onLayoutChange: (config: LayoutConfig) => void;
+  onPanelUpdate: (panelId: string, updates: Partial<PanelConfig>) => void;
 } 
