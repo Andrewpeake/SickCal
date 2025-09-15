@@ -4,6 +4,7 @@ import { Event, Task } from '../types';
 import { formatDate, formatTime } from '../utils/dateUtils';
 import { clsx } from 'clsx';
 import ContextMenu from './ContextMenu';
+import PomodoroTimer from './PomodoroTimer';
 
 interface SidebarProps {
   events: Event[];
@@ -74,6 +75,11 @@ const Sidebar: React.FC<SidebarProps> = ({
             <span className="sm:hidden">Task</span>
           </button>
         </div>
+      </div>
+
+      {/* Pomodoro Timer */}
+      <div className="mb-6 sm:mb-8">
+        <PomodoroTimer settings={settings} />
       </div>
 
       {/* Task Summary */}

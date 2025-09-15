@@ -9,6 +9,7 @@ import QuickActionsPanel from './panels/QuickActionsPanel';
 import TaskProgressPanel from './panels/TaskProgressPanel';
 import UpcomingEventsPanel from './panels/UpcomingEventsPanel';
 import PendingTasksPanel from './panels/PendingTasksPanel';
+import PomodoroTimer from './PomodoroTimer';
 
 const ModularLayout: React.FC<ModularLayoutProps> = ({
   layoutConfig,
@@ -84,6 +85,9 @@ const ModularLayout: React.FC<ModularLayoutProps> = ({
         
         case 'quick-actions':
           return <QuickActionsPanel settings={settings} />;
+        
+        case 'pomodoro-timer':
+          return <PomodoroTimer settings={settings} />;
         
         case 'task-progress':
           return <TaskProgressPanel tasks={tasks || []} settings={settings} maxItems={panel.content?.maxItems} />;

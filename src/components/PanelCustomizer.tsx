@@ -23,6 +23,7 @@ const PanelCustomizer: React.FC<PanelCustomizerProps> = ({
     { value: 'calendar', label: 'Calendar' },
     { value: 'sidebar', label: 'Sidebar' },
     { value: 'quick-actions', label: 'Quick Actions' },
+    { value: 'pomodoro-timer', label: 'Pomodoro Timer' },
     { value: 'task-progress', label: 'Task Progress' },
     { value: 'upcoming-events', label: 'Upcoming Events' },
     { value: 'pending-tasks', label: 'Pending Tasks' },

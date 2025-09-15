@@ -165,6 +165,7 @@ export type PanelType =
   | 'upcoming-events'
   | 'pending-tasks'
   | 'quick-actions'
+  | 'pomodoro-timer'
   | 'custom';
 
 export type PanelSize = 
