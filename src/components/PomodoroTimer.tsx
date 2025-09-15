@@ -34,7 +34,11 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
   });
 
   // Local state for input values (to prevent immediate updates)
-  const [inputValues, setInputValues] = useState({
+  const [inputValues, setInputValues] = useState<{
+    workDuration: number | null;
+    shortBreak: number | null;
+    longBreak: number | null;
+  }>({
     workDuration: pomodoroSettings.workDuration,
     shortBreak: pomodoroSettings.shortBreak,
     longBreak: pomodoroSettings.longBreak
@@ -181,20 +185,35 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
 
   const handleInputKeyPress = (e: React.KeyboardEvent, type: 'workDuration' | 'shortBreak' | 'longBreak') => {
     if (e.key === 'Enter') {
-      const value = parseInt((e.target as HTMLInputElement).value);
-      if (value && value > 0) {
-        handleDurationChange(type, value);
+      const inputValue = (e.target as HTMLInputElement).value;
+      if (inputValue === '' || inputValue === null) {
+        // If field is empty, reset to original value
+        setInputValues(prev => ({ ...prev, [type]: pomodoroSettings[type] }));
+      } else {
+        const value = parseInt(inputValue);
+        if (value && value > 0) {
+          handleDurationChange(type, value);
+        } else {
+          // Reset to original value if invalid
+          setInputValues(prev => ({ ...prev, [type]: pomodoroSettings[type] }));
+        }
       }
     }
   };
 
   const handleInputBlur = (e: React.FocusEvent, type: 'workDuration' | 'shortBreak' | 'longBreak') => {
-    const value = parseInt((e.target as HTMLInputElement).value);
-    if (value && value > 0) {
-      handleDurationChange(type, value);
-    } else {
-      // Reset to original value if invalid
+    const inputValue = (e.target as HTMLInputElement).value;
+    if (inputValue === '' || inputValue === null) {
+      // If field is empty, reset to original value
       setInputValues(prev => ({ ...prev, [type]: pomodoroSettings[type] }));
+    } else {
+      const value = parseInt(inputValue);
+      if (value && value > 0) {
+        handleDurationChange(type, value);
+      } else {
+        // Reset to original value if invalid
+        setInputValues(prev => ({ ...prev, [type]: pomodoroSettings[type] }));
+      }
     }
   };
 
@@ -354,8 +373,14 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
                   type="number"
                   min="1"
                   max="60"
-                  value={inputValues.workDuration}
-                  onChange={(e) => setInputValues(prev => ({ ...prev, workDuration: parseInt(e.target.value) || 25 }))}
+                  value={inputValues.workDuration || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setInputValues(prev => ({ 
+                      ...prev, 
+                      workDuration: value === '' ? null : parseInt(value) || null 
+                    }));
+                  }}
                   onKeyPress={(e) => handleInputKeyPress(e, 'workDuration')}
                   onBlur={(e) => handleInputBlur(e, 'workDuration')}
                   className={`w-full px-2 py-1 text-sm rounded border ${
@@ -374,8 +399,14 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
                   type="number"
                   min="1"
                   max="30"
-                  value={inputValues.shortBreak}
-                  onChange={(e) => setInputValues(prev => ({ ...prev, shortBreak: parseInt(e.target.value) || 5 }))}
+                  value={inputValues.shortBreak || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setInputValues(prev => ({ 
+                      ...prev, 
+                      shortBreak: value === '' ? null : parseInt(value) || null 
+                    }));
+                  }}
                   onKeyPress={(e) => handleInputKeyPress(e, 'shortBreak')}
                   onBlur={(e) => handleInputBlur(e, 'shortBreak')}
                   className={`w-full px-2 py-1 text-sm rounded border ${
@@ -394,8 +425,14 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
                   type="number"
                   min="1"
                   max="60"
-                  value={inputValues.longBreak}
-                  onChange={(e) => setInputValues(prev => ({ ...prev, longBreak: parseInt(e.target.value) || 15 }))}
+                  value={inputValues.longBreak || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setInputValues(prev => ({ 
+                      ...prev, 
+                      longBreak: value === '' ? null : parseInt(value) || null 
+                    }));
+                  }}
                   onKeyPress={(e) => handleInputKeyPress(e, 'longBreak')}
                   onBlur={(e) => handleInputBlur(e, 'longBreak')}
                   className={`w-full px-2 py-1 text-sm rounded border ${
