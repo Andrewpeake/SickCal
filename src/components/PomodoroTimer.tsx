@@ -157,199 +157,205 @@ const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
   };
 
   const getModeColor = () => {
-    switch (mode) {
-      case 'work': return 'text-red-600';
-      case 'shortBreak': return 'text-green-600';
-      case 'longBreak': return 'text-blue-600';
-      default: return 'text-gray-600';
-    }
+    return settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700';
   };
 
   const getModeBgColor = () => {
-    switch (mode) {
-      case 'work': return 'bg-red-50 border-red-200';
-      case 'shortBreak': return 'bg-green-50 border-green-200';
-      case 'longBreak': return 'bg-blue-50 border-blue-200';
-      default: return 'bg-gray-50 border-gray-200';
-    }
+    return settings.theme === 'dark' ? 'bg-[#0d1117] border-[#30363d]' : 'bg-gray-50 border-gray-200';
   };
 
   return (
-    <div className={`p-4 rounded-lg border ${getModeBgColor()} ${
-      settings.theme === 'dark' ? 'bg-opacity-20' : ''
-    }`}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+    <div className={`rounded-lg ${getModeBgColor()}`}>
+      {/* Compact Header */}
+      <div className="flex items-center justify-between p-3">
         <div className="flex items-center space-x-2">
-          <Clock className={`w-5 h-5 ${getModeColor()}`} />
-          <h3 className={`font-semibold ${getModeColor()}`}>
-            {mode === 'work' ? 'Focus Time' : 
-             mode === 'shortBreak' ? 'Short Break' : 'Long Break'}
+          <Clock className={`w-4 h-4 ${getModeColor()}`} />
+          <h3 className={`text-sm font-medium ${getModeColor()}`}>
+            {mode === 'work' ? 'Focus' : 
+             mode === 'shortBreak' ? 'Break' : 'Long Break'}
           </h3>
         </div>
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className={`p-1 rounded hover:bg-gray-100 ${
-            settings.theme === 'dark' ? 'hover:bg-[#30363d] text-[#8b949e]' : 'text-gray-500'
-          }`}
-        >
-          <Settings size={16} />
-        </button>
+        <div className="flex items-center space-x-2">
+          <span className={`text-xs ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-500'}`}>
+            {pomodoroCount}
+          </span>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className={`p-1 rounded hover:bg-gray-100 ${
+              settings.theme === 'dark' ? 'hover:bg-[#30363d] text-[#8b949e]' : 'text-gray-500'
+            }`}
+          >
+            <Settings size={14} />
+          </button>
+        </div>
       </div>
 
-      {/* Timer Display */}
-      <div className="text-center mb-6">
-        <div className={`text-4xl font-mono font-bold mb-2 ${getModeColor()}`}>
-          {formatTime(timeLeft)}
+      {/* Compact Timer Display */}
+      <div className="px-3 pb-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className={`text-2xl font-mono font-medium ${getModeColor()}`}>
+            {formatTime(timeLeft)}
+          </div>
+          <div className="flex space-x-1">
+            <button
+              onClick={isRunning ? pauseTimer : startTimer}
+              className={`p-2 rounded-lg transition-colors ${
+                isRunning
+                  ? settings.theme === 'dark' 
+                    ? 'bg-[#30363d] hover:bg-[#484f58] text-[#c9d1d9]'
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                  : settings.theme === 'dark'
+                    ? 'bg-[#1f6feb] hover:bg-[#1f6feb]/80 text-white'
+                    : 'bg-primary-600 hover:bg-primary-700 text-white'
+              }`}
+            >
+              {isRunning ? <Pause size={14} /> : <Play size={14} />}
+            </button>
+            
+            <button
+              onClick={resetTimer}
+              className={`p-2 rounded-lg transition-colors ${
+                settings.theme === 'dark'
+                  ? 'bg-[#30363d] hover:bg-[#484f58] text-[#8b949e]'
+                  : 'bg-gray-200 hover:bg-gray-300 text-gray-600'
+              }`}
+            >
+              <RotateCcw size={14} />
+            </button>
+          </div>
         </div>
         
-        {/* Progress Bar */}
-        <div className={`w-full h-2 rounded-full ${
+        {/* Compact Progress Bar */}
+        <div className={`w-full h-1 rounded-full ${
           settings.theme === 'dark' ? 'bg-[#30363d]' : 'bg-gray-200'
         }`}>
           <div
-            className={`h-2 rounded-full transition-all duration-1000 ${
-              mode === 'work' ? 'bg-red-500' :
-              mode === 'shortBreak' ? 'bg-green-500' : 'bg-blue-500'
+            className={`h-1 rounded-full transition-all duration-1000 ${
+              settings.theme === 'dark' ? 'bg-[#1f6feb]' : 'bg-primary-600'
             }`}
             style={{ width: `${getProgressPercentage()}%` }}
           />
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex items-center justify-center space-x-3 mb-4">
-        <button
-          onClick={isRunning ? pauseTimer : startTimer}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-            isRunning
-              ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-              : 'bg-green-500 hover:bg-green-600 text-white'
-          }`}
-        >
-          {isRunning ? <Pause size={16} /> : <Play size={16} />}
-          <span>{isRunning ? 'Pause' : 'Start'}</span>
-        </button>
-        
-        <button
-          onClick={resetTimer}
-          className="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium bg-gray-500 hover:bg-gray-600 text-white transition-colors"
-        >
-          <RotateCcw size={16} />
-          <span>Reset</span>
-        </button>
-      </div>
-
-      {/* Mode Selector */}
-      <div className="flex space-x-2 mb-4">
+      {/* Compact Mode Selector */}
+      <div className="flex space-x-1 px-3 pb-3">
         <button
           onClick={() => switchMode('work')}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex-1 py-1.5 px-2 rounded text-xs font-medium transition-colors ${
             mode === 'work'
-              ? 'bg-red-500 text-white'
+              ? settings.theme === 'dark'
+                ? 'bg-[#1f6feb] text-white'
+                : 'bg-primary-600 text-white'
               : settings.theme === 'dark'
-                ? 'bg-[#30363d] text-[#c9d1d9] hover:bg-[#484f58]'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-[#30363d] text-[#8b949e] hover:bg-[#484f58]'
+                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
           }`}
         >
           Work
         </button>
         <button
           onClick={() => switchMode('shortBreak')}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex-1 py-1.5 px-2 rounded text-xs font-medium transition-colors ${
             mode === 'shortBreak'
-              ? 'bg-green-500 text-white'
+              ? settings.theme === 'dark'
+                ? 'bg-[#1f6feb] text-white'
+                : 'bg-primary-600 text-white'
               : settings.theme === 'dark'
-                ? 'bg-[#30363d] text-[#c9d1d9] hover:bg-[#484f58]'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-[#30363d] text-[#8b949e] hover:bg-[#484f58]'
+                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
           }`}
         >
           Break
         </button>
         <button
           onClick={() => switchMode('longBreak')}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+          className={`flex-1 py-1.5 px-2 rounded text-xs font-medium transition-colors ${
             mode === 'longBreak'
-              ? 'bg-blue-500 text-white'
+              ? settings.theme === 'dark'
+                ? 'bg-[#1f6feb] text-white'
+                : 'bg-primary-600 text-white'
               : settings.theme === 'dark'
-                ? 'bg-[#30363d] text-[#c9d1d9] hover:bg-[#484f58]'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-[#30363d] text-[#8b949e] hover:bg-[#484f58]'
+                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
           }`}
         >
           Long
         </button>
       </div>
 
-      {/* Pomodoro Count */}
-      <div className="text-center">
-        <div className={`text-sm ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'}`}>
-          Completed: {pomodoroCount} pomodoros
-        </div>
-      </div>
-
-      {/* Settings Panel */}
+      {/* Compact Settings Panel */}
       {showSettings && (
-        <div className={`mt-4 p-4 rounded-lg border ${
-          settings.theme === 'dark' ? 'bg-[#0d1117] border-[#30363d]' : 'bg-gray-50 border-gray-200'
+        <div className={`px-3 pb-3 border-t ${
+          settings.theme === 'dark' ? 'border-[#30363d]' : 'border-gray-200'
         }`}>
-          <h4 className={`font-medium mb-3 ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-900'}`}>
-            Timer Settings
-          </h4>
-          
-          <div className="space-y-3">
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'}`}>
-                Work Duration (minutes)
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="60"
-                value={pomodoroSettings.workDuration}
-                onChange={(e) => setPomodoroSettings(prev => ({ ...prev, workDuration: parseInt(e.target.value) || 25 }))}
-                className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              />
+          <div className="pt-3 space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className={`block text-xs font-medium mb-1 ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'}`}>
+                  Work
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="60"
+                  value={pomodoroSettings.workDuration}
+                  onChange={(e) => setPomodoroSettings(prev => ({ ...prev, workDuration: parseInt(e.target.value) || 25 }))}
+                  className={`w-full px-2 py-1 text-sm rounded border ${
+                    settings.theme === 'dark' 
+                      ? 'bg-[#0d1117] border-[#30363d] text-[#c9d1d9]' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                />
+              </div>
+              
+              <div>
+                <label className={`block text-xs font-medium mb-1 ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'}`}>
+                  Short
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={pomodoroSettings.shortBreak}
+                  onChange={(e) => setPomodoroSettings(prev => ({ ...prev, shortBreak: parseInt(e.target.value) || 5 }))}
+                  className={`w-full px-2 py-1 text-sm rounded border ${
+                    settings.theme === 'dark' 
+                      ? 'bg-[#0d1117] border-[#30363d] text-[#c9d1d9]' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                />
+              </div>
+              
+              <div>
+                <label className={`block text-xs font-medium mb-1 ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'}`}>
+                  Long
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="60"
+                  value={pomodoroSettings.longBreak}
+                  onChange={(e) => setPomodoroSettings(prev => ({ ...prev, longBreak: parseInt(e.target.value) || 15 }))}
+                  className={`w-full px-2 py-1 text-sm rounded border ${
+                    settings.theme === 'dark' 
+                      ? 'bg-[#0d1117] border-[#30363d] text-[#c9d1d9]' 
+                      : 'bg-white border-gray-300 text-gray-900'
+                  }`}
+                />
+              </div>
             </div>
             
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'}`}>
-                Short Break (minutes)
+            <div className="flex items-center justify-between">
+              <label className={`text-xs ${settings.theme === 'dark' ? 'text-[#8b949e]' : 'text-gray-600'}`}>
+                Sound
               </label>
-              <input
-                type="number"
-                min="1"
-                max="30"
-                value={pomodoroSettings.shortBreak}
-                onChange={(e) => setPomodoroSettings(prev => ({ ...prev, shortBreak: parseInt(e.target.value) || 5 }))}
-                className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-medium mb-1 ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'}`}>
-                Long Break (minutes)
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="60"
-                value={pomodoroSettings.longBreak}
-                onChange={(e) => setPomodoroSettings(prev => ({ ...prev, longBreak: parseInt(e.target.value) || 15 }))}
-                className={`input-field ${settings.theme === 'dark' ? 'dark-theme-input' : ''}`}
-              />
-            </div>
-            
-            <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                id="soundEnabled"
                 checked={pomodoroSettings.soundEnabled}
                 onChange={(e) => setPomodoroSettings(prev => ({ ...prev, soundEnabled: e.target.checked }))}
                 className="rounded"
               />
-              <label htmlFor="soundEnabled" className={`text-sm ${settings.theme === 'dark' ? 'text-[#c9d1d9]' : 'text-gray-700'}`}>
-                Enable sound notifications
-              </label>
             </div>
           </div>
         </div>
